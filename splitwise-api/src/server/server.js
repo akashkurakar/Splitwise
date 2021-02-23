@@ -1,6 +1,5 @@
 'use strict'
 var cors = require('cors');
-const connection = require('./dbFeed');
 
 const express = require('express');
 

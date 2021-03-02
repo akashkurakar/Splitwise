@@ -1,7 +1,8 @@
 import React from 'react';
-    import axios from 'axios';
-    import Footer from "../footer"
-    import Header from "../header"
+import Footer from "../footer";
+import {connect} from "react-redux";
+import * as userActions from "../redux/actions/userAction"
+import Header from "../header"
 class SignUp extends React.Component {
 
     constructor(props) {
@@ -9,7 +10,8 @@ class SignUp extends React.Component {
         this.state = {
             name: "",
             email: "",
-            password: ""
+            password: "",
+            user:""
         }
     }
       
@@ -39,36 +41,19 @@ class SignUp extends React.Component {
             email: this.state.email,
             password: this.state.password
         }
-        //set the with credentials to true
-        axios.defaults.withCredentials = true;
-        //make a post request with the user data
-        axios.post('http://localhost:3001/api/signup', data)
-            .then(response => {
-                console.log("Status Code : ", response.status);
-                if (response.status === 200) {
-                    if (response.data === "Successful Login") {
-                        this.setState({
-                            authFlag: true,
-                        })
-                    }
-                    else if (response.data === "Invalid Credentials!") {
-                        this.setState({
-                            authFlag: false,
-                            errorMessage: true
-                        })
-                    }
-                }
-            });
+        this.props.signupUser(data);
+       
     }
 
     render() {
         const { errorMessage } = this.state;
         return (
             <>   <Header/>
-                <div className="container">
+                <div className="container"  style={{margin:'5%'}}>
                     <div className="row">
-                        <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
-                            <div className="card card-signin my-5">
+                    <div className="col-4">
+                </div>
+                            <div className="col-6">
                                 <div id="card-body" className="card-body">
                                     <h5 className="card-title text-center">Hi there! Sign me up!</h5>
                                     <form className="form-signin" onSubmit={this.handleSignUp}>
@@ -90,13 +75,21 @@ class SignUp extends React.Component {
                                     </form>
                                 </div>
                             </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                   
                 <Footer />
             </>
         );
     }
 }
+const mapStatetoProps=(state)=>{
+    return {
+     user : state.user
+    }
+ }
+ const mapDispatchToProps ={
+    signupUser : userActions.signupUser
+ }
 
-export default SignUp;
+export default connect(mapStatetoProps,mapDispatchToProps)(SignUp);

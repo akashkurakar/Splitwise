@@ -1,25 +1,39 @@
     import React from "react";
-    import UserHeader from "../Dashboard/userheader"
-    import Footer from "../../footer"
-    import axios from "axios";
-    import cookie from 'react-cookies';
-
+    import {connect} from "react-redux";
+    import UserHeader from "../Dashboard/UserHeader" 
+    import * as userActions from "../../redux/actions/userAction";
     class UserProfile extends React.Component {
-        constructor(){
-            super();
+        constructor(props){
+            super(props);
             this.state={
                 name:"",
                 email:"",
                 phone:"",
                 default_currency:"",
-                language:"",
+                lang:"",
                 timezone:"",
+                image_path:"",
+                username:"",
+                user:this.props.user,
                 errorMessage:false
-
             }
         }
-        componentDidMount(){
-            let userId =cookie.load('cookie');
+       
+       componentDidMount(){
+           this.setState({
+            name:this.props.user.name,
+            email:this.props.user.email,
+            phone:this.props.user.phone,
+            default_currency:this.props.user.default_currency,
+            lang:this.props.user.lang,
+            timezone:this.props.user.timezone,
+            image_path:this.props.user.image_path,
+            username:this.props.user.username
+           })
+       
+       }
+       
+           /* let userId =cookie.load('cookie');
             axios.defaults.withCredentials = true;
             //make a post request with the user data
              axios.get(`http://localhost:3001/api/user?id=${userId}`)
@@ -40,8 +54,8 @@
                     }else{
 
                     }
-                });
-        }
+                });*/
+        
         nameChangeHandler = (e) => {
             this.setState({
                 name : e.target.value
@@ -62,17 +76,17 @@
 
         nameFieldChangeHandler=(e)=>{
             e.preventDefault();
-            document.getElementById('name').disabled=false;
+            document.getElementById('name').disabled= !document.getElementById('name').disabled;
         }
 
         emailFieldChangeHandler=(e)=>{
             e.preventDefault();
-            document.getElementById('email').disabled=false;
+            document.getElementById('email').disabled=!document.getElementById('name').disabled;
         }
 
         phoneFieldChangeHandler=(e)=>{
             e.preventDefault();
-            document.getElementById('phone').disabled=false;
+            document.getElementById('phone').disabled=!document.getElementById('name').disabled;
         }
         handleCurrencySelect=(e)=>{
             console.log("Inside currency")
@@ -97,34 +111,16 @@
                 email:this.state.email,
                 phone:this.state.phone,
                 default_currency:this.state.default_currency,
-                language:this.state.language,
-                timezone:this.state.timezone
+                lang:this.state.language,
+                timezone:this.state.timezone,
+                image_path:this.props.user.image_path,
+                username:this.props.user.username
             }
-            axios.defaults.withCredentials = true;
-            //make a post request with the user data
-             axios.post(`http://localhost:3001/api/user/update`,data)
-                .then(response => {
-                    console.log("Status Code : ", response.status);
-                    if (response.status === 200) {
-                        const data = response.data;
-                        console.log(data)
-                            this.setState({
-                                name:data.name,
-                                email:data.email,
-                                phone:data.phone,
-                                default_currency:data.default_currency,
-                                language:data.lang,
-                                timezone:data.timezone
-                            })
-                      
-                    }else{
-
-                    }
-                });
+            this.props.updateUserProfile(data);
         }
         render() {
             return (<>
-            <UserHeader/>
+           <UserHeader/>
                 <div>
                     <div className="container">
                         <div className="row">
@@ -182,7 +178,7 @@
                                     </div>
                                     <div className="form-label-group">
                                         <label for="sel1">Language</label>
-                                            <select onChange={this.handleLanguageSelect} value={this.state.language} class="form-control" id="sel2">
+                                            <select onChange={this.handleLanguageSelect} value={this.state.lang} class="form-control" id="sel2">
                                                 <option value="ENGLISH">English</option>
                                                 <option value="CHINESE">Mandarin Chinese</option>
                                                 <option value="HINDI">Hindi</option>
@@ -191,7 +187,7 @@
                                             </select>
                                     </div>
                                     <div>
-                                        <button class="btn btn-lg btn-success btn-block text-uppercase" type="submit" id="location">Save</button>
+                                        <button class="btn btn-lg btn-success btn-block text-uppercase" type="submit" id="location" style={{float:'left','background-color':'#ff652f'}}>Save</button>
                                     </div>
 
                                 </form>
@@ -199,8 +195,16 @@
                         </div>
                     </div>
                 </div>
-                <Footer/>
+               
             </>)
         }
     }
-    export default UserProfile;
+    const mapStatetoProps=(state)=>{
+        return {
+            user : state.user
+        }
+     }
+     const mapDispatchToProps ={
+        updateUserProfile : userActions.updateUserProfile,
+    }
+    export default connect(mapStatetoProps,mapDispatchToProps)(UserProfile);

@@ -1,6 +1,8 @@
 'use strict'
 var cors = require('cors');
 
+const con = require('./db/db')
+
 const express = require('express');
 
 const app = express();
@@ -28,3 +30,10 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
+con.connect( err => {
+  if (err) {
+    console.log(`Failed to connect to the database. ${err.stack}`);
+  }
+});
+
+con.on('error', err => console.log(err.stack));

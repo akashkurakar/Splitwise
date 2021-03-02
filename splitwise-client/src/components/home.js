@@ -1,13 +1,11 @@
 import React from 'react';
-
-
-import Footer from "../footer"
 import Header from "../header"
-class Home extends React.Component{
 
+class Home extends React.Component{
     render(){
-    return( <><Header/>
-    <div className="container mw-100">
+    return( <>
+    <Header/>
+    <div maxWidth="xl" id="home">
     <div className="row">
         <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
             <div className="card card-signin my-5">
@@ -23,7 +21,7 @@ class Home extends React.Component{
         </div>
     </div>
 </div>
-<Footer />
+
 </>
     );
 }

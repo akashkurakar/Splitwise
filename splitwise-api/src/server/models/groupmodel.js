@@ -8,10 +8,7 @@ groups.add = async (group) => {
         var name = group.grp_name;
         var createdBy = group.user;
         var updatedBy = group.user;
-        con.connect(function (err) {
-            if (err) {
-                return err;
-            }
+       
             con.query('USE main;');
             var sql = `INSERT INTO grps (grp_name, created_by, updated_by) VALUES ('${name}','${createdBy}','${updatedBy}')`;
             con.query(sql, function (error, result, fields) {
@@ -21,18 +18,14 @@ groups.add = async (group) => {
                 return resolve(result)
 
             });
-            con.end()
         })
-    });
+   
 }
 groups.find = async (group) => {
     return new Promise((resolve, reject) => {
-        con.connect(function (err) {
-            if (err) {
-                return err;
-            }
+       
             con.query('USE main;');
-            var findQuery = `select * from grps where grp_name='${group.grp_name}'`;
+            var findQuery = `select * from participants where user_name='${group.grp_name}'`;
             con.query(findQuery, function (error, result, fields) {
                 if (error) {
                     return reject(error);
@@ -41,6 +34,21 @@ groups.find = async (group) => {
 
             });
         })
-    });
+   
+}
+groups.approveRequest = async (invite) => {
+    return new Promise((resolve, reject) => {
+       
+            con.query('USE main;');
+            var findQuery = `UPDATE participants set status='active' where user_name='${invite.user}' and grp_name=${invite.grp_id};`;
+            con.query(findQuery, function (error, result, fields) {
+                if (error) {
+                    return reject(error);
+                }
+                return resolve(result)
+
+            });
+        })
+   
 }
 module.exports = groups;

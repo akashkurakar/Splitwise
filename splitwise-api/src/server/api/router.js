@@ -3,81 +3,54 @@
 
 const express = require('express');
 
-const UserService = require('../services/userService');
-
-const GroupService = require('../services/groupService');
-
 const bodyParser = require('body-parser');
 
 var jsonParser = bodyParser.json();
 
 var router = express.Router();
 
-let userService = new UserService();
+const GroupController = require('../controller/groupcontroller');
 
-let groupService = new GroupService();
+const UserController = require('../controller/usercontroller');
 
-router.post('/login', jsonParser, async (req, res) => {
-    const userObj = req.body;
-    try{
-        let result = await userService.Login(userObj);
-        res.cookie('cookie',userObj.email,{maxAge: 900000, httpOnly: false, path : '/'});
-        res.json(result);
-    }catch(e){
-        console.log(e);
-        res.sendStatus(500);
+const InvitationController = require('../controller/invitationcontroller');
 
-    }
+const TransactionController = require('../controller/transactioncontroller');
 
-});
+const ParticipantController = require('../controller/participantcontroller');
 
-router.post('/signup', jsonParser, async (req, res) => {
-    const userObj = req.body;
-    try{
-        let result = await userService.SignUp(userObj);
-        res.json(result);
-    }catch(e){
-        console.log(e);
-        res.sendStatus(500);
+router.post('/login', jsonParser, UserController.login);
 
-    }
-    });
+router.post('/signup', jsonParser, UserController.signup);
 
-    router.post('/user/update', jsonParser, async (req, res) => {
-        const userObj = req.body;
-        try{
-            let result = await userService.update(userObj);
-            res.json(result);
-        }catch(e){
-            console.log(e);
-            res.sendStatus(500);
+router.post('/user/update', jsonParser,UserController.update);
     
-        }
-        });
-    
+router.get('/user/',UserController.userByEmail);
 
-    router.get('/user/', async (req, res) => {
-        const user = req.query;
-        try{
-            let result = await userService.getUser(user.id);
-            res.json(result);
-        }catch(e){
-            console.log(e);
-            res.sendStatus(500);
-        }
-    
-    });
-    router.post('/group/create', jsonParser, async (req, res) => {
-        const groupObj = req.body;
-        try{
-            let result = await groupService.createGroup(groupObj);
-            res.json(result);
-        }catch(e){
-            console.log(e);
-            res.sendStatus(500);
-        }
-    
-    });
-    
+router.get('/users/',UserController.user);
+
+router.post('/group/create', jsonParser, GroupController.createGroup);
+
+router.get('/groups/', jsonParser, GroupController.getGroups);
+
+router.post('/groups/request', jsonParser, GroupController.approveGroupRequest);
+
+router.post('/notify/send', jsonParser, InvitationController.sendInvitation);
+
+router.get('/notify/', jsonParser, InvitationController.sendInvitation);
+
+router.get('/notifications/', jsonParser, InvitationController.getInvitationList);
+
+router.get('/transactions/', jsonParser, TransactionController.getTransaction);
+
+router.get('/balances/', jsonParser, TransactionController.getBalances);
+
+router.post('/transactions', jsonParser, TransactionController.addTransaction);
+
+router.get('/transactions/data', jsonParser, TransactionController.getTotalPaidOwedTransactions);
+
+router.get('/participants', jsonParser, ParticipantController.getParticipant);
+
+
 module.exports = router;
-
+    

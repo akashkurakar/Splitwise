@@ -37,8 +37,8 @@
      Login=async(user)=>{
         try{
             let search = await db.find(user);
-            if(search[0].email==user.email && search[0].password==user.password){
-                return "Valid credentials";
+                if(search[0].email==user.email && search[0].password==user.password){
+                return search[0];
             }else{
                 return "Invalid credentials";
             }
@@ -48,6 +48,20 @@
         }
     }
     getUser=async(user)=>{
+        try{
+            let search = await db.findAll(user);
+            if(search.length==0){
+                return "Something went wrong";
+            }else{
+                return search[0];
+                
+            }
+            
+        }catch(e){
+            console.log(e);
+        }
+    }
+    getUserByEmail=async(user)=>{
         try{
             let search = await db.findByEmail(user);
             if(search.length==0){
@@ -61,7 +75,23 @@
             console.log(e);
         }
     }
+    getUsers =async()=>{
+        try{
+            let search = await db.findAll();
+            if(search.length==0){
+                return "Something went wrong";
+            }else{
+                return search;
+                
+            }
+            
+        }catch(e){
+            return e;
+        }
+    }
 }
+
+
 
 
 

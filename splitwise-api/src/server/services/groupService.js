@@ -15,6 +15,25 @@ class GroupService{
                console.log(e);
            }
    }
+   getGroups =async(user)=>{
+    try{
+        let search = await grpDb.find(user);
+            return search;
+       
+    }catch(e){
+        console.log(e);
+    }
+}
+
+approveGroupRequest =async(invite)=>{
+    try{
+        let search = await grpDb.approveRequest(invite);
+            return search;
+       
+    }catch(e){
+        console.log(e);
+    }
+}
 }
 
 module.exports = GroupService;

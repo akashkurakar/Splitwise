@@ -1,92 +1,110 @@
 import React from 'react';
-import axios from 'axios';
-import { Redirect } from 'react-router';
-import Footer from "../footer"
 import Header from "../header"
-class Login extends React.Component{
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import PropTypes from 'prop-types'; 
+import * as userActions from "../redux/actions/userAction";
+import {connect} from "react-redux";
+class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: "",
-            password: "",
-            authFlag:false
+                email: "",
+                password: "",
+                user:"",
+                alert:""
         }
     }
-    
+ 
+ 
     emailChangeHandler = (e) => {
+        e.preventDefault();
         this.setState({
-            email : e.target.value
+           
+            email: e.target.value,
         })
     }
     //password change handler to update state variable with the text entered by the user
     passwordChangeHandler = (e) => {
+        e.preventDefault();
         this.setState({
-            password : e.target.value
+            
+            password: e.target.value
+            
         })
     }
     
-    handleLogin = (e)=>{
+    handleLogin = (e) => {
         e.preventDefault();
-        const data = {
-            email: this.state.email,
-            password: this.state.password
-        }
-        console.log(data);
-        //set the with credentials to true
-        axios.defaults.withCredentials = true;
-        //make a post request with the user data
-        axios.post('http://localhost:3001/api/login', data)
-            .then(response => {
-                console.log("Status Code : ", response.status);
-                if (response.status === 200) {
-                    if (response.data === "Valid credentials") {
-                        this.setState({
-                            authFlag: true,
-                        })
-
-                    }
-                    else if (response.data === "Invalid credentials") {
-                        this.setState({
-                            authFlag: false,
-                            errorMessage: true
-                        })
-                    }
-                }
-            });
+       const data= {
+           email:this.state.email,
+           password:this.state.password
+       }
+       this.props.loginUser(data);
+      
+        
     }
-render() {
-    const { errorMessage } = this.state;
-    const{authFlag} = this.state;
-    return (
-        <>
-          <Header/>
-            <div className="container">
-                <div className="row">
-                    <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
-                        <div className="card card-signin my-5">
-                            <div id="card-body" className="card-body">
-                                <h5 className="card-title text-center">Please login!</h5>
-                                <form className="form-signin" onSubmit={this.handleLogin}>
-                                    {errorMessage && <p>User already present! Please sign in</p>}
-                                    <div className="form-label-group">
-                                        <label for="email">Email</label>
-                                        <input type="email" id="email" onChange={this.emailChangeHandler} className="form-control" placeholder="email" required />
-                                    </div>
-                                    <label for="address">Password</label>
+    render() {
+        const classes = makeStyles((theme) => ({
+            margin: {
+                margin: theme.spacing(1),
+            },
+            extendedIcon: {
+                marginRight: theme.spacing(1),
+            },
+        }));
+    
+        return (
+            <>
+  <Header />
+                <Container>
+                    <Row>
+                        <Col md={3}>
+                        </Col>
+                        <Col md={3}>
+                            <img src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg" width="200" height="200" className="img-fluid" alt="" />
+                        </Col>
+                        <Col md={3}>
+                            <h5 className="card-title text-center" style={{ 'font-size': '16px', color: '#999' }}>WELCOME TO SPLITWISE</h5>
+                            <form className="form-signin" onSubmit={this.handleLogin}>
+                                {this.state.alert.message!=={} && <p>Invalid Credentials</p>}
+                                <div className="clearfix">
+                                    <label for="email" style={{fontSize:'18px'}}>Email Address</label>
+                                    <input type="email" id="email" onChange={this.emailChangeHandler} className="form-control" placeholder="email" required />
+                                </div>
+                                <div className="clearfix">
+                                    <label for="address" style={{fontSize:'18px'}}>Password</label>
                                     <input type="password" id="password" onChange={this.passwordChangeHandler} className="form-control" placeholder="Password" required />
-                                    <div>
-                                        <button class="btn btn-lg btn-success btn-block text-uppercase" type="submit" id="location">Sign me up!</button>
-                                    </div>
-                                    {authFlag && <Redirect to="/dashboard" />}
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <Footer />
-        </>
-    );
+                                </div>
+                                <div class="clearfix">
+                                    <Button size="medium" className={classes.margin} type="submit" style={{ float: 'left', 'background-color': '#ff652f',color:'white',width:'90px','font-size':'18px',margin:'10px 0px 0px 0px' }}>
+                                        Login
+        </Button></div>
+                               
+                            </form>
+                        </Col>
+                    </Row>
+                </Container>
+            </>
+        );
+    }
 }
+
+Login.propTypes ={
+    actions:PropTypes.object.isRequired
 }
-export default Login;
+
+const mapStatetoProps=(state)=>{
+   return {
+    user : state.user,
+   alert:state.alert
+   }
+}
+const mapDispatchToProps ={
+    loginUser : userActions.loginUser
+}
+
+export default connect(mapStatetoProps,mapDispatchToProps)(Login);

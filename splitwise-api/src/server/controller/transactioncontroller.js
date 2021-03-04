@@ -5,10 +5,10 @@ let transactionService = new TransactionService();
 
 exports.getTransaction=async(req,res)=>{
     let user = req.query.user;
-    let groupName = req.query.groupName;
+    let groupName = req.query.id;
     try{
         let result="";
-        if(user!==null){
+        if(user!==undefined){
              result = await transactionService.getTransactionByUser(user);
         }else{
             result = await transactionService.getTransactionByGroup(groupName);
@@ -68,7 +68,20 @@ exports.getTotalPaidOwedTransactions=async(req,res)=>{
        
     }catch(e){
         console.log(e);
-        res.sendStatus(500);
+        res.sendStatus(403);
+    }
+    res.end();
+}
+
+exports.transactionSettle=async(req,res)=>{
+    const transaction = req.body;
+    try{
+        let result =  await transactionService.transactionSettle(transaction);
+        res.json(result);
+       
+    }catch(e){
+        console.log(e);
+        res.sendStatus(403);
     }
     res.end();
 }

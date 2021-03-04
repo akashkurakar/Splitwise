@@ -15,8 +15,10 @@
                 image_path:"",
                 username:"",
                 user:this.props.user,
+                alert:this.props.alert,
                 errorMessage:false
             }
+            
         }
        
        componentDidMount(){
@@ -123,7 +125,10 @@
            <UserHeader/>
                 <div>
                     <div className="container">
+                    {this.props.alert.message!=="" && ( <div class="alert alert-success" role="alert">{this.props.alert.message}</div>)}
+                                { (this.props.alert.message && this.props.alert.message.response!==undefined) ? ( <div class="alert alert-danger" role="alert">{this.props.alert.message.response.data.message}</div>):null}
                         <div className="row">
+                        
                             <div className="col-3">
                                 <img src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg" width="150" height="150" className="img-fluid" alt="" />
                                 <div>
@@ -133,7 +138,7 @@
 
                             <div className="col-3">
                                 <form className="form-signin" onSubmit={this.handleLogin}>
-
+                               
                                     <div className="form-label-group">
                                         <label for="name">Your Name</label>
                                         <input type="name" id="name" onChange={this.nameChangeHandler} className="form-control" placeholder="Name" value={this.state.name} required disabled />
@@ -201,7 +206,8 @@
     }
     const mapStatetoProps=(state)=>{
         return {
-            user : state.user
+            user : state.user,
+            alert:state.alert
         }
      }
      const mapDispatchToProps ={

@@ -1,8 +1,7 @@
 import React from "react";
 import cookie from 'react-cookies';
 import Container from '@material-ui/core/Container';
-import {Link} from "react-router-dom";
-import Dropdown from 'react-bootstrap/Dropdown'
+import { Typography } from "@material-ui/core";
 class Header extends React.Component {
     isLoggedIn() {
         return cookie.load('cookie')!== null;
@@ -25,7 +24,9 @@ class Header extends React.Component {
                                         Login
         </a>
                     </div>
-                   <label> or </label>
+                    <div style={{padding:"10px"}}>
+                   <Typography><h4>or</h4> </Typography>
+                   </div>
                     <div>
                     <a size="medium" href="/signup" className="nav-link btn-orange" type="submit">
                                         Sign Up

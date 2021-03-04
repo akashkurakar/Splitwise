@@ -1,10 +1,11 @@
 import React from 'react';
-import photo from "../../static/images/avatar/download.png";
+import photo from '../../static/images/avatar/download.png';
 import AssistantPhotoIcon from '@material-ui/icons/AssistantPhoto';
 import ListOutlinedIcon from '@material-ui/icons/ListOutlined';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
+import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 
 class LeftSideBar extends React.Component {
 
@@ -83,7 +84,7 @@ class LeftSideBar extends React.Component {
                         <div class="dropdown-divider"></div>
                      
                         <li className="active">
-                        <GroupWorkIcon/>    
+                        <NotificationImportantIcon/>    
                             <a href="/#" data-toggle="collapse" aria-expanded="false" onClick={this.loadAllNotifications}>Notifications</a>
                         </li>
                         <div class="dropdown-divider"></div>
@@ -106,10 +107,11 @@ class LeftSideBar extends React.Component {
                                 <SupervisedUserCircleIcon color="primary"/>
                                     <label onClick={()=>this.handleGroupClick(index)} >{r.grp_name}</label>
                                 </div>
+                                <div class="dropdown-divider"></div>
                             </li>
+                            
                         ))}
 
-                        <div class="dropdown-divider"></div>
                      
                         <li className="active">
                         <GroupWorkIcon/>    

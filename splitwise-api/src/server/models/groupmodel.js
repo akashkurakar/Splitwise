@@ -21,11 +21,26 @@ groups.add = async (group) => {
         })
    
 }
-groups.find = async (group) => {
+groups.findAll = async (user) => {
     return new Promise((resolve, reject) => {
        
             con.query('USE main;');
-            var findQuery = `select * from participants where user_name='${group.grp_name}'`;
+            var findQuery = `select * from participants where user_name='${user.user}'`;
+            con.query(findQuery, function (error, result, fields) {
+                if (error) {
+                    return reject(error);
+                }
+                return resolve(result)
+
+            });
+        })
+   
+}
+groups.find = async (user) => {
+    return new Promise((resolve, reject) => {
+       
+            con.query('USE main;');
+            var findQuery = `select * from participants where user_name='${user.id}' AND status='active'`;
             con.query(findQuery, function (error, result, fields) {
                 if (error) {
                     return reject(error);
@@ -40,7 +55,7 @@ groups.approveRequest = async (invite) => {
     return new Promise((resolve, reject) => {
        
             con.query('USE main;');
-            var findQuery = `UPDATE participants set status='active' where user_name='${invite.user}' and grp_name=${invite.grp_id};`;
+            var findQuery = `UPDATE participants set status='active' where user_name='${invite.user}' and grp_name='${invite.grp_id}';`;
             con.query(findQuery, function (error, result, fields) {
                 if (error) {
                     return reject(error);

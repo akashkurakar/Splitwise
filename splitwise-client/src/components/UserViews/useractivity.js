@@ -8,8 +8,36 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import cookie from 'react-cookies';
 import Row from 'react-bootstrap/Row';
+import axios from "axios";
+
+import {connect} from "react-redux";
 class UserActivity extends React.Component {
+    constructor(props){
+        super(props);
+        this.state={
+            transactions:[]
+        }
+    }
+    componentDidMount(){
+        this.getTransactionByUser();
+    }
+    getTransactionByUser=()=>{
+        let userId = this.props.user.name;
+        axios.defaults.withCredentials = true;
+        axios.get(`http://localhost:3001/api/transactions/?user=${userId}`)
+            .then(response => {
+                console.log("Status Code : ", response.status);
+                if (response.status === 200) {
+                    const data = response.data;
+                    console.log(data)
+                    this.setState({
+                        transactions: data
+                    })
+                } else {
     
+                }
+            });
+    }
     render() {
         let userId = cookie.load('cookie');
         const classes = makeStyles((theme) => ({
@@ -23,7 +51,6 @@ class UserActivity extends React.Component {
             <>
 
                 <Row>
-
                     <div style={{ "background-color": "#eeeeee", width: "100%" }} className="card">
                         <div className="card-body">
                             <table style={{ width: "100%" }}>
@@ -39,7 +66,7 @@ class UserActivity extends React.Component {
                 <Row>
 
                     <List dense className={classes.root}>
-                        {this.props.transactions.length > 0 ? this.props.transactions.filter(transaction => transaction.owed_name === userId && transaction.paid_by !== userId).map(trans => (
+                        {this.state.transactions.length > 0 ? this.state.transactions.filter(transaction => transaction.owed_name === userId && transaction.paid_by !== userId).map(trans => (
                             <ListItem button>
                                 <ListItemAvatar>
                                     <Avatar
@@ -63,4 +90,9 @@ class UserActivity extends React.Component {
             </>)
     }
 }
-export default UserActivity
+const mapStatetoProps=(state)=>{
+    return {
+     user : state.user
+    }
+ }
+export default  connect(mapStatetoProps)(UserActivity)

@@ -30,7 +30,8 @@ class InvitationModel {
         return new Promise((resolve, reject) => {
            
                 con.query('USE main;');
-                var sql = `select * from grps inner join notifications n on grps.grp_id = n.grp_id where invited_to='${user.user}'`;
+                var sql = `select * from participants inner join grps on participants.grp_name=grps.grp_name where participants.user_name='${user.user}' AND participants.status='PENDING'`
+                //`select * from pa inner join notifications n on grps.grp_id = n.grp_id where invited_to='${user.user}' AND status=""`;
                 con.query(sql, function (error, result, fields) {
                     if (error) {
                         return reject(error);

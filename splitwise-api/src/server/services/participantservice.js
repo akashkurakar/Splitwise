@@ -1,9 +1,9 @@
 
 const participantDb = require('../models/participantmodel')
 class Participants{
-    addParticipant=async(grpName,user)=>{
+    addParticipant=async(grpName,user,owner)=>{
         try{
-            let participant = await participantDb.addParticipant(user,grpName);
+            let participant = await participantDb.addParticipant(user,grpName,owner);
               return participant;   
           }catch(e){
               console.log(e);

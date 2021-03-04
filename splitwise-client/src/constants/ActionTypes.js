@@ -1,3 +1,5 @@
-export const userConstants = {
-    ADD_USER: 'ADD_USER'
+const userConstants = {
+  ADD_USER: 'ADD_USER',
 };
+
+export default userConstants;

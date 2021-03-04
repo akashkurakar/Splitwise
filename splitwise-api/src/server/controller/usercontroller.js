@@ -11,8 +11,10 @@ exports.login = async (req, res) => {
             var json = {data:result,message:"Login Successfull"};
             res.json(json);
         }else{
-            res.status(403);
-            res.json( {data:[],message:"Invalid Credentials"});
+            res.status(400).send({
+                "message":"Invalid Credentials!"
+            });
+           
         }
        
 
@@ -27,8 +29,15 @@ exports.signup = async (req, res) => {
     const userObj = req.body;
     try {
         let result = await userService.SignUp(userObj);
-        res.json(result);
-
+        if(result==='User already present'){
+            res.status(400).send({
+                "message":"User already Present! Please Login!"
+            });
+        }else{
+            var json = {data:result,message:"Signup Successfull"};
+            res.json(json);
+        }
+        
     } catch (e) {
         console.log(e);
         res.sendStatus(500);
@@ -41,7 +50,15 @@ exports.update = async (req, res) => {
     const userObj = req.body;
     try {
         let result = await userService.update(userObj);
-        res.json(result);
+        if(result==="User updation failed"){
+            res.status(400).send({
+                "message":"User updation failed"
+            });
+        }else{
+            var json = {data:result,message:"Update Successfull"};
+            res.json(json);
+        }
+        
 
     } catch (e) {
         console.log(e);
@@ -85,7 +102,9 @@ exports.getUser = async (req, res) => {
 
     } catch (e) {
         console.log(e);
-        res.sendStatus(500);
+        res.send(400).send({
+            "message":"Something went wrong!"
+        });
     }
     res.end();
 }

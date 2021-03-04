@@ -8,7 +8,8 @@ var moment = require('moment');
         return new Promise((resolve, reject) => {
            
                 con.query('USE main;');
-                var sql = `Select sum(amount) from transactions where grp_name='${grpName.id}' group by tran_name`;
+                con.query("SET sql_mode = ''");
+                var sql = `Select * from transactions where grp_name='${grpName}' group by created_on`;
                 con.query(sql, function (error, result, fields) {
                     if (error) {
                         return reject(error);
@@ -108,6 +109,20 @@ var moment = require('moment');
                 });
                 
             })
+    }
+    transaction.transactionSettle=(transaction)=>{
+        return new Promise((resolve, reject) => {
+           
+            con.query('USE main;');
+            var sql = `update transactions set status="settled" where (paid_by="${transaction.user1}" and owed_name="${transaction.user2}") OR (paid_by="${transaction.user2}" and owed_name="${transaction.user1}")`;
+            con.query(sql, function (error, result, fields) {
+                if (error) {
+                    return reject(error);
+                }
+                return resolve(result)
+
+            });
+        })
     }
 
 module.exports = transaction;

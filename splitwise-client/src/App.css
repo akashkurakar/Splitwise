@@ -32,6 +32,16 @@ background: #ff652f;
       border: 1px solid #cccccc;
       border-radius: 4px;
   }
+  .button-green-submit{
+    background: #5bc5a7;
+    color: #fff;
+    text-shadow: 0 -1px 0 #318970;
+
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size:'15px';
+   margin: 10px;
+  }
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -41,6 +51,9 @@ background: #ff652f;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+.home-logo{
+  margin:65px
 }
 .header-user,.btn-primary:hover ,.show>.btn-primary.dropdown-toggle {
   color: #fff;

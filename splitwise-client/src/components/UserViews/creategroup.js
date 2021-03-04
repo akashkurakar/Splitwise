@@ -68,9 +68,9 @@ class CreateGroup extends React.Component {
             users: this.state.members
         }
         console.log(data)
-        //set the with credentials to true
+       
         axios.defaults.withCredentials = true;
-        //make a post request with the user data
+        
         axios.post('http://localhost:3001/api/group/create', data)
             .then(response => {
                 console.log("Status Code : ", response.status);

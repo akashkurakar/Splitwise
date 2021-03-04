@@ -1,13 +1,61 @@
 import React from "react";
 import { makeStyles } from '@material-ui/core/styles';
+import {connect} from "react-redux";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ImageIcon from '@material-ui/icons/Image';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import SelectGroup from "./SelectGroup";
+import axios from "axios";
+import Button from 'react-bootstrap/Button';
+
 class UserGroups extends React.Component{
- 
+  constructor(props){
+    super(props);
+    this.state={
+      selectedGroup:"",
+      navigate:false,
+      groups:[]
+    }
+  }
+  handleSelectedGroup = (e) => {
+    //e.preventDefault();
+    console.log(e);
+    this.setState({
+      selectedGroup:e,
+      navigate:true,
+      user:"",
+      alert:""
+    })
+
+  }
+  componentDidMount(){
+    this.getAllGroups();
+  }
+  getAllGroups=()=>{
+    const userId = this.props.user.name;
+    axios.defaults.withCredentials = true;
+
+    axios.get(`http://localhost:3001/api/groups/all?user=${userId}`)
+        .then(response => {
+
+            if (response.status === 200) {
+                const data = response.data;
+                console.log(data)
+                this.setState({
+                    groups: data
+                })
+            } else {
+
+            }
+        });
+  }
     render(){
         const classes=makeStyles((theme) => ({
             root: {
@@ -24,33 +72,62 @@ class UserGroups extends React.Component{
             <table style={{width:"100%"}}>
                 <tr>
                     <td style={{width:"50%"}}>
-                        <h5>All Groups</h5>
+                        <h2>All Groups</h2>
                         </td>
                         
                 </tr>
             </table>
         </div>
+        
     </div>
     </div>
-    <div className="row">
-    <List component="nav" className={classes.root} style={{width:"100%" }}>
-    {this.props.groups.length>0?this.props.groups.map((r) => ( <ListItem>
-        <ListItemAvatar>
+   <Row>
+
+<Col md={12}>   <Autocomplete
+        freeSolo
+        id="free-solo-2-demo"
+        disableClearable
+        options={this.state.groups.map((option) => option.grp_name)}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Search Group"
+            margin="normal"
+           
+            InputProps={{ ...params.InputProps, type: 'search' }}
+          />
+        )}
+      /></Col>
+   </Row>
+    <Row>
+    <Col md={12}>
+    <List dense className={classes.root}>
+    {this.state.groups.length>0?this.state.groups.map((r) => (
+      <ListItem button  onClick={(event) => this.handleSelectedGroup(r.grp_name)}>
+      <ListItemAvatar>
           <Avatar>
             <ImageIcon />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary={r.grp_name} secondary="" />
+        <ListItemText primary={r.grp_name} secondary="Created by"   />
+        { r.status==='PENDING' && <Button variant="primary" style={{ 'background-color': '#5bc5a7', 'border-color': '#5bc5a7' }} value={r.grp_name} onClick={this.handleApprove}>Accept</Button>}
       </ListItem>
   )):<ListItem>
         <ListItemText primary="No groups available" />
       </ListItem>}
-  </List>
+                        </List>
+                        </Col>
  
-    </div>
-       
+    </Row>
+       {this.state.navigate && <SelectGroup grp_name={this.state.selectedGroup}/> }
             </>
         )
     }
 }
-export default UserGroups;
+const mapStatetoProps=(state)=>{
+  return {
+      user : state.user,
+      alert: state.alert
+  }
+}
+export default connect(mapStatetoProps)(UserGroups);

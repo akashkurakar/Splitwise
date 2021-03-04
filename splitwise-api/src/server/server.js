@@ -9,7 +9,7 @@ const app = express();
 
 const api = require('./api/router.js');
 
-const port = 3001;
+const port = 3001;  
 
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 

@@ -1,7 +1,9 @@
 
  'use strict';
  const db = require('../models/usermodel')
-
+ const bcrypt = require('bcrypt');
+ const saltRounds = 10;
+ const salt = bcrypt.genSaltSync(saltRounds);
  class UserService{
    
      SignUp =async(user)=>{
@@ -9,7 +11,8 @@
                 let search = await db.find(user);
                 if(search.length==0){
                     let users = await db.add(user);
-                    return users;
+                    user = await db.find(user);
+                    return user;
                 }else{
                     return "User already present";
                 }
@@ -37,11 +40,18 @@
      Login=async(user)=>{
         try{
             let search = await db.find(user);
-                if(search[0].email==user.email && search[0].password==user.password){
+           
+            if(search.length===0){
+                return "Invalid credentials";
+                
+            }else{
+                //var password = bcrypt.hashSync(user.password, salt);
+                if(search[0].email==user.email && bcrypt.compareSync(user.password, search[0].password)){
                 return search[0];
             }else{
                 return "Invalid credentials";
             }
+        }
             
         }catch(e){
             console.log(e);

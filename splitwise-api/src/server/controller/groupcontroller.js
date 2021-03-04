@@ -20,12 +20,13 @@ exports.createGroup = async (req, res) => {
         let group = await groupService.createGroup(groupObj);
         //let user = await userervice.getUserByEmail(element.name)
         console.log(group);
-      
-        groupObj.users.forEach(element => {
-            participantSerice.addParticipant(groupObj.grp_name, element.name);
+        participantSerice.addParticipant(groupObj.grp_name, groupObj.user,true);
+        groupObj.users.forEach((element,index) => {
+            
+            participantSerice.addParticipant(groupObj.grp_name, element.name,false);
            
         });
-        invitationSerice.sendInvitation(group.insertId, groupObj.user, groupObj.users);
+        //invitationSerice.sendInvitation(group.insertId, groupObj.user, groupObj.users);
         res.json(group);
     } catch (e) {
         console.log(e);
@@ -38,6 +39,18 @@ exports.getGroups = async (req, res) => {
     const user = req.query;
     try {
         let groups = await groupService.getGroups(user);
+        res.json(groups);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+    res.end();
+}
+
+exports.getAllGroups = async (req, res) => {
+    const user = req.query;
+    try {
+        let groups = await groupService.getAllGroups(user);
         res.json(groups);
     } catch (e) {
         console.log(e);

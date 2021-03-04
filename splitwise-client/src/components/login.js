@@ -1,13 +1,14 @@
 import React from 'react';
-import Header from "../header"
+import Header from '../header'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import PropTypes from 'prop-types'; 
-import * as userActions from "../redux/actions/userAction";
-import {connect} from "react-redux";
+import * as userActions from '../redux/actions/userAction';
+import {connect} from 'react-redux';
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -70,7 +71,9 @@ class Login extends React.Component {
                         <Col md={3}>
                             <h5 className="card-title text-center" style={{ 'font-size': '16px', color: '#999' }}>WELCOME TO SPLITWISE</h5>
                             <form className="form-signin" onSubmit={this.handleLogin}>
-                                {this.state.alert.message!=={} && <p>Invalid Credentials</p>}
+                           
+                                { (this.props.alert.message && this.props.alert.message.response!==undefined) ? ( <div class="alert alert-danger" role="alert">{this.props.alert.message.response.data.message}</div>):null}
+                               
                                 <div className="clearfix">
                                     <label for="email" style={{fontSize:'18px'}}>Email Address</label>
                                     <input type="email" id="email" onChange={this.emailChangeHandler} className="form-control" placeholder="email" required />

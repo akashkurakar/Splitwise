@@ -33,6 +33,8 @@ router.post('/group/create', jsonParser, GroupController.createGroup);
 
 router.get('/groups/', jsonParser, GroupController.getGroups);
 
+router.get('/groups/all', jsonParser, GroupController.getAllGroups);
+
 router.post('/groups/request', jsonParser, GroupController.approveGroupRequest);
 
 router.post('/notify/send', jsonParser, InvitationController.sendInvitation);
@@ -48,6 +50,8 @@ router.get('/balances/', jsonParser, TransactionController.getBalances);
 router.post('/transactions', jsonParser, TransactionController.addTransaction);
 
 router.get('/transactions/data', jsonParser, TransactionController.getTotalPaidOwedTransactions);
+
+router.post('/transactions/settle', jsonParser, TransactionController.transactionSettle);
 
 router.get('/participants', jsonParser, ParticipantController.getParticipant);
 

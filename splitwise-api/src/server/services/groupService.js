@@ -24,6 +24,15 @@ class GroupService{
         console.log(e);
     }
 }
+getAllGroups =async(user)=>{
+    try{
+        let search = await grpDb.findAll(user);
+            return search;
+       
+    }catch(e){
+        console.log(e);
+    }
+}
 
 approveGroupRequest =async(invite)=>{
     try{

@@ -1,4 +1,5 @@
 import React from 'react';
+
 class RightSideBar extends React.Component{
     render(){
         return( <nav id="sidebar">
@@ -19,6 +20,7 @@ class RightSideBar extends React.Component{
 
 
     </nav>)
-    }
+    
+  }
 }
 export default RightSideBar;

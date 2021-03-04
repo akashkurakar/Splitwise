@@ -56,6 +56,15 @@ return data
 } catch(e){
     console.log(e);
 }
+
+}
+transactionSettle=async(transaction)=>{
+    try{
+        let users =await tranDb.transactionSettle(transaction);
+        return users;   
+    }catch(e){
+        console.log(e);
+    }
 }
 }
 module.exports=TransactionService;

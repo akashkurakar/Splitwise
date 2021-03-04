@@ -5,19 +5,22 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-
-
+import axios from 'axios';
+import { connect } from "react-redux";
+import Chip from '@material-ui/core/Chip';
+import Avatar from '@material-ui/core/Avatar';
 class AddExpenseModal extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state={
-            show:this.props.show
+        this.state = {
+            show: this.props.show,
+            user: this.props.user
         }
     }
     handleDescription = (e) => {
         this.setState({
             description: e.target.value,
-           
+
         })
         this.handleClose = this.handleClose.bind(this);
     }
@@ -31,11 +34,10 @@ class AddExpenseModal extends React.Component {
         this.props.show(false);
     }
     handleAddExpenses = () => {
-        /*let userId = cookie.load('cookie');
         axios.defaults.withCredentials = true;
         const data = {
-            user: userId,
-            grpName: this.props.selectedGroup,
+            user: this.state.user.name,
+            grpName: this.props.grp_name,
             description: this.state.description,
             amount: this.state.amount
         }
@@ -46,13 +48,19 @@ class AddExpenseModal extends React.Component {
                     const data = response.data;
                     console.log(data)
                     this.setState({
-                        transactions: data 
+                        transactions: data
                     })
-                    this.props.show(false);
+                    this.setState({
+                        show:false
+                    }
+                    )
                 } else {
-                    this.props.show(false);
+                    this.setState({
+                        show:true
+                    }
+                    )
                 }
-            });*/
+            });
     }
     render() {
         return (<Modal
@@ -61,39 +69,49 @@ class AddExpenseModal extends React.Component {
             backdrop="static"
             keyboard={false}
         >
-            
-        <Modal.Header style={{ 'background-color': '#5bc5a7' }} closeButton>
-        <Modal.Title style={{'color':'white'}}>Add Expense</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-        <div>
-            <label>With you and:<input></input></label>
-        </div>
 
-        <Dropdown.Divider />
-        <Container>
-            <Row>
-                <Col md={3}>
-                    <img src="https://s3.amazonaws.com/splitwise/uploads/category/icon/square_v2/uncategorized/general@2x.png" width="100" height="100" className="img-fluid" alt="" />
-                </Col>
-                <Col md={8}>
-                    <div className="clearfix">
-                        <input type="description" id="description" className="form-control" placeholder="Enter Description" required onChange={this.handleDescription} />
-                    </div>
-                    <div className="clearfix">
-                        <input type="amount" id="amount" onChange={this.handleAmount} className="form-control" placeholder="Amount" required />
-                    </div>
-                </Col>
-            </Row>
-        </Container>
-    </Modal.Body>
-    <Modal.Footer>
-        <Button variant="secondary" onClick={this.handleClose}>
+            <Modal.Header style={{ 'background-color': '#5bc5a7' }} closeButton>
+                <Modal.Title style={{ 'color': 'white' }}>Add Expense</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <div>
+                    <label>With you and:<Chip
+                        avatar={<Avatar></Avatar>}
+                        label={this.props.grp_name}
+                        variant="outlined"
+                    /></label>
+                </div>
+
+
+                <Dropdown.Divider />
+                <Container>
+                    <Row>
+                        <Col md={3}>
+                            <img src="https://s3.amazonaws.com/splitwise/uploads/category/icon/square_v2/uncategorized/general@2x.png" width="100" height="100" className="img-fluid" alt="" />
+                        </Col>
+                        <Col md={8}>
+                            <div className="clearfix">
+                                <input type="description" id="description" className="form-control" placeholder="Enter Description" required onChange={this.handleDescription} />
+                            </div>
+                            <div className="clearfix">
+                                <input type="amount" id="amount" onChange={this.handleAmount} className="form-control" placeholder="Amount" required />
+                            </div>
+                        </Col>
+                    </Row>
+                </Container>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={this.handleClose}>
                     Cancel
 </Button>
-        <Button variant="primary" style={{ 'background-color': '#5bc5a7', 'border-color': '#5bc5a7' }} onClick={this.handleClose}>Add</Button>
-    </Modal.Footer>
-</Modal>)
+                <Button variant="primary" style={{ 'background-color': '#5bc5a7', 'border-color': '#5bc5a7' }} onClick={this.handleAddExpenses}>Add</Button>
+            </Modal.Footer>
+        </Modal>)
     }
 }
-export default AddExpenseModal;
+const mapStatetoProps = (state) => {
+    return {
+        user: state.user
+    }
+}
+export default connect(mapStatetoProps)(AddExpenseModal);

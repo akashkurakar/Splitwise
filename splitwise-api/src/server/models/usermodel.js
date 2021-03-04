@@ -1,12 +1,14 @@
 const con = require('../db/db')
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 let user = {};
-
+const salt = bcrypt.genSaltSync(saltRounds);
 user.add = async (user) => {
     return new Promise((resolve, reject) => {
+        
         var name = user.name;
         var email = user.email;
-        var password = user.password;
+        var password = bcrypt.hashSync(user.password, salt);
             con.query('USE main;');
             var sql = `INSERT INTO users (name, email, password) VALUES ('${name}','${email}','${password}')`;
             con.query(sql, function (error, result, fields) {

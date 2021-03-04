@@ -1,91 +1,122 @@
 import React from 'react';
-import Footer from "../footer";
-import {connect} from "react-redux";
-import * as userActions from "../redux/actions/userAction"
-import Header from "../header"
+import { connect } from 'react-redux';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { Typography } from '@material-ui/core';
+import Header from '../header';
+import * as userActions from '../redux/actions/userAction';
+
 class SignUp extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: '',
+      email: '',
+      password: '',
+    };
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: "",
-            email: "",
-            password: "",
-            user:""
-        }
-    }
-      
-    //username change handler to update state variable with the text entered by the user
-    nameChangeHandler = (e) => {
-        this.setState({
-            name : e.target.value
-        })
-    }
+  // username change handler to update state variable with the text entered by the user
+  nameChangeHandler = (e) => {
+    this.setState({
+      name: e.target.value,
+    });
+  };
 
-    emailChangeHandler = (e) => {
-        this.setState({
-            email : e.target.value
-        })
-    }
-    //password change handler to update state variable with the text entered by the user
-    passwordChangeHandler = (e) => {
-        this.setState({
-            password : e.target.value
-        })
-    }
-    
-    handleSignUp = async (e) => {
-        e.preventDefault();
-        const data = {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password
-        }
-        this.props.signupUser(data);
-       
-    }
+  emailChangeHandler = (e) => {
+    this.setState({
+      email: e.target.value,
+    });
+  };
 
-    render() {
-        const { errorMessage } = this.state;
-        return (
-            <>   <Header/>
-                <div className="container"  style={{margin:'5%'}}>
-                    <div className="row">
-                    <div className="col-4">
-                </div>
-                            <div className="col-6">
-                                <div id="card-body" className="card-body">
-                                    <h5 className="card-title text-center">Hi there! Sign me up!</h5>
-                                    <form className="form-signin" onSubmit={this.handleSignUp}>
-                                        {errorMessage && <p>User already present! Please sign in</p>}
-                                        <div className="form-label-group">
-                                            <label for="inputEmail">My name is</label>
-                                            <input type="name" onChange={this.nameChangeHandler} id="name" className="form-control" placeholder="Full Name" required
-                                                autofocus />
-                                        </div>
-                                        <div className="form-label-group">
-                                            <label for="email">Heres my email address</label>
-                                            <input type="email" id="email" onChange={this.emailChangeHandler} className="form-control" placeholder="email" required />
-                                        </div>
-                                        <label for="address">And here's my password</label>
-                                        <input type="password" id="password" onChange={this.passwordChangeHandler} className="form-control" placeholder="Password" required />
+  // password change handler to update state variable with the text entered by the user
+  passwordChangeHandler = (e) => {
+    this.setState({
+      password: e.target.value,
+    });
+  };
+
+  handleSignUp = async (e) => {
+    e.preventDefault();
+    const data = {
+      name: this.state.name,
+      email: this.state.email,
+      password: this.state.password,
+    };
+    this.props.signupUser(data);
+  };
+
+  render() {
+    const { errorMessage } = this.state;
+    return (
+      // eslint-disable-next-line react/jsx-filename-extension
+      <>
+        {' '}
+        <Header />
+        <Container>
+          <Row>
+            <Col md={4}>
+            <div className="home-logo"><img src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg" width="200" height="200" className="img-fluid" alt="" /></div>
+            </Col>
+            <Col md={6}> { (this.props.alert.message && this.props.alert.message.response!==undefined) ? ( <div class="alert alert-danger" role="alert">{this.props.alert.message.response.data.message}</div>):null}
+              <div id="card-body" className="card-body">
+                <Typography>
+                  <h3 className="card-title text-center">Hi there! Sign me up!</h3>
+                  <form className="form-signin" onSubmit={this.handleSignUp}>
+                    {errorMessage && <p>User already present! Please sign in</p>}
+                    <div className="form-label-group">
+                      <Typography>
+                        <label for="inputEmail">My name is</label>
+                      </Typography>
+                      <input
+                        type="name"
+                        onChange={this.nameChangeHandler}
+                        id="name"
+                        className="form-control"
+                        placeholder="Full Name"
+                      />
+                    </div>
+                    <div className="form-label-group">
+                      <Typography>
+                        <label for="email">Heres my email address</label>
+                      </Typography>
+                      <input
+                        type="email"
+                        id="email"
+                        onChange={this.emailChangeHandler}
+                        className="form-control"
+                        placeholder="email"
+                        required
+                      />
+                    </div>
+                    <Typography>
+                      <label for="address">And here's my password</label>
+                    </Typography>
+                    <input
+                      type="password"
+                      id="password"
+                      onChange={this.passwordChangeHandler}
+                      className="form-control"
+                      placeholder="Password"
+                      required/>
                                         <div>
-                                            <button class="btn btn-lg btn-success btn-block text-uppercase" type="submit" id="location">Sign me up!</button>
+                                            <button className="nav-link button-green-submit text-uppercase" type="submit" id="location">Sign me up!</button>
                                         </div>
                                     </form>
+                                    </Typography>
                                 </div>
-                            </div>
-                            </div>
-                        </div>
-                   
-                <Footer />
+                            </Col>
+                            </Row>
+                            </Container>
             </>
         );
     }
 }
 const mapStatetoProps=(state)=>{
     return {
-     user : state.user
+     user : state.user,
+     alert:state.alert
     }
  }
  const mapDispatchToProps ={

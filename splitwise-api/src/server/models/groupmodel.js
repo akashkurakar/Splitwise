@@ -7,8 +7,7 @@ groups.add = async (group) => {
     return new Promise((resolve, reject) => {
         var name = group.grp_name;
         var createdBy = group.user;
-        var updatedBy = group.user;
-       
+        var updatedBy = group.user;    
             con.query('USE main;');
             var sql = `INSERT INTO grps (grp_name, created_by, updated_by) VALUES ('${name}','${createdBy}','${updatedBy}')`;
             con.query(sql, function (error, result, fields) {
@@ -16,14 +15,12 @@ groups.add = async (group) => {
                     return reject(error);
                 }
                 return resolve(result)
-
             });
         })
    
 }
 groups.findAll = async (user) => {
     return new Promise((resolve, reject) => {
-       
             con.query('USE main;');
             var findQuery = `select * from participants where user_name='${user.user}'`;
             con.query(findQuery, function (error, result, fields) {
@@ -65,5 +62,19 @@ groups.approveRequest = async (invite) => {
             });
         })
    
+}
+
+groups.leaveGroup = async (request)=>{
+    return new Promise((resolve, reject) => {
+    con.query('USE main;');
+    var findQuery = `UPDATE participants set status='left' where user_name='${request.user}' and grp_name='${request.group}';`;
+    con.query(findQuery, function (error, result, fields) {
+        if (error) {
+            return reject(error);
+        }
+        return resolve(result)
+
+    });
+})
 }
 module.exports = groups;

@@ -114,7 +114,22 @@ var moment = require('moment');
         return new Promise((resolve, reject) => {
            
             con.query('USE main;');
-            var sql = `update transactions set status="settled" where (paid_by="${transaction.user1}" and owed_name="${transaction.user2}") OR (paid_by="${transaction.user2}" and owed_name="${transaction.user1}")`;
+            var sql = `update transactions set status="setteled" where (paid_by="${transaction.user1}" and owed_name="${transaction.user2}") OR (paid_by="${transaction.user2}" and owed_name="${transaction.user1}")`;
+            con.query(sql, function (error, result, fields) {
+                if (error) {
+                    return reject(error);
+                }
+                return resolve(result)
+
+            });
+        })
+    }
+
+    transaction.transactionStatus=(transaction)=>{
+        return new Promise((resolve, reject) => {
+           
+            con.query('USE main;');
+            var sql = `select * from transactions where (paid_by='${transaction.user}' OR owed_name='${transaction.user}') AND status="PENDING" AND grp_name='${transaction.group}'`;
             con.query(sql, function (error, result, fields) {
                 if (error) {
                     return reject(error);

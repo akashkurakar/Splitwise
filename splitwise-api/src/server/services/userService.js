@@ -75,7 +75,7 @@
         try{
             let search = await db.findByEmail(user);
             if(search.length==0){
-                return "Something went wrong";
+                return "No User found";
             }else{
                 return search[0];
                 

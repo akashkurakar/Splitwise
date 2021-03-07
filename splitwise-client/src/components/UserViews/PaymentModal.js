@@ -31,14 +31,7 @@ handleClose=()=>{
     this.props.show(false);
 }
 componentDidMount=()=>{
-    let userConn=[];
     this.getUsers();
-    // this.state.owe.forEach(element => {
-    //     userConn.push(element.paidBy)
-    // });
-    // this.state.owed.forEach(element => {
-    //     userConn.push(element.owed_name)
-    // });
 }
 getUsers=()=>{
     axios.defaults.withCredentials = true;

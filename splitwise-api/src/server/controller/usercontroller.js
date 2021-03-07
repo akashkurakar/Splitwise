@@ -34,7 +34,7 @@ exports.signup = async (req, res) => {
                 "message":"User already Present! Please Login!"
             });
         }else{
-            var json = {data:result,message:"Signup Successfull"};
+            var json = {data:result[0],message:"Signup Successfull"};
             res.json(json);
         }
         
@@ -72,7 +72,14 @@ exports.userByEmail = async (req, res) => {
     const user = req.query;
     try {
         let result = await userService.getUserByEmail(user.id);
-        res.json(result);
+        if(result==="No User found"){
+            res.status(400).send({
+                "message":"No User found"
+            });
+        }else{
+            var json = {data:result,message:""};
+            res.json(json);
+        }
 
     } catch (e) {
         console.log(e);
@@ -93,18 +100,3 @@ exports.user = async (req, res) => {
     }
     res.end();
 };
-exports.getUser = async (req, res) => {
-    const user = req.query;
-    try {
-        let users = await userService.getUser(user.id);
-        res.cookie('users', users, { maxAge: 900000, httpOnly: false, path: '/' });
-        res.json(users);
-
-    } catch (e) {
-        console.log(e);
-        res.send(400).send({
-            "message":"Something went wrong!"
-        });
-    }
-    res.end();
-}

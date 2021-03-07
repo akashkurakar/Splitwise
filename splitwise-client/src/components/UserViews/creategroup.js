@@ -4,6 +4,7 @@ import axios from 'axios';
     import UserHeader from "../Dashboard/UserHeader" ;
     import FormData from 'form-data'
     import {connect} from "react-redux";
+    import * as groupsActions from "../../redux/actions/GroupsActions";
 class CreateGroup extends React.Component {
     constructor() {
         super();
@@ -14,7 +15,8 @@ class CreateGroup extends React.Component {
             image:{
                 review:"",
                 raw:""
-            },  
+            },
+            groups:[]
         }
         this.handleMembers = this.handleMembers.bind(this);
         
@@ -76,9 +78,7 @@ class CreateGroup extends React.Component {
                 console.log("Status Code : ", response.status);
                 if (response.status === 200) {
                     if (response.data === "Successful Login") {
-                        this.setState({
-                            authFlag: true,
-                        })
+                        this.props.getGroups(this.props.user.name);
                     }
                     else if (response.data === "Invalid Credentials!") {
                         this.setState({
@@ -135,7 +135,11 @@ class CreateGroup extends React.Component {
 }
 const mapStatetoProps=(state)=>{
     return {
-     user : state.user
+     user : state.user,
+     groups:state.groups
     }
 }
-export default  connect(mapStatetoProps)(CreateGroup)
+const mapDispatchToProps = {
+    getGroups:groupsActions.getGroups,
+}
+export default  connect(mapStatetoProps,mapDispatchToProps)(CreateGroup)

@@ -4,29 +4,27 @@ const InvitationSerice = require("../services/invitationservice");
 
 const ParticipantSerice = require("../services/participantservice");
 
+const ActivityService = require("../services/ActivityService");
+
 const UserService = require("../services/userService");
 
 let groupService = new GroupService();
 
-let invitationSerice = new InvitationSerice();
-
-let userervice = new UserService();
-
 let participantSerice = new ParticipantSerice();
+
+let activityService = new ActivityService();
 
 exports.createGroup = async (req, res) => {
     const groupObj = req.body;
     try {
         let group = await groupService.createGroup(groupObj);
-        //let user = await userervice.getUserByEmail(element.name)
+        activityService.addActivity("created group",groupObj.grp_name,groupObj.user);
         console.log(group);
         participantSerice.addParticipant(groupObj.grp_name, groupObj.user,true);
-        groupObj.users.forEach((element,index) => {
-            
-            participantSerice.addParticipant(groupObj.grp_name, element.name,false);
-           
+        groupObj.users.forEach((element) => { 
+            participantSerice.addParticipant(groupObj.grp_name, element.name,false); 
+            activityService.addActivity("created group",groupObj.grp_name,element.name);
         });
-        //invitationSerice.sendInvitation(group.insertId, groupObj.user, groupObj.users);
         res.json(group);
     } catch (e) {
         console.log(e);
@@ -62,6 +60,17 @@ exports.approveGroupRequest = async (req, res) => {
     const invite = req.body;
     try {
         let groups = await groupService.approveGroupRequest(invite);
+        res.json(groups);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+    res.end();
+}
+exports.leaveGroup =async (req,res) => {
+    const groupData =  req.body;
+    try {
+        let groups = await groupService.leaveGroup(groupData);
         res.json(groups);
     } catch (e) {
         console.log(e);

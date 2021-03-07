@@ -53,12 +53,12 @@ exports.addTransaction=async(req,res)=>{
     try{
         let result =  await transactionService.addTransaction(transaction);
         res.json(result);
-       
+        res.end();
     }catch(e){
         console.log(e);
         res.sendStatus(500);
     }
-    res.end();
+   
 }
 exports.getTotalPaidOwedTransactions=async(req,res)=>{
     const user = req.query.user;

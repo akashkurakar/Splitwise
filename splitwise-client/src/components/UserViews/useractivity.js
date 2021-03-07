@@ -15,23 +15,23 @@ class UserActivity extends React.Component {
     constructor(props){
         super(props);
         this.state={
-            transactions:[]
+            activities:[]
         }
     }
     componentDidMount(){
-        this.getTransactionByUser();
+        this.getActivitiesByUser();
     }
-    getTransactionByUser=()=>{
+    getActivitiesByUser=()=>{
         let userId = this.props.user.name;
         axios.defaults.withCredentials = true;
-        axios.get(`http://localhost:3001/api/transactions/?user=${userId}`)
+        axios.get(`http://localhost:3001/api/activities/?user=${userId}`)
             .then(response => {
                 console.log("Status Code : ", response.status);
                 if (response.status === 200) {
                     const data = response.data;
                     console.log(data)
                     this.setState({
-                        transactions: data
+                        activities: data
                     })
                 } else {
     
@@ -66,7 +66,7 @@ class UserActivity extends React.Component {
                 <Row>
 
                     <List dense className={classes.root}>
-                        {this.state.transactions.length > 0 ? this.state.transactions.filter(transaction => transaction.owed_name === userId && transaction.paid_by !== userId).map(trans => (
+                        {this.state.activities.length > 0 ? this.state.activities.map(trans => (
                             <ListItem button>
                                 <ListItemAvatar>
                                     <Avatar
@@ -74,7 +74,7 @@ class UserActivity extends React.Component {
                                         src={`/static/images/avatar/${1}.jpg`}
                                     />
                                 </ListItemAvatar>
-                                <ListItemText id="item1" primary={trans.paid_by} />
+                                <ListItemText id="item1" primary={trans.description} />
                                 <ListItemSecondaryAction>
 
                                 </ListItemSecondaryAction>

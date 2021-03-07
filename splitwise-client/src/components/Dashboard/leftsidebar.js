@@ -6,13 +6,14 @@ import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
+import { connect } from "react-redux";
 
 class LeftSideBar extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            groups: []
+            groups: this.props.groups
         }
         this.loadActivity = this.loadActivity.bind(this);
         this.loadDashboard = this.loadDashboard.bind(this);
@@ -101,7 +102,7 @@ class LeftSideBar extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        {this.props.groups.map((r, index) => (
+                        {this.props.groups.length>0 ? this.props.groups.map((r, index) => (
                             <li>
                                 <div className="card-body" style={{ 'padding': '0', 'height': '1rem' }} value={r.grp_name}>
                                 <SupervisedUserCircleIcon color="primary"/>
@@ -110,9 +111,7 @@ class LeftSideBar extends React.Component {
                                 <div class="dropdown-divider"></div>
                             </li>
                             
-                        ))}
-
-                     
+                        )):null}
                         <li className="active">
                         <GroupWorkIcon/>    
                             <a href="/#" data-toggle="collapse" aria-expanded="false" onClick={this.loadAllGroups}>All Groups</a>
@@ -125,4 +124,11 @@ class LeftSideBar extends React.Component {
             </nav>)
     }
 }
-export default LeftSideBar; 
+const mapStatetoProps = (state) => {
+    return {
+        user: state.user,
+        alert: state.alert,
+        groups:state.groups
+    }
+}
+export default connect(mapStatetoProps)(LeftSideBar); 

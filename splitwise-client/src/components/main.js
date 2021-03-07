@@ -10,6 +10,7 @@ import Activity from "./UserViews/UserActivity";
 import MainContent from "./Dashboard/MainContent";
 import CreateGroup from "./UserViews/CreateGroup";
 import UserProfile from "./UserViews/UserProfile";
+import SelectGroup from "./UserViews/SelectGroup";
 
 class Main extends React.Component {
   constructor(props) {
@@ -28,6 +29,7 @@ class Main extends React.Component {
         <Route path="/activity" component={Activity} />
         <Route path="/creategroup" component={CreateGroup} />
         <Route path="/userprofile" component={UserProfile} />
+        <Route path="/selectgroup" component={SelectGroup} />
       </div>
     );
   }

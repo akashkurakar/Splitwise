@@ -10,44 +10,18 @@ const { url } = require('inspector');
 var jsonParser = bodyParser.json();
 
 describe('GET users API call', () => {
-
-    // using async
-    it('should return LIST OF USERS (using async)', async () => {
+    it('should return LIST OF USERS', async () => {
       await get('http://127.0.0.1:3001/api/users').then(response=>{
-        console.log(response);
-        assert.deepStrictEqual(response,[
-            {
-              id: 1,
-              name: 'Akash Kuratkar',
-              username: null,
-              email: 'akash@gmail.com',
-              password: '$2b$10$ionN8uNAQyfN1EtVmB7TIOLu8qi78D5.RY9E7lFmiorz5IqWWJXfu',
-              phone: 'null',
-              default_currency: 'GBP',
-              image_path: null,
-              lang: 'undefined',
-              timezone: 'null'
-            },
-            {
-              id: 2,
-              name: 'Aditya Baravkar',
-              username: null,
-              email: 'aditya@gmail.com',
-              password: '$2b$10$ionN8uNAQyfN1EtVmB7TIOKNKVcFP7E3RywPIdlgJCDd2W4kqSXJ2',
-              phone: 'null',
-              default_currency: 'CAD',
-              image_path: null,
-              lang: 'undefined',
-              timezone: 'null'
-            }
-          ])
+        //console.log(response);
+        assert.deepStrictEqual(response.length>0,true)
        });
        
         
         });
    
 });
-it('should return LIST OF USERS (using async)', async () => {
+describe('POST users API call', () => {
+it('should authenticate user', async () => {
     const data={
         email:"akash@gmail.com",
         password:"akash"
@@ -58,7 +32,7 @@ it('should return LIST OF USERS (using async)', async () => {
      });
       });
  
-
+    });
 const post = async(data) => {
     const options = {
         hostname: '127.0.0.1',

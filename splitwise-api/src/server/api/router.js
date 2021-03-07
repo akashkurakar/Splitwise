@@ -19,17 +19,22 @@ const TransactionController = require('../controller/transactioncontroller');
 
 const ParticipantController = require('../controller/participantcontroller');
 
+const ActivityController = require('../controller/ActivityController');
+
 router.post('/login', jsonParser, UserController.login);
 
 router.post('/signup', jsonParser, UserController.signup);
 
 router.post('/user/update', jsonParser,UserController.update);
     
+
 router.get('/user/',UserController.userByEmail);
 
 router.get('/users/',UserController.user);
 
 router.post('/group/create', jsonParser, GroupController.createGroup);
+
+router.post('/group/leave', jsonParser, GroupController.leaveGroup);
 
 router.get('/groups/', jsonParser, GroupController.getGroups);
 
@@ -54,6 +59,8 @@ router.get('/transactions/data', jsonParser, TransactionController.getTotalPaidO
 router.post('/transactions/settle', jsonParser, TransactionController.transactionSettle);
 
 router.get('/participants', jsonParser, ParticipantController.getParticipant);
+
+router.get('/activities', jsonParser, ActivityController.getActivities);
 
 
 module.exports = router;

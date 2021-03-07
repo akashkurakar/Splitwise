@@ -20,7 +20,6 @@ export default function userLogin(state = [], action) {
       return Object.assign({...state}, action.payload);
     case 'LOGOUT_USER':
       storage.removeItem('persist:root');
-    
       return state=[];
     default:
       return state;

@@ -15,7 +15,7 @@ import Divider from '@material-ui/core/Divider';
 import PaymentModal from "./PaymentModal";
 import photo from "../../static/images/avatar/person.png";
 import Typography from '@material-ui/core/Typography';
-import converter from "../../constants/currency"
+import converter from "../../constants/currency";
 import {connect} from "react-redux";
 import axios from "axios";
 import {Redirect} from 'react-router';
@@ -173,7 +173,7 @@ class DashboardMiddle extends React.Component {
                                     <ListItemSecondaryAction>
                                     </ListItemSecondaryAction>
                                     
-                                </ListItem>)) : <ListItem button>
+                                </ListItem>)) : <ListItem>
 
                                     <ListItemText id="item1" primary='No Transactions' />
                                    
@@ -201,7 +201,7 @@ class DashboardMiddle extends React.Component {
 
 </ListItemSecondaryAction>
                                 </ListItem>)) :
-                                <ListItem button>
+                                <ListItem>
 
                                     <ListItemText id="item1" primary='No Transactions' />
                                     <ListItemSecondaryAction>

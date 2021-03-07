@@ -20,7 +20,9 @@ class Login extends React.Component {
         }
     }
  
- 
+    componentWillUnmount(){
+        
+    }
     emailChangeHandler = (e) => {
         e.preventDefault();
         this.setState({
@@ -28,7 +30,7 @@ class Login extends React.Component {
             email: e.target.value,
         })
     }
-    //password change handler to update state variable with the text entered by the user
+
     passwordChangeHandler = (e) => {
         e.preventDefault();
         this.setState({
@@ -103,11 +105,12 @@ Login.propTypes ={
 const mapStatetoProps=(state)=>{
    return {
     user : state.user,
-   alert:state.alert
+    alert:state.alert
    }
 }
 const mapDispatchToProps ={
-    loginUser : userActions.loginUser
+    loginUser : userActions.loginUser,
+   
 }
 
 export default connect(mapStatetoProps,mapDispatchToProps)(Login);

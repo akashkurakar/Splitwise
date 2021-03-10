@@ -48,6 +48,21 @@ groups.find = async (user) => {
         })
    
 }
+groups.findGroupByName = async (user) => {
+    return new Promise((resolve, reject) => {
+       
+            con.query('USE main;');
+            var findQuery = `select * from participants where user_name='${user.user}' AND grp_name="${user.grp_name}" AND status='active'`;
+            con.query(findQuery, function (error, result, fields) {
+                if (error) {
+                    return reject(error);
+                }
+                return resolve(result)
+
+            });
+        })
+   
+}
 groups.approveRequest = async (invite) => {
     return new Promise((resolve, reject) => {
        

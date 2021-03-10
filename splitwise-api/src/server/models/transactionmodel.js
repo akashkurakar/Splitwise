@@ -9,7 +9,7 @@ var moment = require('moment');
            
                 con.query('USE main;');
                 con.query("SET sql_mode = ''");
-                var sql = `Select * from transactions where grp_name='${grpName}' group by created_on`;
+                var sql = `Select * from transactions where grp_name='${grpName}' AND status!='setteled'`;
                 con.query(sql, function (error, result, fields) {
                     if (error) {
                         return reject(error);
@@ -23,7 +23,7 @@ var moment = require('moment');
         return new Promise((resolve, reject) => {
            
                 con.query('USE main;');
-                var sql = `Select * from transactions where paid_by='${user}' OR owed_name= '${user}' order by updated_on desc`;
+                var sql = `Select * from transactions where (paid_by='${user}' OR owed_name= '${user}') order by updated_on desc`;
                 con.query(sql, function (error, result, fields) {
                     if (error) {
                         return reject(error);

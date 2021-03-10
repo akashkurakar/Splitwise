@@ -15,6 +15,7 @@ exports.getTransaction=async(req,res)=>{
         }
        
         res.json(result);
+        res.end();
     }catch(e){
         console.log(e);
         res.sendStatus(500);

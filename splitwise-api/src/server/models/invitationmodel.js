@@ -36,7 +36,7 @@ class InvitationModel {
                     if (error) {
                         return reject(error);
                     }
-                    return resolve(result)
+                        return resolve(result)
     
                 });
             

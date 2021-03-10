@@ -26,7 +26,6 @@ router.post('/login', jsonParser, UserController.login);
 router.post('/signup', jsonParser, UserController.signup);
 
 router.post('/user/update', jsonParser,UserController.update);
-    
 
 router.get('/user/',UserController.userByEmail);
 

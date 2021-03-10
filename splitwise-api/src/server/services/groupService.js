@@ -9,7 +9,8 @@ class GroupService {
             let search = await grpDb.find(group);
             if (search.length == 0) {
                 let groups = await grpDb.add(group);
-                return groups;
+                group = await grpDb.findGroupByName(group);
+                return group;
             } else {
                 return "Group already present";
             }

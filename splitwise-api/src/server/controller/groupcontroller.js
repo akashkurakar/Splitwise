@@ -25,7 +25,16 @@ exports.createGroup = async (req, res) => {
             participantSerice.addParticipant(groupObj.grp_name, element.name,false); 
             activityService.addActivity("created group",groupObj.grp_name,element.name);
         });
-        res.json(group);
+        if(group!="Group already present"){
+            var json = {data:group,message:"Group Created Successfully!"};
+            res.json(json);
+        }else{
+            res.status(400).send({
+                "message":"Group already present"
+            });
+        }
+        
+        
     } catch (e) {
         console.log(e);
         res.sendStatus(500);

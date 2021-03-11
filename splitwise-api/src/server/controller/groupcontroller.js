@@ -15,75 +15,65 @@ let participantSerice = new ParticipantSerice();
 let activityService = new ActivityService();
 
 exports.createGroup = async (req, res) => {
-    const groupObj = req.body;
-    try {
-        let group = await groupService.createGroup(groupObj);
-        activityService.addActivity("created group",groupObj.grp_name,groupObj.user);
-        console.log(group);
-        participantSerice.addParticipant(groupObj.grp_name, groupObj.user,true);
-        groupObj.users.forEach((element) => { 
-            participantSerice.addParticipant(groupObj.grp_name, element.name,false); 
-            activityService.addActivity("created group",groupObj.grp_name,element.name);
-        });
-        if(group!="Group already present"){
-            var json = {data:group,message:"Group Created Successfully!"};
-            res.json(json);
-        }else{
-            res.status(400).send({
-                "message":"Group already present"
-            });
-        }
-        
-        
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(500);
+  const groupObj = req.body;
+  try {
+    let group = await groupService.createGroup(groupObj);
+    if (group === "Group has been created successfully!") {
+      var json = { data: [], message: "Group Created Successfully!" };
+      res.json(json);
+    } else {
+      var json = { data: [], message: "Group already present!" };
+      res.json(json);
     }
-    res.end();
-}
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+  res.end();
+};
 
 exports.getGroups = async (req, res) => {
-    const user = req.query;
-    try {
-        let groups = await groupService.getGroups(user);
-        res.json(groups);
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(500);
-    }
-    res.end();
-}
+  const user = req.query;
+  try {
+    let groups = await groupService.getGroups(user);
+    res.json(groups);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+  res.end();
+};
 
 exports.getAllGroups = async (req, res) => {
-    const user = req.query;
-    try {
-        let groups = await groupService.getAllGroups(user);
-        res.json(groups);
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(500);
-    }
-    res.end();
-}
+  const user = req.query;
+  try {
+    let groups = await groupService.getAllGroups(user);
+    res.json(groups);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+  res.end();
+};
 exports.approveGroupRequest = async (req, res) => {
-    const invite = req.body;
-    try {
-        let groups = await groupService.approveGroupRequest(invite);
-        res.json(groups);
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(500);
-    }
-    res.end();
-}
-exports.leaveGroup =async (req,res) => {
-    const groupData =  req.body;
-    try {
-        let groups = await groupService.leaveGroup(groupData);
-        res.json(groups);
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(500);
-    }
-    res.end();
-}
+  const invite = req.body;
+  try {
+    let groups = await groupService.approveGroupRequest(invite);
+    res.json(groups);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+  res.end();
+};
+exports.leaveGroup = async (req, res) => {
+  const groupData = req.body;
+  try {
+    let groups = await groupService.leaveGroup(groupData);
+    res.json(groups);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+  res.end();
+};

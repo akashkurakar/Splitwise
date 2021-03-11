@@ -1,10 +1,10 @@
 function converter(currency) {
   return new Intl.NumberFormat(`en-${currency.substr(0, 2)}`, {
-    style: 'currency',
+    style: "currency",
     currency,
     minimumFractionDigits: 2,
     useGrouping: false,
-    notation: 'standard',
+    notation: "standard",
   });
 }
 

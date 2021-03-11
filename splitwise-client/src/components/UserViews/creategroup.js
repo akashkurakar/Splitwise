@@ -1,145 +1,169 @@
-import React from "react"
-import GroupMembers from "./GroupMembers";
+/* eslint-disable arrow-body-style */
+import React from 'react';
 import axios from 'axios';
-    import UserHeader from "../Dashboard/UserHeader" ;
-    import FormData from 'form-data'
-    import {connect} from "react-redux";
-    import * as groupsActions from "../../redux/actions/GroupsActions";
+import { connect } from 'react-redux';
+import { Typography } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import * as groupsActions from '../../redux/actions/GroupsActions';
+import UserHeader from '../Dashboard/UserHeader';
+import GroupMembers from './GroupMembers';
+
 class CreateGroup extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            grpName: "",
-            members:"",
-            user:"",
-            image:{
-                review:"",
-                raw:""
-            },
-            groups:[]
-        }
-        this.handleMembers = this.handleMembers.bind(this);
-        
-       
-    }   
-    handleChange = e => {
-        if (e.target.files.length) {
-          this.setState({
-            preview: URL.createObjectURL(e.target.files[0]),
-            raw: e.target.files[0]
-          });
-        }
-      };
-      handleUpload = async e => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append("image", this.state.image.raw);
-    
-        await axios.put('http://localhost:3001/api/group/create', formData, {
-            headers: {
-              'Content-Type': formData.type
-            }
-          });
-      };
-    grpNameChangeHandler = (e) => {
+  constructor() {
+    super();
+    this.state = {
+      grpName: '',
+      members: '',
+      user: '',
+      image: {
+        review: '',
+        raw: '',
+      },
+      errorMessage: '',
+    };
+    this.handleMembers = this.handleMembers.bind(this);
+  }
 
-        this.setState({
-            grpName: e.target.value
-        })
+  componentDidMount() {
+    this.setState({
+      user: this.props.user,
+    });
+  }
 
-    }
-    handleMembers=(childData)=>{
-        console.log(childData);
-        this.setState({
-            members:childData
-        })
+  grpNameChangeHandler = (e) => {
+    this.setState({
+      grpName: e.target.value,
+    });
+  };
 
-        
+  handleMembers = (childData) => {
+    this.setState({
+      members: childData,
+    });
+  };
+
+  handleCreateGroup = async (e) => {
+    e.preventDefault();
+    if (this.state.members.length === 0) {
+      this.setState({
+        errorMessage: 'Please select at least one member',
+      });
+      return;
     }
-    componentDidMount(){
-       this.setState({
-        user : this.props.user
-       })
-    }
-   
-    handleCreateGroup = async (e) => {
-        e.preventDefault();
-        const data = {
-            grp_name: this.state.grpName,
-            user: this.state.user.name,
-            users: this.state.members
-        }
-        console.log(data)
-       
-        axios.defaults.withCredentials = true;
-        
-        axios.post('http://localhost:3001/api/group/create', data)
-            .then(response => {
-                console.log("Status Code : ", response.status);
-                if (response.status === 200) {
-                    if (response.data === "Successful Login") {
-                        this.props.getGroups(this.props.user.name);
-                    }
-                    else if (response.data === "Invalid Credentials!") {
-                        this.setState({
-                            authFlag: false,
-                            errorMessage: true
-                        })
-                    }
-                }
+    const data = {
+      grp_name: this.state.grpName,
+      user: this.state.user.name,
+      users: this.state.members,
+    };
+    axios.defaults.withCredentials = true;
+    axios
+      .post('http://localhost:3001/api/group/create', data)
+      .then((response) => {
+        if (response.status === 200) {
+          if (response.data.message === 'Group Created Successfully!') {
+            this.props.getGroups(this.props.user.name);
+            this.setState({
+              errorMessage: '',
             });
-    }
-    render() {
-        return (
-            <><UserHeader/>
-                        <div class="flex_container blank_page clearfix">
-                            <div className="card">
-                                <div className="row no-gutters">
-                                <div className="container max-auto">
-                                    <div class="row">
-                                    <div className="col-3">
-                                    </div>
-                                    <div className="col-3">
-                                    {this.state.image.preview ? ( <img src={this.state.image.preview} alt="dummy" width="300" height="300" />
-        ) : (<img  src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg" width="150" height="150" className="img-fluid" alt="" onChange={this.handleChange}/>)}
-                                        <div>
-                                            <input id="" onChange={this.handleUpload} name="" type="file" />
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="col-4">
-                                        <div className="content-block">
-                                            <form className="form-signin" onSubmit={this.handleCreateGroup}>
+            window.location.href = './dashboard';
+          } else {
+            this.setState({
+              errorMessage: response.data.message,
+            });
+          }
+        }
+      })
+      .catch((res) => {
+        this.setState({
+          errorMessage: res.message,
+        });
+      });
+  };
 
-                                                <div className="form-label-group">
-                                                    <label for="email">Group name shall be</label>
-                                                    <input type="text" id="grp_name" onChange={this.grpNameChangeHandler} className="form-control" placeholder="Group Name" required />
-                                                </div>
-                                                {this.state.grpName!=="" ? <GroupMembers onAddMember={this.handleMembers.bind(this)}/> : null}
-                                                <div>
-                                                    <button class="btn btn-lg btn-success btn-block text-uppercase" type="submit" id="location">Create Group</button>
-                                                </div>
-
-
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+  render() {
+    return (
+      <>
+        <UserHeader />
+        <div className="flex_container blank_page clearfix">
+          <div className="card">
+            <div className="row no-gutters">
+              <div className="container max-auto">
+                <div className="row">
+                  <div className="col-3" />
+                  <div className="col-3">
+                    {this.state.image.preview ? (
+                      <img src={this.state.image.preview} alt="dummy" width="300" height="300" />
+                    ) : (
+                      <img
+                        src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
+                        width="150"
+                        height="150"
+                        className="img-fluid"
+                        alt=""
+                        onChange={this.handleChange}
+                      />
+                    )}
+                    <div>
+                      <input id="" onChange={this.handleUpload} name="" type="file" />
                     </div>
-                </div>
-            </>)
-    }
+                  </div>
 
+                  <div className="col-4">
+                    <div className="content-block">
+                      <form className="form-signin" onSubmit={this.handleCreateGroup}>
+                        <div className="form-label-group">
+                          {this.state.errorMessage !== '' && (
+                            <div className="alert alert-danger" role="alert">
+                              {this.state.errorMessage}
+                            </div>
+                          )}
+                          <Typography className="header-label">Group name shall be</Typography>
+                          <input
+                            type="text"
+                            id="grp_name"
+                            onChange={this.grpNameChangeHandler}
+                            className="form-control"
+                            placeholder="Group Name"
+                            required
+                          />
+                        </div>
+                        {this.state.grpName !== '' ? (
+                          <GroupMembers onAddMember={this.handleMembers} />
+                        ) : null}
+                        <div>
+                          <button
+                            className="nav-link button-green-submit text-uppercase"
+                            type="submit"
+                            id="location"
+                          >
+                            Create Group
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 }
-const mapStatetoProps=(state)=>{
-    return {
-     user : state.user,
-     groups:state.groups
-    }
-}
+const mapStatetoProps = (state) => {
+  return {
+    user: state.user,
+    groups: state.groups,
+  };
+};
 const mapDispatchToProps = {
-    getGroups:groupsActions.getGroups,
-}
-export default  connect(mapStatetoProps,mapDispatchToProps)(CreateGroup)
+  getGroups: groupsActions.getGroups,
+};
+
+CreateGroup.propTypes = {
+  getGroups: PropTypes.func.isRequired,
+  user: PropTypes.objectOf.isRequired,
+};
+
+export default connect(mapStatetoProps, mapDispatchToProps)(CreateGroup);

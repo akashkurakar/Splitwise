@@ -1,21 +1,21 @@
 /* eslint-disable arrow-body-style */
-import React from "react";
-import { connect } from "react-redux";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { Typography } from "@material-ui/core";
-import PropTypes from "prop-types";
-import Header from "../header";
-import * as userActions from "../redux/actions/userAction";
+import React from 'react';
+import { connect } from 'react-redux';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { Typography } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import Header from '../header';
+import * as userActions from '../redux/actions/UserAction';
 
 class SignUp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     };
   }
 
@@ -55,7 +55,7 @@ class SignUp extends React.Component {
     return (
       // eslint-disable-next-line react/jsx-filename-extension
       <>
-        {" "}
+        {' '}
         <Header />
         <Container>
           <Row>
@@ -71,22 +71,17 @@ class SignUp extends React.Component {
               </div>
             </Col>
             <Col md={6}>
-              {" "}
-              {this.props.alert.message &&
-              this.props.alert.message.response !== undefined ? (
+              {' '}
+              {this.props.alert.message && this.props.alert.message.response !== undefined ? (
                 <div className="alert alert-danger" role="alert">
                   {this.props.alert.message.response.data.message}
                 </div>
               ) : null}
               <div id="card-body" className="card-body">
                 <Typography>
-                  <h3 className="card-title text-center">
-                    Hi there! Sign me up!
-                  </h3>
+                  <h3 className="card-title text-center">Hi there! Sign me up!</h3>
                   <form className="form-signin" onSubmit={this.handleSignUp}>
-                    {errorMessage && (
-                      <p>User already present! Please sign in</p>
-                    )}
+                    {errorMessage && <p>User already present! Please sign in</p>}
                     <div className="form-label-group">
                       <Typography>My name is</Typography>
                       <input

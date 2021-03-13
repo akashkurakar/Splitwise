@@ -11,9 +11,9 @@ class ActivityService {
     }
   };
 
-  addActivity = async (description, grpName, user) => {
+  addActivity = async (description, user) => {
     try {
-      let search = await activityDb.addActivity(description, grpName, user);
+      let search = await activityDb.addActivity(description, user);
       return "User added successfully";
     } catch (e) {
       return e;

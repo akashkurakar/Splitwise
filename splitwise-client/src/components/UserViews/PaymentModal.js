@@ -1,20 +1,20 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable arrow-body-style */
-import React from "react";
-import Row from "react-bootstrap/Row";
-import Button from "react-bootstrap/Button";
-import Avatar from "@material-ui/core/Avatar";
-import Col from "react-bootstrap/Col";
-import Modal from "react-bootstrap/Modal";
-import Container from "react-bootstrap/Container";
-import TextField from "@material-ui/core/TextField";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import axios from "axios";
-import { connect } from "react-redux";
-import Chip from "@material-ui/core/Chip";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import PropTypes from "prop-types";
-import converter from "../../constants/currency";
+import React from 'react';
+import Row from 'react-bootstrap/Row';
+import Button from 'react-bootstrap/Button';
+import Avatar from '@material-ui/core/Avatar';
+import Col from 'react-bootstrap/Col';
+import Modal from 'react-bootstrap/Modal';
+import Container from 'react-bootstrap/Container';
+import TextField from '@material-ui/core/TextField';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import axios from 'axios';
+import { connect } from 'react-redux';
+import Chip from '@material-ui/core/Chip';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import PropTypes from 'prop-types';
+import { converter } from '../../constants/commonservice';
 
 class PaymentModal extends React.Component {
   constructor(props) {
@@ -37,22 +37,19 @@ class PaymentModal extends React.Component {
   getUsers = () => {
     const userData = [];
     this.props.transactions.forEach((element) => {
-      if (
-        !userData.includes(element.owed_name) &&
-        element.name !== this.props.user.name
-      ) {
-        userData.push(element.name);
-      } else if (
-        !userData.includes(element.paid_by) &&
-        element.name !== this.props.user.name
-      ) {
-        userData.push(element.name);
+      if (!userData.includes(element.owed_name) && element.owed_name !== this.props.user.name) {
+        userData.push(element.owed_name);
+      } else if (!userData.includes(element.paid_by) && element.paid_by !== this.props.user.name) {
+        userData.push(element.paid_by);
       }
+    });
+    this.setState({
+      users: userData,
     });
   };
 
   handleUser = (e) => {
-    e.preventDefault();
+    this.props.data.user = e;
   };
 
   handleAddExpenses = (e) => {
@@ -62,36 +59,29 @@ class PaymentModal extends React.Component {
       user2: this.props.data.user,
     };
     axios.defaults.withCredentials = true;
-    axios
-      .post("http://localhost:3001/api/transactions/settle", data)
-      .then((response) => {
-        if (response.status === 200) {
-          if (response.data === "Successful Login") {
-            this.props.getTransactions();
-            this.props.show(false);
-          } else if (response.data === "Invalid Credentials!") {
-            // error
-          }
+    axios.post('http://localhost:3001/api/transactions/settle', data).then((response) => {
+      if (response.status === 200) {
+        if (response.data === 'Transaction Settled') {
+          this.props.getTransactions();
+          this.handleClose(false);
+        } else if (response.data === 'Invalid Credentials!') {
+          // error
         }
-      });
+      }
+    });
   };
 
   render() {
     return (
-      <Modal
-        show={this.state.show}
-        onHide={this.handleClose}
-        backdrop="static"
-        keyboard={false}
-      >
-        <Modal.Header style={{ "background-color": "#5bc5a7" }} closeButton>
-          <Modal.Title style={{ color: "white" }}>Add Payment</Modal.Title>
+      <Modal show={this.state.show} onHide={this.handleClose} backdrop="static" keyboard={false}>
+        <Modal.Header style={{ 'background-color': '#5bc5a7' }} closeButton>
+          <Modal.Title style={{ color: 'white' }}>Add Payment</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Container>
             <Row>
               <Col md={4}>
-                {" "}
+                {' '}
                 <Chip
                   avatar={<Avatar>&nbsp;</Avatar>}
                   label={this.props.user.name}
@@ -107,27 +97,26 @@ class PaymentModal extends React.Component {
                   id="free-solo-2-demo"
                   disableClearable
                   value={this.props.data.user}
-                  options={this.state.users.map((option) => option.name)}
+                  options={this.state.users.map((option) => option)}
+                  onChange={(event, value) => this.handleUser(value)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label=""
                       margin="normal"
-                      InputProps={{ ...params.InputProps, type: "search" }}
+                      InputProps={{ ...params.InputProps, type: 'search' }}
                     />
                   )}
                 />
               </Col>
             </Row>
             <Row>
-              {" "}
-              <Col md={3} />{" "}
+              {' '}
+              <Col md={3} />{' '}
               <Col md={4}>
                 <TextField
                   id="standard-basic"
-                  value={converter(this.props.user.default_currency).format(
-                    this.props.data.amount
-                  )}
+                  value={converter(this.props.user.default_currency).format(this.props.data.amount)}
                 />
               </Col>
             </Row>
@@ -139,7 +128,7 @@ class PaymentModal extends React.Component {
           </Button>
           <Button
             variant="primary"
-            style={{ "background-color": "#5bc5a7", "border-color": "#5bc5a7" }}
+            style={{ 'background-color': '#5bc5a7', 'border-color': '#5bc5a7' }}
             onClick={this.handleAddExpenses}
           >
             Pay
@@ -163,4 +152,5 @@ const mapStatetoProps = (state) => {
     transactions: state.transactions,
   };
 };
+
 export default connect(mapStatetoProps)(PaymentModal);

@@ -1,11 +1,12 @@
 /* eslint-disable arrow-body-style */
-import React from "react";
-import cookie from "react-cookies";
-import { Link } from "react-router-dom";
-import Dropdown from "react-bootstrap/Dropdown";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
-import * as userActions from "../../redux/actions/userAction";
+import React from 'react';
+import cookie from 'react-cookies';
+import { Link } from 'react-router-dom';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { Typography } from '@material-ui/core';
+import * as userActions from '../../redux/actions/UserAction';
 
 class UserHeader extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class UserHeader extends React.Component {
 
   handleLogout = (e) => {
     e.preventDefault();
-    cookie.remove("cookie");
+    cookie.remove('cookie');
   };
 
   handleLogout = () => {
@@ -27,12 +28,9 @@ class UserHeader extends React.Component {
   render() {
     return (
       <>
-        <header style={{ "max-height": "50px", "background-color": "#5bc5a7" }}>
+        <header style={{ 'max-height': '50px', 'background-color': '#5bc5a7' }}>
           <div className="container mx-auto">
-            <nav
-              className="navbar"
-              style={{ "max-height": "50px", "align-content": "center" }}
-            >
+            <nav className="navbar" style={{ 'max-height': '50px', 'align-content': 'center' }}>
               <a className="navbar-brand" href="/">
                 <img
                   src="https://assets.splitwise.com/assets/core/logo-wordmark-horizontal-white-short-c309b91b96261a8a993563bdadcf22a89f00ebb260f4f04fd814c2249a6e05d4.svg"
@@ -45,30 +43,21 @@ class UserHeader extends React.Component {
               <div>
                 <form className="form-inline my-2 my-lg-0">
                   <div>
-                    <Link to="/dashboard" style={{ color: "white" }}>
-                      Home
+                    <Link to="/dashboard" style={{ color: 'white' }}>
+                      <Typography>Home</Typography>
                     </Link>
                   </div>
 
                   <div>
                     <Dropdown>
-                      <Dropdown.Toggle
-                        className="header-user"
-                        id="dropdown-basic"
-                      >
+                      <Dropdown.Toggle className="header-user" id="dropdown-basic">
                         {this.state.user.name}
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        <Dropdown.Item href="/userprofile">
-                          My Profile
-                        </Dropdown.Item>
-                        <Dropdown.Item href="creategroup">
-                          Create Group
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={this.handleLogout}>
-                          Logout
-                        </Dropdown.Item>
+                        <Dropdown.Item href="/userprofile">My Profile</Dropdown.Item>
+                        <Dropdown.Item href="creategroup">Create Group</Dropdown.Item>
+                        <Dropdown.Item onClick={this.handleLogout}>Logout</Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
                   </div>

@@ -13,7 +13,8 @@ import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
-import converter from '../../constants/currency';
+import { converter } from '../../constants/commonservice';
+import * as transactionActions from '../../redux/actions/TransactionAction';
 
 class AddExpenseModal extends React.Component {
   constructor(props) {
@@ -52,13 +53,17 @@ class AddExpenseModal extends React.Component {
     };
     axios.post(`http://localhost:3001/api/transactions`, data).then((response) => {
       if (response.status === 200) {
-        this.setState({
-          show: false,
-        });
-      } else {
-        this.setState({
-          show: true,
-        });
+        if (response.data.message === 'Expenses added successfully!') {
+          this.setState({
+            show: false,
+          });
+          this.props.getTransaction(this.props.user.name);
+          this.handleClose();
+        } else {
+          this.setState({
+            show: true,
+          });
+        }
       }
     });
   };
@@ -135,11 +140,18 @@ AddExpenseModal.propTypes = {
   show: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
   grp_name: PropTypes.string.isRequired,
+  getTransaction: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
+    transactions: state.transactions,
   };
 };
-export default connect(mapStatetoProps)(AddExpenseModal);
+
+const mapDispatchToProps = {
+  getTransaction: transactionActions.getTransaction,
+};
+
+export default connect(mapStatetoProps, mapDispatchToProps)(AddExpenseModal);

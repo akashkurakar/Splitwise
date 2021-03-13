@@ -1,23 +1,23 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-undef */
 /* eslint-disable arrow-body-style */
-import React from "react";
-import { connect } from "react-redux";
-import { Typography } from "@material-ui/core";
-import PropTypes from "prop-types";
-import UserHeader from "../Dashboard/UserHeader";
-import * as userActions from "../../redux/actions/userAction";
+import React from 'react';
+import { connect } from 'react-redux';
+import { Typography } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import UserHeader from '../Dashboard/UserHeader';
+import * as userActions from '../../redux/actions/UserAction';
 
 class UserProfile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "",
-      email: "",
-      phone: "",
-      default_currency: "",
-      lang: "",
-      timezone: "",
+      name: '',
+      email: '',
+      phone: '',
+      default_currency: '',
+      lang: '',
+      timezone: '',
     };
   }
 
@@ -43,13 +43,13 @@ class UserProfile extends React.Component {
     const formData = new FormData();
 
     // Update the formData object
-    formData.append("myFile", this.state.selectedFile);
+    formData.append('myFile', this.state.selectedFile);
 
     // Details of the uploaded file
 
     // Request made to the backend api
     // Send formData object
-    // axios.post("api/uploadfile", formData);
+    // axios.post('api/uploadfile', formData);
   };
 
   fileData = () => {
@@ -85,20 +85,17 @@ class UserProfile extends React.Component {
 
   nameFieldChangeHandler = (e) => {
     e.preventDefault();
-    document.getElementById("name").disabled = !document.getElementById("name")
-      .disabled;
+    document.getElementById('name').disabled = !document.getElementById('name').disabled;
   };
 
   emailFieldChangeHandler = (e) => {
     e.preventDefault();
-    document.getElementById("email").disabled = !document.getElementById("name")
-      .disabled;
+    document.getElementById('email').disabled = !document.getElementById('name').disabled;
   };
 
   phoneFieldChangeHandler = (e) => {
     e.preventDefault();
-    document.getElementById("phone").disabled = !document.getElementById("name")
-      .disabled;
+    document.getElementById('phone').disabled = !document.getElementById('name').disabled;
   };
 
   handleCurrencySelect = (e) => {
@@ -140,13 +137,12 @@ class UserProfile extends React.Component {
         <UserHeader />
         <div>
           <div className="container">
-            {this.props.alert.message !== "" && (
+            {this.props.alert.message !== '' && this.props.alert.message !== undefined ? (
               <div className="alert alert-success" role="alert">
                 {this.props.alert.message}
               </div>
-            )}
-            {this.props.alert.message &&
-            this.props.alert.message.response !== undefined ? (
+            ) : null}
+            {this.props.alert.message && this.props.alert.message.response !== undefined ? (
               <div className="alert alert-danger" role="alert">
                 {this.props.alert.message.response.data.message}
               </div>
@@ -160,15 +156,10 @@ class UserProfile extends React.Component {
                     height="150"
                     className="img-fluid"
                     alt=""
+                    onChange={this.imageUpload}
                   />
                 ) : (
-                  <img
-                    src=""
-                    width="150"
-                    height="150"
-                    className="img-fluid"
-                    alt=""
-                  />
+                  <img src="" width="150" height="150" className="img-fluid" alt="" />
                 )}
                 <div>
                   <input id="" onSubmit={this.onFileChange} type="file" />
@@ -246,7 +237,7 @@ class UserProfile extends React.Component {
                     >
                       <option value="USD">USD</option>
                       <option value="KWD">KWD</option>
-                      <option value="BSD">BSD</option>
+                      <option value="BHBHD">BHD</option>
                       <option value="GBP">GBP</option>
                       <option value="CAD">CAD</option>
                     </select>
@@ -260,18 +251,10 @@ class UserProfile extends React.Component {
                       id="sel2"
                     >
                       <option value="GMT">(GMT)GMT(Greenwich Mean Time)</option>
-                      <option value="IST">
-                        (IST)GMT+5:30(Indian Standard Time)
-                      </option>
-                      <option value="PST">
-                        (PST)GMT-8:00(Pacific Standard Time)
-                      </option>
-                      <option value="MST">
-                        (MST)GMT-7:00(Mountain Standard Time)
-                      </option>
-                      <option value="EST">
-                        (EST)GMT-5:00(Eastern Standard Time)
-                      </option>
+                      <option value="IST">(IST)GMT+5:30(Indian Standard Time)</option>
+                      <option value="PST">(PST)GMT-8:00(Pacific Standard Time)</option>
+                      <option value="MST">(MST)GMT-7:00(Mountain Standard Time)</option>
+                      <option value="EST">(EST)GMT-5:00(Eastern Standard Time)</option>
                     </select>
                   </div>
                   <div className="form-label-group">
@@ -294,7 +277,7 @@ class UserProfile extends React.Component {
                       className="btn btn-lg btn-success btn-block text-uppercase"
                       type="submit"
                       id="location"
-                      style={{ float: "left", "background-color": "#ff652f" }}
+                      style={{ float: 'left', 'background-color': '#ff652f' }}
                     >
                       Save
                     </button>

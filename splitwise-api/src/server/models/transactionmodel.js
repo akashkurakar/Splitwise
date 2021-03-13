@@ -1,143 +1,125 @@
-const con = require('../db/db');
+const con = require("../db/db");
 
-var moment = require('moment');
+var moment = require("moment");
 
-    var transaction={};
+var transaction = {};
 
-    transaction.getTransactionByGroup=(grpName)=>{
-        return new Promise((resolve, reject) => {
-           
-                con.query('USE main;');
-                con.query("SET sql_mode = ''");
-                var sql = `Select * from transactions where grp_name='${grpName}' AND status!='setteled'`;
-                con.query(sql, function (error, result, fields) {
-                    if (error) {
-                        return reject(error);
-                    }
-                    return resolve(result)
-    
-                });
-            })
-    }
-    transaction.getTransactionByUser=(user)=>{
-        return new Promise((resolve, reject) => {
-           
-                con.query('USE main;');
-                var sql = `Select * from transactions where (paid_by='${user}' OR owed_name= '${user}') order by updated_on desc`;
-                con.query(sql, function (error, result, fields) {
-                    if (error) {
-                        return reject(error);
-                    }
-                    return resolve(result)
-    
-                });
-            })
-    }
-    transaction.getOwedTransactionByUser=(user)=>{
-        return new Promise((resolve, reject) => {
-           
-                con.query('USE main;');
-                var sql = `Select sum(amount) from transactions where owed_name='${user}' and status='PENDING'`;
-                con.query(sql, function (error, result, fields) {
-                    if (error) {
-                        return reject(error);
-                    }
-                    return resolve(result)
-    
-                });
-            })
-    }
-    transaction.getPaidTransactionByUser=(user)=>{
-        return new Promise((resolve, reject) => {
-           
-                con.query('USE main;');
-                var sql = `Select sum(amount) from transactions where paid_by='${user}' and status='PENDING'`;
-                con.query(sql, function (error, result, fields) {
-                    if (error) {
-                        return reject(error);
-                    }
-                    return resolve(result)
-    
-                });
-            })
-    }
-    transaction.getTotalPaidTransactionByUser=(user)=>{
-        return new Promise((resolve, reject) => {
-           
-                con.query('USE main;');
-                var sql = `Select owed_name,sum(amount) as total_amt from transactions where paid_by='${user}' and status='PENDING' group by owed_name`;
-                con.query(sql, function (error, result, fields) {
-                    if (error) {
-                        return reject(error);
-                    }
-                    return resolve(result)
-    
-                });
-            })
-    }
-    transaction.getTotalOwedTransactionByUser=(user)=>{
-        return new Promise((resolve, reject) => {
-           
-                con.query('USE main;');
-                var sql = `Select paid_by,sum(amount) as total_amt from transactions where owed_name='${user}' and status='PENDING' group by paid_by`;
-                con.query(sql, function (error, result, fields) {
-                    if (error) {
-                        return reject(error);
-                    }
-                    return resolve(result)
-    
-                });
-            })
-    }
-    transaction.addTransaction=(users,grpName,transaction)=>{
-        return new Promise((resolve, reject) => {
-           let amt = parseFloat(transaction.amount)/users.length;
-           let createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-           console.log(createDate);
-                con.query('USE main;');
-                users.forEach(element => {
-                    if(element.user_name!==transaction.user){
-                    var sql = `Insert into transactions (tran_name,amount,paid_by,grp_name,owed_name,created_on,bill_amt,status) values ('${transaction.description}',${amt},'${transaction.user}','${grpName}','${element.user_name}','${createDate}','${transaction.amount}','PENDING')`;
-                con.query(sql, function (error, result, fields) {
-                    if (error) {
-                        return reject(error);
-                    }
-                    return resolve(result)
-    
-                });
-            }
-                });
-                
-            })
-    }
-    transaction.transactionSettle=(transaction)=>{
-        return new Promise((resolve, reject) => {
-           
-            con.query('USE main;');
-            var sql = `update transactions set status="setteled" where (paid_by="${transaction.user1}" and owed_name="${transaction.user2}") OR (paid_by="${transaction.user2}" and owed_name="${transaction.user1}")`;
-            con.query(sql, function (error, result, fields) {
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(result)
+transaction.getTransactionByGroup = (grpName) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    con.query("SET sql_mode = ''");
+    var sql = `Select * from transactions where grp_name='${grpName}' AND status!='setteled' group by tran_name order by created_on desc`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+transaction.getTransactionByUser = (user) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `Select * from transactions where (paid_by='${user}' OR owed_name= '${user}') order by updated_on desc`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+transaction.getOwedTransactionByUser = (user) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `Select sum(amount) from transactions where owed_name='${user}' and status='PENDING'`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+transaction.getPaidTransactionByUser = (user) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `Select sum(amount) from transactions where paid_by='${user}' and status='PENDING'`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+transaction.getTotalPaidTransactionByUser = (user) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `Select owed_name,sum(amount) as total_amt from transactions where paid_by='${user}' and status='PENDING' group by owed_name`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+transaction.getTotalOwedTransactionByUser = (user) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `Select paid_by,sum(amount) as total_amt from transactions where owed_name='${user}' and status='PENDING' group by paid_by`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+transaction.addTransaction = (users, grpName, transaction) => {
+  return new Promise((resolve, reject) => {
+    let amt = parseFloat(transaction.amount) / users.length;
+    let createDate = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
+    console.log(createDate);
+    con.query("USE main;");
+    users.forEach((element) => {
+      if (element.user_name !== transaction.user) {
+        var sql = `Insert into transactions (tran_name,amount,paid_by,grp_name,owed_name,created_on,bill_amt,status) values ('${transaction.description}',${amt},'${transaction.user}','${grpName}','${element.user_name}','${createDate}','${transaction.amount}','PENDING')`;
+        con.query(sql, function (error, result, fields) {
+          if (error) {
+            return reject(error);
+          }
+          return resolve(result);
+        });
+      }
+    });
+  });
+};
+transaction.transactionSettle = (transaction) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `update transactions set status="setteled" where (paid_by="${transaction.user1}" and owed_name="${transaction.user2}") OR (paid_by="${transaction.user2}" and owed_name="${transaction.user1}")`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
 
-            });
-        })
-    }
-
-    transaction.transactionStatus=(transaction)=>{
-        return new Promise((resolve, reject) => {
-           
-            con.query('USE main;');
-            var sql = `select * from transactions where (paid_by='${transaction.user}' OR owed_name='${transaction.user}') AND status="PENDING" AND grp_name='${transaction.group}'`;
-            con.query(sql, function (error, result, fields) {
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(result)
-
-            });
-        })
-    }
+transaction.transactionStatus = (transaction) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `select * from transactions where (paid_by='${transaction.user}' OR owed_name='${transaction.user}') AND status="PENDING" AND grp_name='${transaction.group}'`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
 
 module.exports = transaction;

@@ -1,12 +1,13 @@
-import { combineReducers } from "redux";
-import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import alert from "./AlertReducers";
-import user from "./userreducer";
-import dashboard from "./DashboardReducers";
-import groups from "./GroupReducer";
-import transactions from "./TransactionReducer";
-import notifications from "./NotificationReducer";
+/* eslint-disable arrow-body-style */
+import { combineReducers } from 'redux';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import alert from './AlertReducers';
+import user from './Userreducer';
+import dashboard from './DashboardReducers';
+import groups from './GroupReducer';
+import transactions from './TransactionReducer';
+import notifications from './NotificationReducer';
 
 const rootreducer = combineReducers({
   user,
@@ -16,10 +17,21 @@ const rootreducer = combineReducers({
   transactions,
   notifications,
 });
-const persistConfig = {
-  key: "root",
-  storage,
-  whitelist: ["user", "alert", "groups", "transactions", "notifications"],
+
+const initialState = rootreducer({}, {});
+
+const appReducer = (state, action) => {
+  if (action.type === 'LOGOUT_USER') {
+    Object.assign(state, initialState);
+  }
+
+  return rootreducer(state, action);
 };
 
-export default persistReducer(persistConfig, rootreducer);
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['user', 'alert', 'groups', 'transactions', 'notifications'],
+};
+
+export default persistReducer(persistConfig, appReducer);

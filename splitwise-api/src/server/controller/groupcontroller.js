@@ -7,6 +7,7 @@ const ParticipantSerice = require("../services/participantservice");
 const ActivityService = require("../services/ActivityService");
 
 const UserService = require("../services/userService");
+const { ids } = require("webpack");
 
 let groupService = new GroupService();
 
@@ -55,6 +56,7 @@ exports.getAllGroups = async (req, res) => {
   }
   res.end();
 };
+
 exports.approveGroupRequest = async (req, res) => {
   const invite = req.body;
   try {
@@ -66,11 +68,24 @@ exports.approveGroupRequest = async (req, res) => {
   }
   res.end();
 };
+
 exports.leaveGroup = async (req, res) => {
   const groupData = req.body;
   try {
     let groups = await groupService.leaveGroup(groupData);
-    res.json(groups);
+    if (groups === "You cant leave group without clearing dues.") {
+      var json = {
+        data: [],
+        message: "You cant leave group without clearing dues.",
+      };
+      res.json(json);
+    } else if (groups === "Success") {
+      var json = {
+        data: [],
+        message: "Group Left Successfully",
+      };
+      res.json(json);
+    }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

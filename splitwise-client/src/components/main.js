@@ -1,16 +1,16 @@
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable import/no-named-as-default-member */
 /* eslint-disable import/no-named-as-default */
-import { Route } from "react-router-dom";
-import React from "react";
-import Signup from "./signup";
-import Login from "./login";
-import Home from "./home";
-import Activity from "./UserViews/UserActivity";
-import MainContent from "./Dashboard/MainContent";
-import CreateGroup from "./UserViews/CreateGroup";
-import UserProfile from "./UserViews/UserProfile";
-import SelectGroup from "./UserViews/SelectGroup";
+import { Route } from 'react-router-dom';
+import React from 'react';
+import Signup from './signup';
+import Login from './login';
+import Home from './home';
+import Activity from './UserViews/UserActivity';
+import MainContent from './Dashboard/MainContent';
+import CreateGroup from './UserViews/CreateGroup';
+import UserProfile from './UserViews/UserProfile';
+import SelectGroup from './UserViews/SelectGroup';
 
 class Main extends React.Component {
   constructor(props) {

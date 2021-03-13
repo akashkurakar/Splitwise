@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import Header from '../header';
-import * as userActions from '../redux/actions/userAction';
+import * as userActions from '../redux/actions/UserAction';
 
 class Login extends React.Component {
   constructor(props) {
@@ -136,7 +136,7 @@ class Login extends React.Component {
 Login.propTypes = {
   alert: PropTypes.objectOf.isRequired,
   loginUser: PropTypes.func.isRequired,
-  user: PropTypes.string.isRequired,
+  user: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {

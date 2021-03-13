@@ -1,57 +1,38 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable arrow-body-style */
-import React from "react";
-import Row from "react-bootstrap/Row";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import { makeStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import Avatar from "@material-ui/core/Avatar";
-import Col from "react-bootstrap/Col";
-import Divider from "@material-ui/core/Divider";
-import Typography from "@material-ui/core/Typography";
-import { connect } from "react-redux";
-import axios from "axios";
-import PropTypes from "prop-types";
-import PaymentModal from "./PaymentModal";
-import photo from "../../static/images/avatar/person.png";
-import converter from "../../constants/currency";
-import * as transactionActions from "../../redux/actions/TransactionAction";
+import React from 'react';
+import Row from 'react-bootstrap/Row';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
+import Col from 'react-bootstrap/Col';
+import Divider from '@material-ui/core/Divider';
+import Typography from '@material-ui/core/Typography';
+import { connect } from 'react-redux';
+import axios from 'axios';
+import PropTypes from 'prop-types';
+import PaymentModal from './PaymentModal';
+import photo from '../../static/images/avatar/person.png';
+import { converter } from '../../constants/commonservice';
+import * as transactionActions from '../../redux/actions/TransactionAction';
 
 class DashboardMiddle extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      useStyles: makeStyles((theme) => ({
-        root: {
-          "& .MuiTextField-root": {
-            margin: theme.spacing(1),
-            width: "25ch",
-          },
-          "& > *": {
-            margin: theme.spacing(1),
-            width: "25ch",
-          },
-          width: "100%",
-          maxWidth: "36ch",
-          backgroundColor: theme.palette.background.paper,
-          inline: {
-            display: "inline",
-          },
-        },
-      })),
       balances: [],
       show: false,
       oweData: [],
       owedData: [],
       modalData: {
-        user: "",
-        amount: "",
+        user: '',
+        amount: '',
       },
     };
   }
@@ -90,47 +71,39 @@ class DashboardMiddle extends React.Component {
   getBalances = () => {
     const userId = this.props.user.name;
     axios.defaults.withCredentials = true;
-    axios
-      .get(`http://localhost:3001/api/balances/?user=${userId}`)
-      .then((response) => {
-        if (response.status === 200) {
-          const { data } = response;
-          this.setState({
-            balances: data,
-          });
-        } else {
-          // error
-        }
-      });
+    axios.get(`http://localhost:3001/api/balances/?user=${userId}`).then((response) => {
+      if (response.status === 200) {
+        const { data } = response;
+        this.setState({
+          balances: data,
+        });
+      } else {
+        // error
+      }
+    });
   };
 
   getTotalTransactionByUser = () => {
     const userId = this.props.user.name;
     axios.defaults.withCredentials = true;
-    axios
-      .get(`http://localhost:3001/api/transactions/data/?user=${userId}`)
-      .then((response) => {
-        if (response.status === 200) {
-          const { data } = response;
-          this.setState({
-            oweData: data.oweData,
-            owedData: data.owedData,
-          });
-        } else {
-          // error
-        }
-      });
+    axios.get(`http://localhost:3001/api/transactions/data/?user=${userId}`).then((response) => {
+      if (response.status === 200) {
+        const { data } = response;
+        this.setState({
+          oweData: data.oweData,
+          owedData: data.owedData,
+        });
+      } else {
+        // error
+      }
+    });
   };
 
   render() {
-    const classes = this.state.useStyles;
     return (
       <>
         <Row>
-          <Card
-            style={{ "background-color": "#eeeeee", width: "100%" }}
-            className="card"
-          >
+          <Card style={{ 'background-color': '#eeeeee', width: '100%' }} className="card">
             <Card.Body>
               <Row>
                 <Col md={4}>
@@ -140,8 +113,8 @@ class DashboardMiddle extends React.Component {
                 <Col md={4}>
                   <Button
                     style={{
-                      "background-color": "#5bc5a7",
-                      "border-color": "#5bc5a7",
+                      'background-color': '#5bc5a7',
+                      'border-color': '#5bc5a7',
                     }}
                     type="submit"
                     id="location"
@@ -154,7 +127,7 @@ class DashboardMiddle extends React.Component {
               <Row>
                 <Col md={4}>
                   <medium className="text-muted">Total Balance</medium>
-                  <h6 style={{ color: "green" }}>
+                  <h6 style={{ color: 'green' }}>
                     {converter(this.props.user.default_currency).format(
                       this.state.balances.balance
                     )}
@@ -163,7 +136,7 @@ class DashboardMiddle extends React.Component {
 
                 <Col md={4}>
                   <medium className="text-muted">You Owe</medium>
-                  <h6 style={{ color: "red" }}>
+                  <h6 style={{ color: 'red' }}>
                     {converter(this.props.user.default_currency).format(
                       this.state.balances.paidAmount
                     )}
@@ -171,7 +144,7 @@ class DashboardMiddle extends React.Component {
                 </Col>
                 <Col md={4}>
                   <medium className="text-muted">You are Owed</medium>
-                  <h6 style={{ color: "green" }}>
+                  <h6 style={{ color: 'green' }}>
                     {converter(this.props.user.default_currency).format(
                       this.state.balances.owedAmount
                     )}
@@ -182,7 +155,7 @@ class DashboardMiddle extends React.Component {
           </Card>
         </Row>
         <Row>
-          <Col style={{ "background-color": "#ffffff" }} md={6}>
+          <Col style={{ 'background-color': '#ffffff' }} md={6}>
             <large
               className="text-muted header-label"
               color="textSecondary"
@@ -191,46 +164,49 @@ class DashboardMiddle extends React.Component {
             >
               You owe
             </large>
-            <List dense className={classes.root}>
-              {this.state.owedData.length > 0 ? (
-                this.state.owedData.map((trans) => (
+            <List dense>
+              {this.state.oweData.length > 0 ? (
+                this.state.oweData.map((trans) => (
                   <ListItem button>
                     <ListItemAvatar>
                       <Avatar alt={`Avatar n°${1}`} src={photo} />
                     </ListItemAvatar>
                     <ListItemText
                       id="item1"
-                      primary={trans.paid_by}
+                      primary={trans.owed_name}
                       secondary={
-                        this.props.transactions.length > 0
-                          ? this.props.transactions
-                              .filter(
-                                (d) =>
-                                  d.owed_name === trans.owed_name &&
-                                  d.status === "PENDING"
-                              )
-                              .map((trans2) => (
-                                <div>
-                                  <Typography
-                                    component="span"
-                                    variant="body2"
-                                    className="header-label"
-                                  >
-                                    You owe{" "}
-                                    {converter(
-                                      this.props.user.default_currency
-                                    ).format(trans2.amount)}{" "}
-                                    for {trans2.grp_name}
-                                  </Typography>
-                                </div>
-                              ))
-                          : null
+                        <ul>
+                          <Typography>
+                            Owe you&nbsp;
+                            {converter(this.props.user.default_currency).format(trans.total_amt)}
+                          </Typography>
+                          {this.props.transactions.length > 0
+                            ? this.props.transactions
+                                .filter(
+                                  (d) => d.owed_name === trans.owed_name && d.status === 'PENDING'
+                                )
+                                .map((trans1) => (
+                                  <li>
+                                    <div>
+                                      <Typography
+                                        component="span"
+                                        variant="body2"
+                                        className="header-label"
+                                      >
+                                        You owe&nbsp;
+                                        {converter(this.props.user.default_currency).format(
+                                          trans1.amount
+                                        )}
+                                        &nbsp; for '{trans1.grp_name}'
+                                      </Typography>
+                                    </div>
+                                  </li>
+                                ))
+                            : null}
+                        </ul>
                       }
                     />
                     <Divider light />
-                    <ListItemSecondaryAction>
-                      <Typography>You owe {trans.grp_name}</Typography>
-                    </ListItemSecondaryAction>
                   </ListItem>
                 ))
               ) : (
@@ -247,42 +223,46 @@ class DashboardMiddle extends React.Component {
             </List>
           </Col>
           <Divider orientation="vertical" flexItem />
-          <Col style={{ "background-color": "#ffffff" }} md={5.5}>
+          <Col style={{ 'background-color': '#ffffff' }} md={5.5}>
             <large className="text-muted header-label">You are owed</large>
-            <List dense className={classes.root}>
-              {this.state.oweData.length > 0 ? (
-                this.state.oweData.map((trans) => (
+            <List dense>
+              {this.state.owedData.length > 0 ? (
+                this.state.owedData.map((user) => (
                   <ListItem alignItems="flex-start" button>
                     <ListItemAvatar>
                       <Avatar alt={`Avatar n°${1}`} src={photo} />
                     </ListItemAvatar>
                     <ListItemText
                       id="item1"
-                      primary={trans.owed_name}
+                      primary={user.paid_by}
                       secondary={
-                        this.props.transactions.length > 0
-                          ? this.props.transactions
-                              .filter(
-                                (d) =>
-                                  d.owed_name === trans.owed_name &&
-                                  d.status === "PENDING"
-                              )
-                              .map((trans1) => (
-                                <div>
-                                  <Typography
-                                    component="span"
-                                    variant="body2"
-                                    className="header-label"
-                                  >
-                                    Owes you{" "}
-                                    {converter(
-                                      this.props.user.default_currency
-                                    ).format(trans1.amount)}{" "}
-                                    for '{trans1.grp_name}'
-                                  </Typography>
-                                </div>
-                              ))
-                          : null
+                        <ul>
+                          <Typography>
+                            Owe you&nbsp;
+                            {converter(this.props.user.default_currency).format(user.total_amt)}
+                          </Typography>
+                          {this.props.transactions.length > 0
+                            ? this.props.transactions
+                                .filter((d) => d.paid_by === user.paid_by && d.status === 'PENDING')
+                                .map((trans1) => (
+                                  <li>
+                                    <div>
+                                      <Typography
+                                        component="span"
+                                        variant="body2"
+                                        className="header-label"
+                                      >
+                                        Owes you
+                                        {converter(this.props.user.default_currency).format(
+                                          trans1.amount
+                                        )}
+                                        for '{trans1.grp_name}'
+                                      </Typography>
+                                    </div>
+                                  </li>
+                                ))
+                            : null}
+                        </ul>
                       }
                     />
 
@@ -303,9 +283,7 @@ class DashboardMiddle extends React.Component {
             </List>
           </Col>
         </Row>
-        {this.state.show && (
-          <PaymentModal show={this.handleModal} data={this.state.modalData} />
-        )}
+        {this.state.show && <PaymentModal show={this.handleModal} data={this.state.modalData} />}
       </>
     );
   }

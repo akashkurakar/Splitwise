@@ -20,6 +20,7 @@ class CreateGroup extends React.Component {
         raw: '',
       },
       errorMessage: '',
+      imgUrl: '',
     };
     this.handleMembers = this.handleMembers.bind(this);
   }
@@ -29,6 +30,24 @@ class CreateGroup extends React.Component {
       user: this.props.user,
     });
   }
+
+  imageUpload = (e) => {
+    const file = e.target.files[0];
+    this.getBase64(file).then((url) =>
+      this.setState({
+        imgUrl: url,
+      })
+    );
+  };
+
+  getBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new global.FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
 
   grpNameChangeHandler = (e) => {
     this.setState({
@@ -54,6 +73,7 @@ class CreateGroup extends React.Component {
       grp_name: this.state.grpName,
       user: this.state.user.name,
       users: this.state.members,
+      imgPath: this.state.imgUrl,
     };
     axios.defaults.withCredentials = true;
     axios
@@ -104,7 +124,7 @@ class CreateGroup extends React.Component {
                       />
                     )}
                     <div>
-                      <input id="" onChange={this.handleUpload} name="" type="file" />
+                      <input id="" onChange={this.imageUpload} name="" type="file" />
                     </div>
                   </div>
 

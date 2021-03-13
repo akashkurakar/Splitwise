@@ -3,6 +3,7 @@ const grpDb = require("../models/groupmodel");
 const trnsactDb = require("../models/transactionmodel");
 const ParticipantSerice = require("../services/participantservice");
 const ActivityService = require("../services/ActivityService");
+const e = require("cors");
 let participantSerice = new ParticipantSerice();
 let activityService = new ActivityService();
 
@@ -14,8 +15,7 @@ class GroupService {
         let groups = await grpDb.add(groupObj);
         let group = await grpDb.findGroupByName(groupObj);
         let activity = await activityService.addActivity(
-          "created group ",
-          groupObj.grp_name,
+          `${groupObj.user} created group ${groupObj.grp_name}`,
           groupObj.user
         );
         if (activity !== "User added successfully") {
@@ -30,19 +30,16 @@ class GroupService {
           return "Failed to create group!";
         }
         groupObj.users.forEach((element) => {
-          participant = participantSerice.addParticipant(
-            groupObj.grp_name,
-            element.name,
-            false
-          );
-          if (participant !== "User added as participants!") {
-            return "Failed to create group!";
+          if (element.name !== "" || element.email !== "") {
+            participant = participantSerice.addParticipant(
+              groupObj.grp_name,
+              element.name,
+              false
+            );
+            if (participant !== "User added as participants!") {
+              return "Failed to create group!";
+            }
           }
-          activity = activityService.addActivity(
-            "created group ",
-            groupObj.grp_name,
-            element.name
-          );
         });
         if (activity !== "User added successfully") {
           return "Failed to create group!";

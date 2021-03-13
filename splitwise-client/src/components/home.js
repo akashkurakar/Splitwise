@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-filename-extension */
-import React from "react";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { Typography } from "@material-ui/core";
-import Header from "../header";
+import React from 'react';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { Typography } from '@material-ui/core';
+import Header from '../header';
 
 const Home = () => (
   <div>
@@ -19,17 +19,14 @@ const Home = () => (
               </div>
               <div>
                 <h5>
-                  Keep track of your shared expenses and balances with
-                  housemates, trips, groups, friends, and family.
+                  Keep track of your shared expenses and balances with housemates, trips, groups,
+                  friends, and family.
                 </h5>
               </div>
             </Typography>
             <form className="form-signin">
               <div>
-                <a
-                  className="btn btn-lg btn-success btn-block text-uppercase"
-                  href="/signup"
-                >
+                <a className="btn btn-lg btn-success btn-block text-uppercase" href="/signup">
                   Sign Up
                 </a>
               </div>
@@ -38,7 +35,7 @@ const Home = () => (
         </div>
       </Col>
       <Col md={5}>
-        {" "}
+        {' '}
         <div className="home-logo">
           <img
             src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"

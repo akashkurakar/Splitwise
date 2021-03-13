@@ -14,9 +14,10 @@ import UserGroups from '../UserViews/UserGroups';
 import SelectGroup from '../UserViews/SelectGroup';
 import UserHeader from './UserHeader';
 import Notification from '../UserViews/Notifications';
-import * as userActions from '../../redux/actions/userAction';
+import * as userActions from '../../redux/actions/UserAction';
 import * as transactionAction from '../../redux/actions/TransactionAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
+import RightSideBar from './RightSidebar';
 
 class MainContent extends React.Component {
   constructor(props) {
@@ -29,7 +30,7 @@ class MainContent extends React.Component {
     };
     this.props.getGroups(this.props.user.name);
     this.handleCallback = this.handleCallback.bind(this);
-    if (this.props.user === undefined || this.props.user.length === 0) {
+    if (this.props.user.name === undefined) {
       window.location.href = './login';
     }
   }
@@ -98,7 +99,7 @@ class MainContent extends React.Component {
                   selectedGroup={this.handleSelectedGroup}
                 />
               </Col>
-              <Col md={9}>
+              <Col md={7}>
                 {this.state.step === 1 ? <UserDashboard balances={this.state.balances} /> : null}
                 {this.state.step === 2 ? <Activity transactions={this.state.transactions} /> : null}
                 {this.state.step === 4 ? <CreateGroup /> : null}
@@ -109,6 +110,9 @@ class MainContent extends React.Component {
                   <SelectGroup selectedGroup={this.state.selectedGroup} />
                 ) : null}
                 {this.state.step === 7 && <Notification />}
+              </Col>
+              <Col>
+                <RightSideBar />
               </Col>
             </Row>
           </Container>

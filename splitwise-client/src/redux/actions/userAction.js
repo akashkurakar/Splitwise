@@ -1,5 +1,6 @@
 /* eslint-disable arrow-body-style */
 import axios from 'axios';
+import storage from 'redux-persist/lib/storage';
 import history from '../../history';
 
 export function loginUserSuccess(user) {
@@ -18,7 +19,8 @@ export function clearAlert() {
 export function logoutUser(user) {
   history.push('/login');
   clearAlert(user);
-  return { type: 'LOGOUT_USER', user };
+  storage.removeItem('persist:root');
+  return { type: 'LOGOUT_USER', data: '' };
 }
 
 export const loginUser = (user) => async (dispatch) => {
@@ -35,7 +37,7 @@ export const loginUser = (user) => async (dispatch) => {
 };
 export const signupUser = (user) => async (dispatch) => {
   await axios
-    .post('http://localhost:3001/api/signup', user)
+    .put('http://localhost:3001/api/signup', user)
     .then((res) => {
       dispatch({ type: 'SIGN_UP_SUCCESS', payload: res.data.data });
       dispatch({ type: 'ALERT_CLEAR', message: res.data.message });

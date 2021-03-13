@@ -14,8 +14,12 @@ class GroupMembers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      rows: ['0', '1', '2', '3'],
-      members: [],
+      members: [
+        { name: '', email: '' },
+        { name: '', email: '' },
+        { name: '', email: '' },
+        { name: '', email: '' },
+      ],
       users: [],
       user: this.props.user,
       isLoggedIn: false,
@@ -30,16 +34,15 @@ class GroupMembers extends React.Component {
     this.getUser();
   }
 
-  handleName = (name, e) => {
-    e.preventDefault();
-    const { members } = this.state;
-    if (members[e.target.id] === undefined) {
-      members.push({ name, email: '' });
+  handleName = (name, index) => {
+    const rows = this.state.members;
+    if (rows[index] === undefined) {
+      rows.push({ name, email: '' });
     } else {
-      members[e.target.id].name = name;
+      rows[index].name = name;
     }
     this.setState({
-      members,
+      members: rows,
     });
   };
 
@@ -57,13 +60,12 @@ class GroupMembers extends React.Component {
     });
   };
 
-  handleEmail = (e) => {
-    e.preventDefault();
+  handleEmail = (id, e) => {
     const members = this.state.members;
-    if (members[e.target.id] === undefined) {
+    if (this.state.members[id] === undefined) {
       members.push({ name: '', email: e.target.value });
     } else {
-      members[e.target.id].email = e.target.value;
+      members[id].email = e.target.value;
     }
     this.setState({
       members,
@@ -78,9 +80,9 @@ class GroupMembers extends React.Component {
 
   addMember = (e) => {
     e.preventDefault();
-    const { rows } = this.state;
-    rows.push('new row');
-    this.setState({ rows });
+    const rows = this.state.members;
+    rows.push({ name: '', email: '' });
+    this.setState({ members: rows });
   };
 
   render() {
@@ -105,7 +107,7 @@ class GroupMembers extends React.Component {
                   <Typography>{this.state.user.name}</Typography>
                 </td>
               </tr>
-              {this.state.rows.map(() => (
+              {this.state.members.map((r, index) => (
                 <tr>
                   <td>
                     <img
@@ -119,11 +121,11 @@ class GroupMembers extends React.Component {
                   <td>
                     <Autocomplete
                       freeSolo
-                      id="free-solo-2-demo"
+                      id={`name-${index}`}
                       disableClearable
-                      value={this.props.user}
+                      value={r.name}
                       options={this.state.users.map((option) => option.name)}
-                      onChange={(event, value) => this.handleName(value, event)}
+                      onChange={(event, value) => this.handleName(value, index)}
                       renderInput={(params) => (
                         <TextField
                           // eslint-disable-next-line react/jsx-props-no-spreading
@@ -141,9 +143,11 @@ class GroupMembers extends React.Component {
                   <td>
                     <TextField
                       label="Email Address"
+                      id={`email-${index}`}
+                      value={r.email}
                       margin="normal"
                       style={{ width: 200 }}
-                      onChange={this.handleEmail}
+                      onChange={(event) => this.handleEmail(index, event)}
                       onBlur={this.onAddMember}
                     />
                   </td>

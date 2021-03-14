@@ -15,6 +15,7 @@ import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import PropTypes from 'prop-types';
 import { converter } from '../../constants/commonservice';
+import * as transactionActions from '../../redux/actions/TransactionAction';
 
 class PaymentModal extends React.Component {
   constructor(props) {
@@ -153,4 +154,7 @@ const mapStatetoProps = (state) => {
   };
 };
 
-export default connect(mapStatetoProps)(PaymentModal);
+const mapDispatchToProps = {
+  getTransaction: transactionActions.getTransaction,
+};
+export default connect(mapStatetoProps, mapDispatchToProps)(PaymentModal);

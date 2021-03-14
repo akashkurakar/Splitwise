@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import AssistantPhotoIcon from '@material-ui/icons/AssistantPhoto';
 import { Typography } from '@material-ui/core';
 import ListOutlinedIcon from '@material-ui/icons/ListOutlined';
-import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+// import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
@@ -175,7 +175,24 @@ class LeftSideBar extends React.Component {
                         value={r.grp_name}
                       >
                         <Typography onClick={() => this.handleGroupClick(index)}>
-                          <SupervisedUserCircleIcon color="primary" />
+                          {r.image_path !== '' ? (
+                            <img
+                              src={r.image_path}
+                              width="20"
+                              height="20"
+                              className="img-fluid"
+                              alt=""
+                            />
+                          ) : (
+                            <img
+                              width="20"
+                              height="20"
+                              className="img-fluid"
+                              alt=""
+                              src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
+                            />
+                          )}
+                          &nbsp;
                           {r.grp_name}
                         </Typography>
                       </div>

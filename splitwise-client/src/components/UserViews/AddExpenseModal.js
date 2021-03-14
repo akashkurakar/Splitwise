@@ -79,8 +79,8 @@ class AddExpenseModal extends React.Component {
             <Typography>
               With you and:
               <Chip
-                avatar={<Avatar>&nbsp;</Avatar>}
-                label={this.props.grp_name}
+                avatar={<Avatar src={this.props.grp_name.image_path} />}
+                label={this.props.grp_name.grp_name}
                 variant="outlined"
               />
             </Typography>

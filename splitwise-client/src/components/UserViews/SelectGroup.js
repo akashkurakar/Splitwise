@@ -8,15 +8,15 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
 import { makeStyles } from '@material-ui/core/styles';
 import Row from 'react-bootstrap/Row';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
 import Col from 'react-bootstrap/Col';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import AddExpenseModal from './AddExpenseModal';
 import { converter, convertDate } from '../../constants/commonservice';
+import EditGroupModal from './EditGroupModal';
 
 class SelectGroup extends React.Component {
   constructor() {
@@ -25,6 +25,7 @@ class SelectGroup extends React.Component {
       show: false,
       transactions: '',
       errorMessage: '',
+      showEdit: false,
     };
   }
 
@@ -32,22 +33,18 @@ class SelectGroup extends React.Component {
     this.getTransaction();
   };
 
-  imageUpload = (e) => {
-    const file = e.target.files[0];
-    return getBase64(file);
-  };
-
-  getBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(file);
-    });
+  nameFieldChangeHandler = (e) => {
+    e.preventDefault();
+    document.getElementById('name').disabled = !document.getElementById('name').disabled;
   };
 
   handleModal = (modal) => {
     this.setState({ show: modal });
+    this.getTransaction();
+  };
+
+  handleEditModal = (modal) => {
+    this.setState({ showEdit: modal });
     this.getTransaction();
   };
 
@@ -74,20 +71,6 @@ class SelectGroup extends React.Component {
     });
   };
 
-  /* getUser = () => {
-    axios.defaults.withCredentials = true;
-    axios.get(`http://localhost:3001/api/users/`).then((response) => {
-      if (response.status === 200) {
-        const { data } = response;
-        this.setState({
-          users: data,
-        });
-      } else {
-        // error
-      }
-    });
-  }; */
-
   getTransaction = () => {
     axios.defaults.withCredentials = true;
     axios
@@ -101,6 +84,33 @@ class SelectGroup extends React.Component {
         } else {
           // error
         }
+      });
+  };
+
+  onFileChange = (event) => {
+    // Update the state
+    this.setState({ selectedFile: event });
+    this.onFileUpload();
+  };
+
+  onFileUpload = () => {
+    const formData = new FormData();
+    formData.append('userprofile', this.state.selectedFile);
+    axios
+      .put(
+        `http://localhost:3001/api/uploadfile/`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+        { responseType: 'blob' }
+      )
+      .then((res) => {
+        console.log(res);
+        this.updateGroup();
+      })
+      .catch((error) => {
+        return error;
       });
   };
 
@@ -120,44 +130,41 @@ class SelectGroup extends React.Component {
             <div className="card-body">
               <Row>
                 <Col md={2}>
-                  <img
-                    src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
-                    width="80"
-                    height="80"
-                    className="img-fluid"
-                    alt=""
-                  />
-                  <div>
-                    <Fab
-                      color="secondary"
-                      size="small"
-                      component="span"
-                      aria-label="add"
-                      variant="extended"
-                      type="file"
-                    >
-                      {' '}
-                      <AddIcon size="small" />
-                    </Fab>
+                  <form onSubmit={this.onFileUpload} encType="multipart/form-data">
+                    {this.props.groups.filter((grp) => grp.grp_name === this.props.selectedGroup)
+                      .image_path !== '' ? (
+                      <Avatar
+                        src={
+                          this.props.groups.filter(
+                            (grp) => grp.grp_name === this.props.selectedGroup
+                          ).image_path
+                        }
+                        className="img-fluid"
+                        alt={
+                          this.props.groups.filter(
+                            (grp) => grp.grp_name === this.props.selectedGroup
+                          ).image_path
+                        }
+                        onChange={this.onFileChange}
+                      />
+                    ) : (
+                      <Avatar
+                        width="100"
+                        height="100"
+                        className="img-fluid"
+                        alt=""
+                        src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
+                      />
+                    )}
+                  </form>
+                </Col>
+                <Col md={3}>
+                  <div className="form-label-group">
+                    <Typography>{this.props.selectedGroup}</Typography>
                   </div>
                 </Col>
-                <Col md={2}>
-                  <h2>{this.props.selectedGroup}</h2>
-                </Col>
-                <Col md={2.5}>
-                  <Button
-                    variant="primary"
-                    className="btn btn-2 btn-success pull-right text-uppercase"
-                    style={{
-                      'background-color': '#ff652f',
-                      'border-color': '#5bc5a7',
-                    }}
-                    onClick={this.handleLeaveGroup}
-                  >
-                    Leave Group
-                  </Button>
-                </Col>
-                <Col md={2.5}>
+
+                <Col md={4}>
                   <Button
                     variant="primary"
                     style={{
@@ -172,16 +179,17 @@ class SelectGroup extends React.Component {
                     Add Expenses
                   </Button>
                 </Col>
-
-                <Col md={2.5}>
+                <Col md={3}>
                   <Button
-                    variant="primary"
                     style={{
                       'background-color': '#5bc5a7',
                       'border-color': '#5bc5a7',
                     }}
+                    type="submit"
+                    id="location"
+                    onClick={this.handleEditModal}
                   >
-                    SETTLE UP
+                    Edit Group
                   </Button>
                 </Col>
               </Row>
@@ -282,7 +290,20 @@ class SelectGroup extends React.Component {
           </Col>
         </Row>
         {this.state.show && (
-          <AddExpenseModal show={this.handleModal} grp_name={this.props.selectedGroup} />
+          <AddExpenseModal
+            show={this.handleModal}
+            grp_name={
+              this.props.groups.filter((grp) => grp.grp_name === this.props.selectedGroup)[0]
+            }
+          />
+        )}
+        {this.state.showEdit && (
+          <EditGroupModal
+            show={this.handleModal}
+            grp_name={
+              this.props.groups.filter((grp) => grp.grp_name === this.props.selectedGroup)[0]
+            }
+          />
         )}
       </>
     );
@@ -291,12 +312,14 @@ class SelectGroup extends React.Component {
 SelectGroup.propTypes = {
   user: PropTypes.objectOf.isRequired,
   selectedGroup: PropTypes.func.isRequired,
+  groups: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     alert: state.alert,
+    groups: state.groups,
     transactions: state.transactions,
   };
 };

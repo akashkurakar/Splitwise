@@ -32,7 +32,7 @@ groups.findAll = async (user) => {
 groups.find = async (user) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
-    var findQuery = `select * from participants where user_name='${user.id}'`;
+    var findQuery = `select * from grps as g join participants as p on g.grp_name=p.grp_name where p.user_name='${user.id}' && p.status='active'`;
     con.query(findQuery, function (error, result, fields) {
       if (error) {
         return reject(error);
@@ -70,6 +70,19 @@ groups.leaveGroup = async (request) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
     var findQuery = `UPDATE participants set status='left' where user_name='${request.user}' and grp_name='${request.group}';`;
+    con.query(findQuery, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+
+groups.updateGroup = async (request) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var findQuery = `UPDATE grps set grp_name='${request.grp_name}' AND image_path = '${request.image_path}' where grp_id='${request.grp_id}';`;
     con.query(findQuery, function (error, result, fields) {
       if (error) {
         return reject(error);

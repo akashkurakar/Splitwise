@@ -93,6 +93,26 @@ class GroupService {
       console.log(e);
     }
   };
+  updateGroup = async (request) => {
+    try {
+      if (request.users.length > 0) {
+        let i = 0;
+        request.users.forEach((user) => {
+          participantSerice
+            .addParticipant(request.grp_name, user, false)
+            .then((res) => {})
+            .catch((err) => {
+              return "User already present!";
+            });
+        });
+      }
+      let status = await grpDb.updateGroup(request);
+      return "Group updated successfully!";
+    } catch (e) {
+      console.log(e);
+      return e;
+    }
+  };
 }
 
 module.exports = GroupService;

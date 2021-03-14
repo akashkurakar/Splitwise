@@ -92,3 +92,15 @@ exports.leaveGroup = async (req, res) => {
   }
   res.end();
 };
+
+exports.updateGroups = async (req, res) => {
+  const group = req.body;
+  try {
+    let groups = await groupService.updateGroup(group);
+    res.json(groups);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+  res.end();
+};

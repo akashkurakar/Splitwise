@@ -2,10 +2,57 @@
 
 const express = require("express");
 
+const AWS = require("aws-sdk");
 const bodyParser = require("body-parser");
 
 var jsonParser = bodyParser.json();
 
+const path = require("path");
+
+const multer = require("multer");
+
+const s3 = new AWS.S3({
+  accessKeyId: "AKIAXUQ3XVLVMAMGZHYT",
+  secretAccessKey: "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",
+});
+
+/*const storage = multer.diskStorage({
+  destination: "./splitwise-api/public/upload/",
+
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  // reject a file
+  if (
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/png" ||
+    file.mimetype == "image/jpg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+    return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 5 },
+  fileFilter: fileFilter,
+});*/
+const storage = multer.memoryStorage({
+  destination: function (req, file, callback) {
+    callback(null, "");
+  },
+});
+
+const upload = multer({ storage }).single("userprofile");
 var router = express.Router();
 
 const GroupController = require("../controller/groupcontroller");
@@ -19,6 +66,7 @@ const TransactionController = require("../controller/transactioncontroller");
 const ParticipantController = require("../controller/participantcontroller");
 
 const ActivityController = require("../controller/ActivityController");
+const { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } = require("constants");
 
 router.post("/login", jsonParser, UserController.login);
 
@@ -35,6 +83,8 @@ router.post("/group/create", jsonParser, GroupController.createGroup);
 router.post("/group/leave", jsonParser, GroupController.leaveGroup);
 
 router.get("/groups/", jsonParser, GroupController.getGroups);
+
+router.put("/group/", jsonParser, GroupController.updateGroups);
 
 router.get("/groups/all", jsonParser, GroupController.getAllGroups);
 
@@ -71,5 +121,19 @@ router.post(
 router.get("/participants", jsonParser, ParticipantController.getParticipant);
 
 router.get("/activities", jsonParser, ActivityController.getActivities);
+
+router.put("/uploadfile/", upload, (req, res) => {
+  const params = {
+    Bucket: "splitwise-bucket",
+    Key: `${req.file.originalname}`,
+    Body: req.file.buffer,
+  };
+  s3.upload(params, (error, data) => {
+    if (error) {
+      res.send(500).send(error);
+    }
+    res.send(data);
+  });
+});
 
 module.exports = router;

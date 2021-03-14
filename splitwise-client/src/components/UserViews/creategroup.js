@@ -15,10 +15,6 @@ class CreateGroup extends React.Component {
       grpName: '',
       members: '',
       user: '',
-      image: {
-        review: '',
-        raw: '',
-      },
       errorMessage: '',
       imgUrl: '',
     };
@@ -31,22 +27,32 @@ class CreateGroup extends React.Component {
     });
   }
 
-  imageUpload = (e) => {
-    const file = e.target.files[0];
-    this.getBase64(file).then((url) =>
-      this.setState({
-        imgUrl: url,
-      })
-    );
+  onFileChange = (event) => {
+    // Update the state
+    this.setState({ selectedFile: event });
+    this.onFileUpload();
   };
 
-  getBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new global.FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(file);
-    });
+  onFileUpload = () => {
+    const formData = new FormData();
+    formData.append('userprofile', this.state.selectedFile);
+    axios
+      .put(
+        `http://localhost:3001/api/uploadfile/`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+        { responseType: 'blob' }
+      )
+      .then((res) => {
+        this.setState({
+          imgUrl: res.data.Location,
+        });
+      })
+      .catch((error) => {
+        return error;
+      });
   };
 
   grpNameChangeHandler = (e) => {
@@ -111,21 +117,33 @@ class CreateGroup extends React.Component {
                 <div className="row">
                   <div className="col-3" />
                   <div className="col-3">
-                    {this.state.image.preview ? (
-                      <img src={this.state.image.preview} alt="dummy" width="300" height="300" />
-                    ) : (
-                      <img
-                        src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
-                        width="150"
-                        height="150"
-                        className="img-fluid"
-                        alt=""
-                        onChange={this.handleChange}
-                      />
-                    )}
-                    <div>
-                      <input id="" onChange={this.imageUpload} name="" type="file" />
-                    </div>
+                    <form onSubmit={this.onFileUpload} encType="multipart/form-data">
+                      {this.state.imgUrl !== '' ? (
+                        <img
+                          src={this.state.imgUrl}
+                          width="150"
+                          height="150"
+                          className="img-fluid"
+                          alt=""
+                          onChange={this.onFileChange}
+                        />
+                      ) : (
+                        <img
+                          width="150"
+                          height="150"
+                          className="img-fluid"
+                          alt=""
+                          src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
+                        />
+                      )}
+                      <div>
+                        <input
+                          id=""
+                          onChange={(e) => this.onFileChange(e.target.files[0])}
+                          type="file"
+                        />
+                      </div>
+                    </form>
                   </div>
 
                   <div className="col-4">

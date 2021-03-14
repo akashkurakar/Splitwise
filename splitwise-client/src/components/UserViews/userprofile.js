@@ -5,6 +5,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import UserHeader from '../Dashboard/UserHeader';
 import * as userActions from '../../redux/actions/UserAction';
 
@@ -18,6 +19,8 @@ class UserProfile extends React.Component {
       default_currency: '',
       lang: '',
       timezone: '',
+      selectedFile: '',
+      img: '',
     };
   }
 
@@ -29,40 +32,37 @@ class UserProfile extends React.Component {
       default_currency: this.props.user.default_currency,
       lang: this.props.user.lang,
       timezone: this.props.user.timezone,
+      selectedFile: '',
+      img: '',
     });
   }
 
   onFileChange = (event) => {
     // Update the state
-    this.setState({ selectedFile: event.target.files[0] });
-    // this.onFileUpload();
+    this.setState({ selectedFile: event });
+    this.onFileUpload();
   };
 
   onFileUpload = () => {
-    // Create an object of formData
     const formData = new FormData();
-
-    // Update the formData object
-    formData.append('myFile', this.state.selectedFile);
-
-    // Details of the uploaded file
-
-    // Request made to the backend api
-    // Send formData object
-    // axios.post('api/uploadfile', formData);
-  };
-
-  fileData = () => {
-    if (this.state.selectedFile) {
-      this.onFileUpload();
-    } else {
-      return (
-        <div>
-          <br />
-          <h4>Choose before Pressing the Upload button</h4>
-        </div>
-      );
-    }
+    formData.append('userprofile', this.state.selectedFile);
+    axios
+      .put(
+        `http://localhost:3001/api/uploadfile/?user=${this.props.user.name}`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+        { responseType: 'blob' }
+      )
+      .then((res) => {
+        this.setState({
+          img: res.data.Location,
+        });
+      })
+      .catch((error) => {
+        return error;
+      });
   };
 
   nameChangeHandler = (e) => {
@@ -125,7 +125,7 @@ class UserProfile extends React.Component {
       default_currency: this.state.default_currency,
       lang: this.state.language,
       timezone: this.state.timezone,
-      image_path: this.props.user.image_path,
+      image_path: this.state.img,
       username: this.props.user.username,
     };
     this.props.updateUserProfile(data);
@@ -149,24 +149,33 @@ class UserProfile extends React.Component {
             ) : null}
             <div className="row">
               <div className="col-3">
-                {this.state.selectedFile === null ? (
-                  <img
-                    src={this.state.selectedFile}
-                    width="150"
-                    height="150"
-                    className="img-fluid"
-                    alt=""
-                    onChange={this.imageUpload}
-                  />
-                ) : (
-                  <img src="" width="150" height="150" className="img-fluid" alt="" />
-                )}
-                <div>
-                  <input id="" onSubmit={this.onFileChange} type="file" />
-                  <button type="button" onClick={this.onFileUpload}>
-                    Upload!
-                  </button>
-                </div>
+                <form onSubmit={this.onFileUpload} encType="multipart/form-data">
+                  {this.props.user.image_path !== '' ? (
+                    <img
+                      src={this.props.user.image_path}
+                      width="150"
+                      height="150"
+                      className="img-fluid"
+                      alt=""
+                      onChange={this.onFileChange}
+                    />
+                  ) : (
+                    <img
+                      width="250"
+                      height="250"
+                      className="img-fluid"
+                      alt=""
+                      src={this.state.user.image_path}
+                    />
+                  )}
+                  <div>
+                    <input
+                      id=""
+                      onChange={(e) => this.onFileChange(e.target.files[0])}
+                      type="file"
+                    />
+                  </div>
+                </form>
               </div>
 
               <div className="col-3">

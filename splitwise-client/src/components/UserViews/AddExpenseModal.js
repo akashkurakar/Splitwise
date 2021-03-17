@@ -13,8 +13,9 @@ import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
-import { converter } from '../../constants/commonservice';
+import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
+import constants from '../../constants/Constants';
 
 class AddExpenseModal extends React.Component {
   constructor(props) {
@@ -58,7 +59,7 @@ class AddExpenseModal extends React.Component {
       description: this.state.description,
       amount: this.state.amount,
     };
-    axios.post(`http://localhost:3001/api/transactions`, data).then((response) => {
+    axios.post(`${constants.baseUrl}/api/transactions`, data).then((response) => {
       if (response.status === 200) {
         if (response.data.message === 'Expenses added successfully!') {
           this.setState({

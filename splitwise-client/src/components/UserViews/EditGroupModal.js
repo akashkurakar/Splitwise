@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as transactionActions from '../../redux/actions/TransactionAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
+import constants from '../../constants/Constants';
 
 class EditGroupModal extends React.Component {
   constructor(props) {
@@ -59,7 +60,7 @@ class EditGroupModal extends React.Component {
     formData.append('userprofile', this.state.selectedFile);
     axios
       .put(
-        `http://localhost:3001/api/uploadfile/`,
+        `${constants.baseUrl}/api/uploadfile/`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -121,7 +122,7 @@ class EditGroupModal extends React.Component {
 
   getUser = () => {
     axios.defaults.withCredentials = true;
-    axios.get(`http://localhost:3001/api/users/`).then((response) => {
+    axios.get(`${constants.baseUrl}/api/users/`).then((response) => {
       if (response.status === 200) {
         const { data } = response;
         this.setState({
@@ -150,7 +151,7 @@ class EditGroupModal extends React.Component {
     };
     axios.defaults.withCredentials = true;
     axios
-      .put('http://localhost:3001/api/group/', data)
+      .put(`${constants.baseUrl}/api/group/`, data)
       .then((response) => {
         if (response.status === 200) {
           if (response.data === 'Group updated successfully!') {

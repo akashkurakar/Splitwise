@@ -19,10 +19,12 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import PaymentModal from './PaymentModal';
 import photo from '../../static/images/avatar/person.png';
-import { converter } from '../../constants/commonservice';
+import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
 import RightSideBar from '../Dashboard/DashboardRightSidebar';
 import * as userListAction from '../../redux/actions/UsersListAction';
+import * as userActions from '../../redux/actions/UserAction';
+import constants from '../../constants/Constants';
 
 class DashboardMiddle extends React.Component {
   constructor(props) {
@@ -43,29 +45,57 @@ class DashboardMiddle extends React.Component {
     this.props.getUsers(this.props.user.id);
     this.getBalances();
     this.getTotalTransactionByUser();
+    this.props.getUser(this.props.user.id);
   };
 
   handleModal = (e) => {
     if (this.state.owedList.length > 0) {
-      this.setState({
-        modalData: {
-          user: this.state.owedList[0].owed_name,
-          amount: this.state.owedList[0].total_amt,
-        },
-      });
+      if (this.state.oweList.length > 0) {
+        const amt = this.state.oweList.filter(
+          (data) => data.paid_by === this.state.owedList[0].owed_name
+        )[0].total_amt;
+        this.setState({
+          modalData: {
+            user: this.state.owedList[0].owed_name,
+            amount: parseFloat(amt - this.state.owedList[0].total_amt),
+          },
+        });
+        this.setState({ show: e });
+      } else {
+        this.setState({
+          modalData: {
+            user: this.state.owedList[0].owed_name,
+            amount: parseFloat(this.state.owedList[0].total_amt),
+          },
+        });
+      }
       this.setState({ show: e });
     } else if (this.state.oweList.length > 0) {
-      this.setState({
-        modalData: {
-          user: this.state.oweList[0].paid_by,
-          amount: this.state.oweList[0].total_amt,
-        },
-      });
-      this.setState({ show: e });
+      if (this.state.owedList.length > 0) {
+        const amt = this.state.owedList.filter(
+          (data) => data.owed_name === this.state.oweList[0].owed_name
+        )[0].total_amt;
+        this.setState({
+          modalData: {
+            user: this.state.oweList[0].paid_by,
+            amount: this.state.oweList[0].total_amt + amt,
+          },
+        });
+        this.setState({ show: e });
+      } else {
+        this.setState({
+          modalData: {
+            user: this.state.oweList[0].paid_by,
+            amount: this.state.oweList[0].total_amt,
+          },
+        });
+        this.setState({ show: e });
+      }
     } else {
       this.setState({ show: false });
     }
     this.getTotalTransactionByUser();
+    this.getBalances();
     this.props.getTransaction(this.props.user.id);
   };
 
@@ -76,7 +106,7 @@ class DashboardMiddle extends React.Component {
   getBalances = () => {
     const userId = this.props.user.id;
     axios.defaults.withCredentials = true;
-    axios.get(`http://localhost:3001/api/balances/?user=${userId}`).then((response) => {
+    axios.get(`${constants.baseUrl}/api/balances/?user=${userId}`).then((response) => {
       if (response.status === 200) {
         const { data } = response;
         this.setState({
@@ -91,7 +121,7 @@ class DashboardMiddle extends React.Component {
   getTotalTransactionByUser = () => {
     const userId = this.props.user.id;
     axios.defaults.withCredentials = true;
-    axios.get(`http://localhost:3001/api/transactions/data/?user=${userId}`).then((response) => {
+    axios.get(`${constants.baseUrl}/api/transactions/data/?user=${userId}`).then((response) => {
       if (response.status === 200) {
         const { data } = response;
         this.setState({
@@ -328,6 +358,7 @@ DashboardMiddle.propTypes = {
   getTransaction: PropTypes.func.isRequired,
   users: PropTypes.objectOf.isRequired,
   getUsers: PropTypes.func.isRequired,
+  getUser: PropTypes.func.isRequired,
 };
 const mapStatetoProps = (state) => {
   return {
@@ -341,6 +372,7 @@ const mapStatetoProps = (state) => {
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
   getUsers: userListAction.getUsers,
+  getUser: userActions.getUser,
 };
 // Export The Main Component
 export default connect(mapStatetoProps, mapDispatchToProps)(DashboardMiddle);

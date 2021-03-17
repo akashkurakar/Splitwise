@@ -14,8 +14,9 @@ import { connect } from 'react-redux';
 import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import PropTypes from 'prop-types';
-import { converter } from '../../constants/commonservice';
+import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
+import constants from '../../constants/Constants';
 
 class PaymentModal extends React.Component {
   constructor(props) {
@@ -62,7 +63,7 @@ class PaymentModal extends React.Component {
       user2: this.props.data.user,
     };
     axios.defaults.withCredentials = true;
-    axios.post('http://localhost:3001/api/transactions/settle', data).then((response) => {
+    axios.post(`${constants.baseUrl}/api/transactions/settle`, data).then((response) => {
       if (response.status === 200) {
         if (response.data === 'Transaction Settled') {
           this.props.getTransaction(this.props.user.id);

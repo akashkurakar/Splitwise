@@ -1,9 +1,10 @@
 /* eslint-disable arrow-body-style */
 import axios from 'axios';
+import constants from '../../constants/Constants';
 
 const getTotalBalances = (user) => async (dispatch) => {
   await axios
-    .get(`http://localhost:3001/api/transactions/data/?user=${user}`)
+    .get(`${constants.baseUrl}/api/transactions/data/?user=${user}`)
     .then((res) => {
       dispatch({ type: 'DASHBOARD_TOTAL_BALANCE_SUCCESS', payload: res.data });
       dispatch({ type: 'ALERT_CLEAR', message: '' });

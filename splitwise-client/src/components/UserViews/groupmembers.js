@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
+import constants from '../../constants/Constants';
 
 class GroupMembers extends React.Component {
   constructor(props) {
@@ -48,7 +49,7 @@ class GroupMembers extends React.Component {
 
   getUser = () => {
     axios.defaults.withCredentials = true;
-    axios.get(`http://localhost:3001/api/users/`).then((response) => {
+    axios.get(`${constants.baseUrl}/api/users/`).then((response) => {
       if (response.status === 200) {
         const { data } = response;
         this.setState({

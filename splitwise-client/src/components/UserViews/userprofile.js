@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import UserHeader from '../Dashboard/UserHeader';
 import * as userActions from '../../redux/actions/UserAction';
+import constants from '../../constants/Constants';
 
 class UserProfile extends React.Component {
   constructor(props) {
@@ -20,20 +21,20 @@ class UserProfile extends React.Component {
       lang: this.props.user.lang,
       timezone: this.props.user.timezone,
       selectedFile: '',
-      image_path: '',
+      image_path: this.props.user.image_path,
     };
   }
 
   componentDidMount() {
-    this.setState({
-      name: this.props.user.name,
-      email: this.props.user.email,
-      phone: this.props.user.phone,
-      default_currency: this.props.user.default_currency,
-      lang: this.props.user.lang,
-      timezone: this.props.user.timezone,
-      selectedFile: '',
-      image_path: '',
+    this.props.getUser(this.props.user.id).then(() => {
+      this.setState({
+        name: this.props.user.name,
+        email: this.props.user.email,
+        phone: this.props.user.phone,
+        default_currency: this.props.user.default_currency,
+        lang: this.props.user.lang,
+        timezone: this.props.user.timezone,
+      });
     });
   }
 
@@ -49,7 +50,7 @@ class UserProfile extends React.Component {
     formData.append('userprofile', this.state.selectedFile);
     axios
       .put(
-        `http://localhost:3001/api/uploadfile/?user=${this.props.user.name}`,
+        `${constants.baseUrl}/api/uploadfile/?user=${this.props.user.name}`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -57,7 +58,7 @@ class UserProfile extends React.Component {
         { responseType: 'blob' }
       )
       .then((res) => {
-        this.props.user.image_path = res.data.Location;
+        this.setState({ image_path: res.data.Location });
       })
       .catch((error) => {
         return error;
@@ -105,7 +106,7 @@ class UserProfile extends React.Component {
 
   handleLanguageSelect = (e) => {
     this.setState({
-      language: e.target.value,
+      lang: e.target.value,
     });
   };
 
@@ -123,7 +124,7 @@ class UserProfile extends React.Component {
       email: this.state.email,
       phone: this.state.phone,
       default_currency: this.state.default_currency,
-      lang: this.state.language,
+      lang: this.state.lang,
       timezone: this.state.timezone,
       image_path: this.state.image_path,
       username: this.props.user.username,
@@ -150,9 +151,9 @@ class UserProfile extends React.Component {
             <div className="row">
               <div className="col-3">
                 <form onSubmit={this.onFileUpload} encType="multipart/form-data">
-                  {this.props.user.image_path !== '' ? (
+                  {this.state.image_path !== '' ? (
                     <img
-                      src={this.props.user.image_path}
+                      src={this.state.image_path}
                       width="150"
                       height="150"
                       className="img-fluid"
@@ -221,8 +222,9 @@ class UserProfile extends React.Component {
                       className="form-control"
                       placeholder="phone"
                       value={this.state.phone}
-                      required
                       disabled
+                      pattern="^(\([0-9]{3}\)|[0-9]{3}-)[0-9]{3}-[0-9]{4}$"
+                      required
                     />
                     <a href="/#" onClick={this.phoneFieldChangeHandler}>
                       Edit
@@ -246,7 +248,7 @@ class UserProfile extends React.Component {
                     >
                       <option value="USD">USD</option>
                       <option value="KWD">KWD</option>
-                      <option value="BHBHD">BHD</option>
+                      <option value="BHD">BHD</option>
                       <option value="GBP">GBP</option>
                       <option value="CAD">CAD</option>
                     </select>
@@ -304,6 +306,7 @@ UserProfile.propTypes = {
   alert: PropTypes.objectOf.isRequired,
   user: PropTypes.objectOf.isRequired,
   updateUserProfile: PropTypes.func.isRequired,
+  getUser: PropTypes.func.isRequired,
 };
 const mapStatetoProps = (state) => {
   return {
@@ -313,5 +316,6 @@ const mapStatetoProps = (state) => {
 };
 const mapDispatchToProps = {
   updateUserProfile: userActions.updateUserProfile,
+  getUser: userActions.getUser,
 };
 export default connect(mapStatetoProps, mapDispatchToProps)(UserProfile);

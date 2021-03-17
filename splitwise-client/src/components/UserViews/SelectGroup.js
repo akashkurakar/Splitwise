@@ -14,25 +14,45 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import AddExpenseModal from './AddExpenseModal';
-import { converter, convertDate } from '../../constants/commonservice';
+import { converter, convertDate } from '../../constants/CommonService';
 import EditGroupModal from './EditGroupModal';
-import GroupRightSideBar from '../Dashboard/GroupRightSidebar';
+import constants from '../../constants/Constants';
 
 class SelectGroup extends React.Component {
   constructor() {
     super();
     this.state = {
       show: false,
-      transactions: '',
+      transactions: [],
       errorMessage: '',
       showEdit: false,
-      refresh: true,
+      userSummary: [],
     };
   }
 
   componentDidMount = () => {
+    this.getBalances();
+    this.setState({
+      transactions: this.props.transactions,
+    });
     this.getTransaction();
+  };
+
+  getBalances = () => {
+    axios.defaults.withCredentials = true;
+    const data = { grp_id: this.props.selectedGroup.grp_id };
+    axios.post(`${constants.baseUrl}/api/transactions/groupbalances/`, data).then((response) => {
+      if (response.status === 200) {
+        const res = response.data;
+        this.setState({
+          userSummary: res,
+        });
+      } else {
+        // error
+      }
+    });
   };
 
   nameFieldChangeHandler = (e) => {
@@ -41,7 +61,7 @@ class SelectGroup extends React.Component {
   };
 
   handleModal = (modal) => {
-    this.setState({ show: modal, refresh: true });
+    this.setState({ show: modal });
     this.getTransaction();
   };
 
@@ -59,7 +79,7 @@ class SelectGroup extends React.Component {
       user: this.props.user.id,
       group: this.props.selectedGroup.grp_name,
     };
-    axios.post(`http://localhost:3001/api/group/leave`, data).then((response) => {
+    axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
       if (response.status === 200) {
         const res = response.data;
         if (res.message === 'Group Left Successfully') {
@@ -78,7 +98,7 @@ class SelectGroup extends React.Component {
   getTransaction = () => {
     axios.defaults.withCredentials = true;
     axios
-      .get(`http://localhost:3001/api/transactions/?id=${this.props.selectedGroup.grp_id}`)
+      .get(`${constants.baseUrl}/api/transactions/?id=${this.props.selectedGroup.grp_id}`)
       .then((response) => {
         if (response.status === 200) {
           const { data } = response;
@@ -99,7 +119,6 @@ class SelectGroup extends React.Component {
         backgroundColor: theme.palette.background.paper,
       },
     }));
-
     return (
       <>
         <Row>
@@ -177,99 +196,103 @@ class SelectGroup extends React.Component {
                     </div>
                   ) : null}
                   <List component="nav" className={classes.root} style={{ width: '100%' }}>
-                    {this.state.transactions.length > 0 ? (
-                      this.state.transactions.map((r) => (
-                        <ListItem style={{ width: '100%' }} button>
-                          <Col md={1.5}>
-                            <ListItemAvatar>
-                              <div className="date">
-                                <img
-                                  src="https://s3.amazonaws.com/splitwise/uploads/category/icon/square_v2/uncategorized/general@2x.png"
-                                  width="100"
-                                  height="100"
-                                  className="img-fluid"
-                                  alt=""
+                    {this.state.transactions.filter(
+                      (grp) => grp.grp_id === this.props.selectedGroup.grp_id
+                    ).length > 0 ? (
+                      this.state.transactions
+                        .filter((grp) => grp.grp_id === this.props.selectedGroup.grp_id)
+                        .map((r) => (
+                          <ListItem style={{ width: '100%' }} button>
+                            <Col md={1.5}>
+                              <ListItemAvatar>
+                                <div className="date">
+                                  <img
+                                    src="https://s3.amazonaws.com/splitwise/uploads/category/icon/square_v2/uncategorized/general@2x.png"
+                                    width="100"
+                                    height="100"
+                                    className="img-fluid"
+                                    alt=""
+                                  />
+                                </div>
+                              </ListItemAvatar>
+                            </Col>
+                            <Col md={5}>
+                              <ListItemText
+                                primary={r.tran_name}
+                                secondary={
+                                  <Typography className="header-label">
+                                    {convertDate(r.created_on)}
+                                  </Typography>
+                                }
+                              />
+                            </Col>
+                            <Col md={3} style={{ 'text-align': 'end' }}>
+                              {r.status === 'PENDING' && (
+                                <ListItemText
+                                  primary=""
+                                  secondary={
+                                    r.paid_by === this.props.user.id ? (
+                                      <Typography
+                                        style={{
+                                          'text-transform': 'uppercase',
+                                          color: '#5bc5a7',
+                                        }}
+                                      >
+                                        you paid{' '}
+                                        {converter(this.props.user.default_currency).format(
+                                          r.bill_amt
+                                        )}
+                                      </Typography>
+                                    ) : (
+                                      <Typography
+                                        style={{
+                                          'text-transform': 'uppercase',
+                                          color: '#ff652f',
+                                        }}
+                                      >
+                                        {this.props.users
+                                          .filter((us) => us.id === r.paid_by)
+                                          .map((r1) => {
+                                            return r1.name;
+                                          })}{' '}
+                                        paid{' '}
+                                        {converter(this.props.user.default_currency).format(
+                                          r.bill_amt
+                                        )}{' '}
+                                      </Typography>
+                                    )
+                                  }
                                 />
-                              </div>
-                            </ListItemAvatar>
-                          </Col>
-                          <Col md={5}>
-                            <ListItemText
-                              primary={r.tran_name}
-                              secondary={
-                                <Typography className="header-label">
-                                  {convertDate(r.created_on)}
-                                </Typography>
-                              }
-                            />
-                          </Col>
-                          <Col md={3} style={{ 'text-align': 'end' }}>
-                            {r.status === 'PENDING' && (
+                              )}
+                            </Col>
+                            <Col md={4}>
                               <ListItemText
                                 primary=""
                                 secondary={
                                   r.paid_by === this.props.user.id ? (
-                                    <Typography
-                                      style={{
-                                        'text-transform': 'uppercase',
-                                        color: '#5bc5a7',
-                                      }}
-                                    >
-                                      you paid{' '}
+                                    <Typography className="header-label">
+                                      you will get back{' '}
                                       {converter(this.props.user.default_currency).format(
-                                        r.bill_amt
+                                        r.bill_amt - r.amount
                                       )}
                                     </Typography>
                                   ) : (
-                                    <Typography
-                                      style={{
-                                        'text-transform': 'uppercase',
-                                        color: '#ff652f',
-                                      }}
-                                    >
+                                    <Typography className="header-label">
+                                      you owe{' '}
                                       {this.props.users
                                         .filter((us) => us.id === r.paid_by)
                                         .map((r1) => {
                                           return r1.name;
                                         })}{' '}
-                                      paid{' '}
-                                      {converter(this.props.user.default_currency).format(
-                                        r.bill_amt
-                                      )}{' '}
+                                      &nbsp;
+                                      {converter(this.props.user.default_currency).format(r.amount)}
                                     </Typography>
                                   )
                                 }
                               />
-                            )}
-                          </Col>
-                          <Col md={4}>
-                            <ListItemText
-                              primary=""
-                              secondary={
-                                r.paid_by === this.props.user.id ? (
-                                  <Typography className="header-label">
-                                    you will get back{' '}
-                                    {converter(this.props.user.default_currency).format(
-                                      r.bill_amt - r.amount
-                                    )}
-                                  </Typography>
-                                ) : (
-                                  <Typography className="header-label">
-                                    you owe{' '}
-                                    {this.props.users
-                                      .filter((us) => us.id === r.paid_by)
-                                      .map((r1) => {
-                                        return r1.name;
-                                      })}{' '}
-                                    &nbsp;
-                                    {converter(this.props.user.default_currency).format(r.amount)}
-                                  </Typography>
-                                )
-                              }
-                            />
-                          </Col>
-                        </ListItem>
-                      ))
+                            </Col>
+                          </ListItem>
+                        ))
                     ) : (
                       <ListItem>
                         <ListItemText primary="No transactions!" />
@@ -281,11 +304,59 @@ class SelectGroup extends React.Component {
             </Row>
           </Col>
           <Col md={4}>
-            <GroupRightSideBar
-              data={this.props.selectedGroup.grp_id}
-              screen="group"
-              refresh={this.state.refresh}
-            />
+            <List dense>
+              <Typography className="header-label">GROUP BALANCES</Typography>
+              {this.state.userSummary.length > 0 ? (
+                this.state.userSummary.map(
+                  (trans) =>
+                    trans.total !== 0 && (
+                      <ListItem button>
+                        <ListItemAvatar>
+                          <Avatar
+                            alt={`Avatar n°${trans.user}`}
+                            src={this.props.users
+                              .filter((us) => us.id === trans.user)
+                              .map((r1) => {
+                                return r1.image_path;
+                              })}
+                          />
+                        </ListItemAvatar>
+
+                        <ListItemText
+                          id="item1"
+                          primary={this.props.users
+                            .filter((us) => us.id === trans.user)
+                            .map((r1) => {
+                              return r1.name;
+                            })}
+                          secondary={
+                            trans.total > 0 ? (
+                              <Typography style={{ color: 'green' }}>
+                                gets back{' '}
+                                {converter(this.props.user.default_currency).format(trans.total)}
+                              </Typography>
+                            ) : (
+                              <Typography style={{ color: 'red' }}>
+                                owes{' '}
+                                {converter(this.props.user.default_currency).format(
+                                  0 - trans.total
+                                )}
+                              </Typography>
+                            )
+                          }
+                        />
+
+                        <ListItemSecondaryAction />
+                      </ListItem>
+                    )
+                )
+              ) : (
+                <ListItem button>
+                  <ListItemText id="item1" primary="No Transactions" />
+                  <ListItemSecondaryAction />
+                </ListItem>
+              )}
+            </List>
           </Col>
         </Row>
         {this.state.show && (
@@ -303,6 +374,7 @@ SelectGroup.propTypes = {
   selectedGroup: PropTypes.func.isRequired,
   groups: PropTypes.objectOf.isRequired,
   users: PropTypes.func.isRequired,
+  transactions: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {

@@ -31,6 +31,5 @@ export const convertDate = (date) => {
 
   // Apply each element to the Date function
   const d = new Date(t[0], t[1] - 1, t[2].substr(0, 2));
-  console.log(d);
   return `${d.getDate()}-${month[d.getMonth()]}-${d.getFullYear()}`;
 };

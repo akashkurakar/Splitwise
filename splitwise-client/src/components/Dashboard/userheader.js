@@ -70,6 +70,7 @@ class UserHeader extends React.Component {
     );
   }
 }
+
 UserHeader.propTypes = {
   logoutUser: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,

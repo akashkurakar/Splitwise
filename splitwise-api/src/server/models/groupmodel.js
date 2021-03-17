@@ -5,8 +5,8 @@ let groups = {};
 groups.add = async (group) => {
   return new Promise((resolve, reject) => {
     var name = group.grp_name;
-    var createdBy = group.user;
-    var updatedBy = group.user;
+    var createdBy = group.id;
+    var updatedBy = group.id;
     con.query("USE main;");
     var sql = `INSERT INTO grps (grp_name, created_by, updated_by,image_path) VALUES ('${name}','${createdBy}','${updatedBy}','${group.imgPath}')`;
     con.query(sql, function (error, result, fields) {

@@ -4,7 +4,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
-import { converter } from '../../constants/commonservice';
+import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
 
 class DashboardRightSideBar extends React.Component {
@@ -47,11 +47,9 @@ DashboardRightSideBar.propTypes = {
 const mapStatetoProps = (state) => ({
   user: state.user,
   transactions: state.transactions,
-  // dashboard:state.dashboard
 });
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
 };
-// Export The Main Component
 
 export default connect(mapStatetoProps, mapDispatchToProps)(DashboardRightSideBar);

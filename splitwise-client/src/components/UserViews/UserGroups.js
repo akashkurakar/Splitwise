@@ -8,7 +8,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
-import ImageIcon from '@material-ui/icons/Image';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Row from 'react-bootstrap/Row';
@@ -20,6 +19,7 @@ import axios from 'axios';
 import SelectGroup from './SelectGroup';
 import * as userNotifications from '../../redux/actions/NotificationAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
+import constants from '../../constants/Constants';
 
 class UserGroups extends React.Component {
   constructor(props) {
@@ -38,18 +38,20 @@ class UserGroups extends React.Component {
     });
   }
 
-  handleLeaveGroup = (e) => {
-    e.preventDefault();
+  handleLeaveGroup = (grpid) => {
     axios.defaults.withCredentials = true;
     const data = {
       user: this.props.user.id,
-      group: this.props.selectedGroup,
+      group: grpid,
     };
-    axios.post(`http://localhost:3001/api/group/leave`, data).then((response) => {
+    axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
       if (response.status === 200) {
         const res = response.data;
-        if (res === 'Success') {
-          // window.location.href = './dashboard';
+        if (res.message === 'Group Left Successfully') {
+          this.props.getNotifications(this.props.user.id);
+          this.props.getGroups(this.props.user.id);
+        } else {
+          // error
         }
       } else {
         // error
@@ -68,7 +70,7 @@ class UserGroups extends React.Component {
       user: this.props.user.id,
       grp_id: grpId,
     };
-    axios.post(`http://localhost:3001/api/groups/request`, data).then((response) => {
+    axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
       if (response.status === 200) {
         this.props.getNotifications(this.props.user.id);
         this.props.getGroups(this.props.user.id);
@@ -130,16 +132,17 @@ class UserGroups extends React.Component {
                 this.props.groups
                   .filter((r) => r.status !== 'left')
                   .map((r) => (
-                    <ListItem
-                      button
-                      onClick={() => r.status === 'active' && this.handleSelectedGroup(r)}
-                    >
+                    <ListItem>
                       <ListItemAvatar>
                         <Avatar>
-                          <ImageIcon />
+                          <img src={r.image_path} className="img-fluid" alt="" />
                         </Avatar>
                       </ListItemAvatar>
-                      <ListItemText primary={r.grp_name} secondary={r.created_by} />
+                      <ListItemText
+                        primary={r.grp_name}
+                        secondary={r.created_by}
+                        onClick={() => r.status === 'active' && this.handleSelectedGroup(r)}
+                      />
                       {r.status === 'PENDING' ? (
                         <Button
                           variant="primary"
@@ -159,7 +162,7 @@ class UserGroups extends React.Component {
                             'background-color': '#ff652f',
                             'border-color': '#5bc5a7',
                           }}
-                          onClick={this.handleLeaveGroup}
+                          onClick={() => this.handleLeaveGroup(r.grp_id)}
                         >
                           Leave Group
                         </Button>

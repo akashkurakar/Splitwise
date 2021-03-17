@@ -2,6 +2,7 @@
 import axios from 'axios';
 import storage from 'redux-persist/lib/storage';
 import history from '../../history';
+import constants from '../../constants/Constants';
 
 export function loginUserSuccess(user) {
   return { type: 'LOGIN_USER_SUCCESS', user };
@@ -25,7 +26,7 @@ export function logoutUser(user) {
 
 export const loginUser = (user) => async (dispatch) => {
   await axios
-    .post('http://localhost:3001/api/login', user)
+    .post(`${constants.baseUrl}/api/login`, user)
     .then((res) => {
       dispatch({ type: 'LOGIN_USER_SUCCESS', payload: res.data.data });
       dispatch({ type: 'ALERT_CLEAR', message: '' });
@@ -35,9 +36,22 @@ export const loginUser = (user) => async (dispatch) => {
       dispatch({ type: 'ALERT_ERROR', message: error });
     });
 };
+
+export const getUser = (id) => async (dispatch) => {
+  await axios
+    .get(`${constants.baseUrl}/api/user/id?id=${id}`)
+    .then((res) => {
+      dispatch({ type: 'USER_SUCCESS', payload: res.data.data });
+      dispatch({ type: 'ALERT_CLEAR', message: '' });
+    })
+    .catch((error) => {
+      dispatch({ type: 'ALERT_ERROR', message: error });
+    });
+};
+
 export const signupUser = (user) => async (dispatch) => {
   await axios
-    .put('http://localhost:3001/api/signup', user)
+    .put(`${constants.baseUrl}/api/signup`, user)
     .then((res) => {
       dispatch({ type: 'SIGN_UP_SUCCESS', payload: res.data.data });
       dispatch({ type: 'ALERT_CLEAR', message: res.data.message });
@@ -49,7 +63,7 @@ export const signupUser = (user) => async (dispatch) => {
 };
 export const updateUserProfile = (user) => async (dispatch) => {
   await axios
-    .post(`http://localhost:3001/api/user/update`, user)
+    .post(`${constants.baseUrl}/api/user/update`, user)
     .then((res) => {
       dispatch({ type: 'USER_PROFILE_SUCCESS', payload: user });
       dispatch({ type: 'ALERT_SUCCESS', message: res.data.message });

@@ -44,7 +44,7 @@ activities.addActivity = async (description, user, groupName) => {
 activities.getActivitiesByGroup = async (grp_id, userid) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
-    var sql = `select * from activities where grp_name='${grp_id}' order by created_on asc`;
+    var sql = `select * from activities where grp_name='${grp_id}' AND user_name=${userid} order by created_on asc`;
     con.query(sql, function (error, result, fields) {
       if (error) {
         return reject(error);

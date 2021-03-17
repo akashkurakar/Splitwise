@@ -1,5 +1,6 @@
 /* eslint-disable arrow-body-style */
 import axios from 'axios';
+import constants from '../../constants/Constants';
 
 export const updateNotifications = (group) => ({
   type: 'USER_NOTFICATION_UPDATE',
@@ -8,7 +9,7 @@ export const updateNotifications = (group) => ({
 
 export const getNotifications = (userId) => async (dispatch) => {
   axios
-    .get(`http://localhost:3001/api/notifications/?user=${userId.name}`)
+    .get(`${constants.baseUrl}/api/notifications/?user=${userId.name}`)
     .then((res) => {
       dispatch({ type: 'USER_NOTIFICATIONS_SUCCESS', payload: res });
       dispatch({ type: 'ALERT_CLEAR', message: '' });

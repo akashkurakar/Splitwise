@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 import AddExpenseModal from './AddExpenseModal';
 import * as userNotifications from '../../redux/actions/NotificationAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
+import constants from '../../constants/Constants';
 
 class Notifications extends React.Component {
   constructor() {
@@ -37,7 +38,7 @@ class Notifications extends React.Component {
       user: this.props.user.name,
       grp_id: grpId,
     };
-    axios.post(`http://localhost:3001/api/groups/request`, data).then((response) => {
+    axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
       if (response.status === 200) {
         this.props.getNotifications(this.props.user);
         this.props.getGroups(this.props.user);

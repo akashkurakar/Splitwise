@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import * as groupsActions from '../../redux/actions/GroupsActions';
 import UserHeader from '../Dashboard/UserHeader';
 import GroupMembers from './GroupMembers';
+import constants from '../../constants/Constants';
 
 class CreateGroup extends React.Component {
   constructor() {
@@ -39,7 +40,7 @@ class CreateGroup extends React.Component {
     formData.append('userprofile', this.state.selectedFile);
     axios
       .put(
-        `http://localhost:3001/api/uploadfile/`,
+        `${constants.baseUrl}/api/uploadfile/`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -84,7 +85,7 @@ class CreateGroup extends React.Component {
     };
     axios.defaults.withCredentials = true;
     axios
-      .post('http://localhost:3001/api/group/create', data)
+      .post(`${constants.baseUrl}/api/group/create`, data)
       .then((response) => {
         if (response.status === 200) {
           if (response.data.message === 'Group Created Successfully!') {

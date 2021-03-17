@@ -1,3 +1,4 @@
+/* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,7 +17,8 @@ import { Typography } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import NativeSelect from '@material-ui/core/NativeSelect';
-import { convertDate } from '../../constants/commonservice';
+import { convertDate } from '../../constants/CommonService';
+import constants from '../../constants/Constants';
 
 class UserActivity extends React.Component {
   constructor(props) {
@@ -24,11 +26,12 @@ class UserActivity extends React.Component {
     this.state = {
       activities: {},
       selectedGroup: '',
+      selectedSort: 'First',
     };
   }
 
   componentDidMount() {
-    // this.getRecentActivitiesByUser();
+    this.getRecentActivitiesByUser();
   }
 
   handleSelectedGrp = (e) => {
@@ -38,10 +41,20 @@ class UserActivity extends React.Component {
     this.getRecentActivitiesByGroup(e.target.value);
   };
 
+  handleSelectedSort = (e) => {
+    this.setState({
+      selectedSort: e.target.value,
+    });
+    if (this.state.activities.length > 0) {
+      const reverseData = this.state.activities.reverse();
+      this.setState({ activities: reverseData });
+    }
+  };
+
   getRecentActivitiesByUser = () => {
     const userId = this.props.user.id;
     axios.defaults.withCredentials = true;
-    axios.get(`http://localhost:3001/api/activities/last?user=${userId}`).then((response) => {
+    axios.get(`${constants.baseUrl}/api/activities?user=${userId}`).then((response) => {
       if (response.status === 200) {
         const { data } = response;
         this.setState({
@@ -57,7 +70,7 @@ class UserActivity extends React.Component {
     axios.defaults.withCredentials = true;
     axios
       .get(
-        `http://localhost:3001/api/activities/group/?userid=${this.props.user.id}&&groupid=${groupId}`
+        `${constants.baseUrl}/api/activities/group/?userid=${this.props.user.id}&&groupid=${groupId}`
       )
       .then((response) => {
         if (response.status === 200) {
@@ -74,7 +87,7 @@ class UserActivity extends React.Component {
   getRecentActivitiesLastByUser = () => {
     const userId = this.props.user.id;
     axios.defaults.withCredentials = true;
-    axios.get(`http://localhost:3001/api/activities/?user=${userId}`).then((response) => {
+    axios.get(`${constants.baseUrl}/api/activities/?user=${userId}`).then((response) => {
       if (response.status === 200) {
         const { data } = response;
         this.setState({
@@ -102,10 +115,10 @@ class UserActivity extends React.Component {
               <div className="card-body">
                 <table style={{ width: '100%' }}>
                   <tr>
-                    <td style={{ width: '50%' }}>
+                    <td style={{ width: '33%' }}>
                       <Typography>Recent Activity</Typography>
                     </td>
-                    <td style={{ width: '50%' }}>
+                    <td style={{ width: '33%' }}>
                       <FormControl className={classes.margin}>
                         <InputLabel htmlFor="demo-customized-select-native">Filter</InputLabel>
                         <NativeSelect
@@ -113,10 +126,27 @@ class UserActivity extends React.Component {
                           value={this.state.selectedGroup}
                           onChange={this.handleSelectedGrp}
                         >
-                          <option aria-label="None" value="" />
-                          {this.props.groups.map((grp) => (
-                            <option value={grp.grp_name}>{grp.grp_name}</option>
-                          ))}
+                          <option aria-label="None" value="ALL">
+                            All
+                          </option>
+                          {this.props.groups
+                            .filter((entry) => entry.status === 'active')
+                            .map((grp) => (
+                              <option value={grp.grp_name}>{grp.grp_name}</option>
+                            ))}
+                        </NativeSelect>
+                      </FormControl>
+                    </td>
+                    <td>
+                      <FormControl className={classes.margin}>
+                        <InputLabel htmlFor="demo-customized-select-native">Sort</InputLabel>
+                        <NativeSelect
+                          id="demo-customized-select-native"
+                          value={this.state.selectedSort}
+                          onChange={this.handleSelectedSort}
+                        >
+                          <option value="First">Most recent First</option>
+                          <option value="Last">Most recent Last</option>
                         </NativeSelect>
                       </FormControl>
                     </td>

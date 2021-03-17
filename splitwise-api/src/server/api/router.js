@@ -76,6 +76,8 @@ router.post("/user/update", jsonParser, UserController.update);
 
 router.get("/user/", UserController.userByEmail);
 
+router.get("/user/id", UserController.userById);
+
 router.get("/users/", UserController.user);
 
 router.post("/group/create", jsonParser, GroupController.createGroup);

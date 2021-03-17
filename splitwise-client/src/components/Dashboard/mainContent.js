@@ -38,41 +38,6 @@ class MainContent extends React.Component {
     this.props.getTransaction(this.props.user.id);
   }
 
-  /* getTotalBalances = () => {
-    const userId = this.state.user.name;
-    axios.defaults.withCredentials = true;
-    axios
-      .get(`http://localhost:3001/api/transactions/data/?user=${userId}`)
-      .then((response) => {
-        console.log("Status Code : ", response.status);
-        if (response.status === 200) {
-          const { data } = response;
-          this.setState({
-            oweData: data.oweData,
-            owedData: data.owedData,
-          });
-        } else {
-        }
-      });
-  };
-  getBalances = () => {
-    let userId = this.state.user.name;
-    axios.defaults.withCredentials = true;
-    axios
-      .get(`http://localhost:3001/api/balances/?user=${userId}`)
-      .then((response) => {
-        console.log("Status Code : ", response.status);
-        if (response.status === 200) {
-          const data = response.data;
-          console.log(data);
-          this.setState({
-            balances: data,
-          });
-        } else {
-        }
-      });
-  }; */
-
   handleCallback = (childData) => {
     this.setState({ step: childData });
   };
@@ -131,5 +96,5 @@ const mapDispatchToProps = {
   getGroups: groupsActions.getGroups,
   getTransaction: transactionAction.getTransaction,
 };
-// Export The Main Component
+
 export default connect(mapStatetoProps, mapDispatchToProps)(MainContent);

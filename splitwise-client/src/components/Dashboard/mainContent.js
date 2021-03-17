@@ -17,7 +17,6 @@ import Notification from '../UserViews/Notifications';
 import * as userActions from '../../redux/actions/UserAction';
 import * as transactionAction from '../../redux/actions/TransactionAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
-import RightSideBar from './RightSidebar';
 
 class MainContent extends React.Component {
   constructor(props) {
@@ -28,7 +27,7 @@ class MainContent extends React.Component {
       transactions: [],
       balances: [],
     };
-    this.props.getGroups(this.props.user.name);
+    this.props.getGroups(this.props.user.id);
     this.handleCallback = this.handleCallback.bind(this);
     if (this.props.user.name === undefined) {
       window.location.href = './login';
@@ -36,10 +35,7 @@ class MainContent extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getTransaction(this.props.user.name);
-    // this.props.getTotalBalances(this.props.user.name);
-    // this.getBalances();
-    // this.getTotalTransactionByUser();
+    this.props.getTransaction(this.props.user.id);
   }
 
   /* getTotalBalances = () => {
@@ -99,7 +95,7 @@ class MainContent extends React.Component {
                   selectedGroup={this.handleSelectedGroup}
                 />
               </Col>
-              <Col md={7}>
+              <Col md={9}>
                 {this.state.step === 1 ? <UserDashboard balances={this.state.balances} /> : null}
                 {this.state.step === 2 ? <Activity transactions={this.state.transactions} /> : null}
                 {this.state.step === 4 ? <CreateGroup /> : null}
@@ -110,9 +106,6 @@ class MainContent extends React.Component {
                   <SelectGroup selectedGroup={this.state.selectedGroup} />
                 ) : null}
                 {this.state.step === 7 && <Notification />}
-              </Col>
-              <Col>
-                <RightSideBar />
               </Col>
             </Row>
           </Container>

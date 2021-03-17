@@ -38,10 +38,12 @@ class PaymentModal extends React.Component {
   getUsers = () => {
     const userData = [];
     this.props.transactions.forEach((element) => {
-      if (!userData.includes(element.owed_name) && element.owed_name !== this.props.user.name) {
-        userData.push(element.owed_name);
-      } else if (!userData.includes(element.paid_by) && element.paid_by !== this.props.user.name) {
-        userData.push(element.paid_by);
+      const paidUser = this.props.users.filter((user) => user.id === element.paid_by)[0].name;
+      const owedUser = this.props.users.filter((user) => user.id === element.owed_name)[0].name;
+      if (!userData.includes(owedUser) && element.owed_name !== this.props.user.id) {
+        userData.push(owedUser);
+      } else if (!userData.includes(paidUser) && element.paid_by !== this.props.user.id) {
+        userData.push(paidUser);
       }
     });
     this.setState({
@@ -56,14 +58,14 @@ class PaymentModal extends React.Component {
   handleAddExpenses = (e) => {
     e.preventDefault();
     const data = {
-      user1: this.props.user.name,
+      user1: this.props.user.id,
       user2: this.props.data.user,
     };
     axios.defaults.withCredentials = true;
     axios.post('http://localhost:3001/api/transactions/settle', data).then((response) => {
       if (response.status === 200) {
         if (response.data === 'Transaction Settled') {
-          this.props.getTransactions();
+          this.props.getTransaction(this.props.user.id);
           this.handleClose(false);
         } else if (response.data === 'Invalid Credentials!') {
           // error
@@ -97,7 +99,9 @@ class PaymentModal extends React.Component {
                   freeSolo
                   id="free-solo-2-demo"
                   disableClearable
-                  value={this.props.data.user}
+                  value={
+                    this.props.users.filter((user) => user.id === this.props.data.user)[0].name
+                  }
                   options={this.state.users.map((option) => option)}
                   onChange={(event, value) => this.handleUser(value)}
                   renderInput={(params) => (
@@ -144,13 +148,15 @@ PaymentModal.propTypes = {
   transactions: PropTypes.objectOf.isRequired,
   data: PropTypes.objectOf.isRequired,
   user: PropTypes.objectOf.isRequired,
-  getTransactions: PropTypes.func.isRequired,
+  getTransaction: PropTypes.func.isRequired,
+  users: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     transactions: state.transactions,
+    users: state.users,
   };
 };
 

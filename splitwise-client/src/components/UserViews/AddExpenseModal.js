@@ -23,8 +23,14 @@ class AddExpenseModal extends React.Component {
       show: this.props.show,
       user: this.props.user,
       amount: '',
+      errorMessage: '',
+      group: this.props.group,
     };
   }
+
+  componentDidMount = () => {
+    this.setState({ group: this.props.group });
+  };
 
   handleDescription = (e) => {
     this.setState({
@@ -46,8 +52,9 @@ class AddExpenseModal extends React.Component {
   handleAddExpenses = () => {
     axios.defaults.withCredentials = true;
     const data = {
-      user: this.state.user.name,
-      grpName: this.props.grp_name,
+      user: this.state.user.id,
+      grpId: this.props.group.grp_id,
+      grpName: this.props.group.grp_name,
       description: this.state.description,
       amount: this.state.amount,
     };
@@ -57,11 +64,12 @@ class AddExpenseModal extends React.Component {
           this.setState({
             show: false,
           });
-          this.props.getTransaction(this.props.user.name);
+          this.props.getTransaction(this.props.user.id);
           this.handleClose();
         } else {
           this.setState({
             show: true,
+            errorMessage: response.data.message,
           });
         }
       }
@@ -75,12 +83,17 @@ class AddExpenseModal extends React.Component {
           <Modal.Title style={{ color: 'white' }}>Add Expense</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {this.state.errorMessage !== '' && (
+            <div className="alert alert-danger" role="alert">
+              {this.state.errorMessage}
+            </div>
+          )}
           <div>
             <Typography>
               With you and:
               <Chip
-                avatar={<Avatar src={this.props.grp_name.image_path} />}
-                label={this.props.grp_name.grp_name}
+                avatar={<Avatar src={this.state.group.image_path} />}
+                label={this.state.group.grp_name}
                 variant="outlined"
               />
             </Typography>
@@ -139,7 +152,7 @@ class AddExpenseModal extends React.Component {
 AddExpenseModal.propTypes = {
   show: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
-  grp_name: PropTypes.string.isRequired,
+  group: PropTypes.objectOf.isRequired,
   getTransaction: PropTypes.func.isRequired,
 };
 

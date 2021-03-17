@@ -13,39 +13,45 @@ import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as transactionActions from '../../redux/actions/TransactionAction';
+import * as groupsActions from '../../redux/actions/GroupsActions';
 
-class AddExpenseModal extends React.Component {
+class EditGroupModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      show: this.props.show,
+      showEdit: this.props.showEdit,
       errorMessage: '',
-      grp_name: this.props.grp_name.grp_name,
+      grp_name: this.props.group.grp_name,
       members: [
         { name: '', email: '' },
         { name: '', email: '' },
         { name: '', email: '' },
         { name: '', email: '' },
       ],
+      grp_id: this.props.group.grp_id,
       users: [],
-      imgUrl: this.props.grp_name.image_path,
+      imgUrl: this.props.group.image_path,
+      group: '',
+      selectedFile: '',
       // group: '',
     };
+    this.handleClose = this.handleClose.bind(this);
   }
 
   componentDidMount() {
-    // this.setState({ group: this.props.grp_name });
+    this.setState({ group: this.props.group });
     this.getUser();
   }
 
   handleClose = () => {
-    this.props.show(false);
+    this.props.showEdit(false);
   };
 
   onFileChange = (event) => {
     // Update the state
-    this.setState({ selectedFile: event });
-    this.onFileUpload();
+    this.setState({ selectedFile: event }, () => {
+      this.onFileUpload();
+    });
   };
 
   onFileUpload = () => {
@@ -140,21 +146,34 @@ class AddExpenseModal extends React.Component {
       user: this.props.user.name,
       users: this.state.members,
       imgPath: this.state.imgUrl,
+      grp_id: this.state.grp_id,
     };
     axios.defaults.withCredentials = true;
     axios
       .put('http://localhost:3001/api/group/', data)
       .then((response) => {
         if (response.status === 200) {
-          if (response.data.message === 'Group Created Successfully!') {
+          if (response.data === 'Group updated successfully!') {
             this.props.getGroups(this.props.user.name);
             this.setState({
-              errorMessage: '',
+              errorMessage: response.data,
+              members: [
+                { name: '', email: '' },
+                { name: '', email: '' },
+                { name: '', email: '' },
+                { name: '', email: '' },
+              ],
             });
-            window.location.href = './dashboard';
+            // window.location.href = './dashboard';
           } else {
             this.setState({
-              errorMessage: 'User already Present',
+              errorMessage: response.data,
+              members: [
+                { name: '', email: '' },
+                { name: '', email: '' },
+                { name: '', email: '' },
+                { name: '', email: '' },
+              ],
             });
           }
         }
@@ -171,7 +190,7 @@ class AddExpenseModal extends React.Component {
       <Container style={{ 'min-height': '100vh', 'min-width': '250vh' }}>
         <Modal
           size="lg"
-          show={this.state.show}
+          show={this.state.showEdit}
           onHide={this.handleClose}
           backdrop="static"
           keyboard={false}
@@ -185,14 +204,14 @@ class AddExpenseModal extends React.Component {
                 <Col md={4}>
                   {' '}
                   <form onSubmit={this.onFileUpload} encType="multipart/form-data">
-                    {this.props.grp_name.image_path !== '' ? (
+                    {this.state.group.image_path !== '' ? (
                       <img
-                        src={this.props.grp_name.image_path}
+                        src={this.state.group.image_path}
                         width="150"
                         height="150"
                         className="img-fluid"
                         alt=""
-                        onChange={this.onFileChange}
+                        onChange={(e) => this.onFileChange(e.target.files[0])}
                       />
                     ) : (
                       <img
@@ -324,12 +343,14 @@ class AddExpenseModal extends React.Component {
   }
 }
 
-AddExpenseModal.propTypes = {
+EditGroupModal.propTypes = {
   show: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
-  grp_name: PropTypes.string.isRequired,
+  grp: PropTypes.string.isRequired,
   getTransaction: PropTypes.func.isRequired,
   getGroups: PropTypes.func.isRequired,
+  showEdit: PropTypes.func.isRequired,
+  group: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -337,11 +358,13 @@ const mapStatetoProps = (state) => {
     user: state.user,
     transactions: state.transactions,
     alert: state.alert,
+    groups: state.groups,
   };
 };
 
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
+  getGroups: groupsActions.getGroups,
 };
 
-export default connect(mapStatetoProps, mapDispatchToProps)(AddExpenseModal);
+export default connect(mapStatetoProps, mapDispatchToProps)(EditGroupModal);

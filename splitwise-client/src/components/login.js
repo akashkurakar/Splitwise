@@ -75,7 +75,11 @@ class Login extends React.Component {
               />
             </Col>
             <Col md={3}>
-              <h5 className="card-title text-center" style={{ 'font-size': '16px', color: '#999' }}>
+              <h5
+                className="card-title text-center"
+                style={{ 'font-size': '16px', color: '#999' }}
+                data-testid="header"
+              >
                 WELCOME TO SPLITWISE
               </h5>
               <form className="form-signin" onSubmit={this.handleLogin}>
@@ -134,7 +138,7 @@ class Login extends React.Component {
 }
 
 Login.propTypes = {
-  alert: PropTypes.objectOf.isRequired,
+  alert: PropTypes.func.isRequired,
   loginUser: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
 };

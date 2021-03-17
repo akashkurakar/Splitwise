@@ -106,6 +106,13 @@ router.get("/balances/", jsonParser, TransactionController.getBalances);
 
 router.post("/transactions", jsonParser, TransactionController.addTransaction);
 
+router.post(
+  "/transactions/groupbalances",
+  jsonParser,
+  TransactionController.getGroupBalances
+);
+
+router.post("/participant", jsonParser, ParticipantController.addParticipant);
 router.get(
   "/transactions/data",
   jsonParser,
@@ -121,6 +128,11 @@ router.post(
 router.get("/participants", jsonParser, ParticipantController.getParticipant);
 
 router.get("/activities", jsonParser, ActivityController.getActivities);
+router.get(
+  "/activities/group",
+  jsonParser,
+  ActivityController.getActivitiesByGroup
+);
 
 router.put("/uploadfile/", upload, (req, res) => {
   const params = {

@@ -58,9 +58,7 @@ class LeftSideBar extends React.Component {
   handleGroupClick = (e) => {
     const step = 6;
     this.props.getStep(step);
-    this.props.selectedGroup(
-      this.props.groups.filter((d) => d.status !== 'left')[e].grp_name.toString()
-    );
+    this.props.selectedGroup(this.props.groups.filter((d) => d.status !== 'left')[e]);
   };
 
   render() {

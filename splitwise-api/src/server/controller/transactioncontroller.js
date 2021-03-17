@@ -22,6 +22,18 @@ exports.getTransaction = async (req, res) => {
   res.end();
 };
 
+exports.getGroupBalances = async (req, res) => {
+  let transaction = req.body;
+  try {
+    res.json(await transactionService.getGroupBalances(transaction));
+    res.end();
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+  res.end();
+};
+
 exports.getBalances = async (req, res) => {
   let user = req.query.user;
   try {
@@ -52,6 +64,7 @@ exports.addTransaction = async (req, res) => {
   try {
     let result = await transactionService.addTransaction(transaction);
     res.json({ data: [], message: result });
+    res.send();
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

@@ -8,6 +8,7 @@ import dashboard from './DashboardReducers';
 import groups from './GroupReducer';
 import transactions from './TransactionReducer';
 import notifications from './NotificationReducer';
+import users from './UsersReducers';
 
 const rootreducer = combineReducers({
   user,
@@ -16,6 +17,7 @@ const rootreducer = combineReducers({
   groups,
   transactions,
   notifications,
+  users,
 });
 
 const initialState = rootreducer({}, {});

@@ -7,9 +7,9 @@ participants.addParticipant = (user, grpName, owner) => {
     con.query("USE main;");
     var sql = "";
     if (owner) {
-      sql = `INSERT INTO participants (grp_name, user_name,status) VALUES ('${grpName}','${user}','active')`;
+      sql = `INSERT INTO participants (grp_id, user_name,status) VALUES ('${grpName}','${user}','active')`;
     } else {
-      sql = `INSERT INTO participants (grp_name, user_name) VALUES ('${grpName}','${user}')`;
+      sql = `INSERT INTO participants (grp_id, user_name) VALUES ('${grpName}','${user}')`;
     }
 
     con.query(sql, function (error, result, fields) {
@@ -24,7 +24,7 @@ participants.addParticipant = (user, grpName, owner) => {
 participants.getParticipant = (grpName) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
-    var sql = `select * from participants where grp_name='${grpName}' AND status='active'`;
+    var sql = `select * from participants where grp_id='${grpName}' AND status='active'`;
     con.query(sql, function (error, result, fields) {
       if (error) {
         return reject(error);
@@ -37,7 +37,7 @@ participants.getParticipant = (grpName) => {
 participants.findParticipant = (grpName, user) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
-    var sql = `select * from participants where grp_name='${grpName}' AND user_name='${user}'`;
+    var sql = `select * from participants where grp_id='${grpName}' AND user_name='${user}'`;
     con.query(sql, function (error, result, fields) {
       if (error) {
         return reject(error);

@@ -29,8 +29,9 @@ class CreateGroup extends React.Component {
 
   onFileChange = (event) => {
     // Update the state
-    this.setState({ selectedFile: event });
-    this.onFileUpload();
+    this.setState({ selectedFile: event }, () => {
+      this.onFileUpload();
+    });
   };
 
   onFileUpload = () => {
@@ -77,7 +78,7 @@ class CreateGroup extends React.Component {
     }
     const data = {
       grp_name: this.state.grpName,
-      user: this.state.user.name,
+      id: this.state.user.id,
       users: this.state.members,
       imgPath: this.state.imgUrl,
     };
@@ -87,10 +88,11 @@ class CreateGroup extends React.Component {
       .then((response) => {
         if (response.status === 200) {
           if (response.data.message === 'Group Created Successfully!') {
-            this.props.getGroups(this.props.user.name);
+            this.props.getGroups(this.props.user.id);
             this.setState({
               errorMessage: '',
             });
+
             window.location.href = './dashboard';
           } else {
             this.setState({

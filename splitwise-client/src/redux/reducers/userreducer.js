@@ -14,7 +14,7 @@ export default function userLogin(state = [], action) {
     case 'SIGN_UP_SUCCESS':
       return Object.assign(...state, action.payload);
     case 'SIGN_UP_FAILURE':
-      return Object.assign(...state, action.payload);
+      return Object.assign(state, action.payload);
     case 'USER_PROFILE_SUCCESS':
       return Object.assign(state, action.payload);
     case 'USER_PROFILE_FAILURE':

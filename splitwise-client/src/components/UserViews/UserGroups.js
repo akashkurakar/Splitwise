@@ -42,7 +42,7 @@ class UserGroups extends React.Component {
     e.preventDefault();
     axios.defaults.withCredentials = true;
     const data = {
-      user: this.props.user.name,
+      user: this.props.user.id,
       group: this.props.selectedGroup,
     };
     axios.post(`http://localhost:3001/api/group/leave`, data).then((response) => {
@@ -65,13 +65,13 @@ class UserGroups extends React.Component {
   approveRequest = (grpId) => {
     axios.defaults.withCredentials = true;
     const data = {
-      user: this.props.user.name,
+      user: this.props.user.id,
       grp_id: grpId,
     };
     axios.post(`http://localhost:3001/api/groups/request`, data).then((response) => {
       if (response.status === 200) {
-        this.props.getNotifications(this.props.user.name);
-        this.props.getGroups(this.props.user.name);
+        this.props.getNotifications(this.props.user.id);
+        this.props.getGroups(this.props.user.id);
       } else {
         // error
       }
@@ -132,7 +132,7 @@ class UserGroups extends React.Component {
                   .map((r) => (
                     <ListItem
                       button
-                      onClick={() => r.status === 'active' && this.handleSelectedGroup(r.grp_name)}
+                      onClick={() => r.status === 'active' && this.handleSelectedGroup(r)}
                     >
                       <ListItemAvatar>
                         <Avatar>
@@ -147,7 +147,7 @@ class UserGroups extends React.Component {
                             'background-color': '#5bc5a7',
                             'border-color': '#5bc5a7',
                           }}
-                          value={r.grp_name}
+                          value={r.grp_id}
                           onClick={this.handleApprove}
                         >
                           Accept

@@ -1,6 +1,7 @@
 const con = require("../db/db");
 
 var moment = require("moment");
+const user = require("./usermodel");
 
 var transaction = {};
 
@@ -8,7 +9,7 @@ transaction.getTransactionByGroup = (grpName) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
     con.query("SET sql_mode = ''");
-    var sql = `Select * from transactions where grp_name='${grpName}' AND status!='setteled' group by tran_name order by created_on desc`;
+    var sql = `Select * from transactions where grp_id='${grpName}' AND status!='setteled' group by transaction_id order by created_on desc`;
     con.query(sql, function (error, result, fields) {
       if (error) {
         return reject(error);
@@ -17,6 +18,7 @@ transaction.getTransactionByGroup = (grpName) => {
     });
   });
 };
+
 transaction.getTransactionByUser = (user) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
@@ -29,6 +31,7 @@ transaction.getTransactionByUser = (user) => {
     });
   });
 };
+
 transaction.getOwedTransactionByUser = (user) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
@@ -41,6 +44,7 @@ transaction.getOwedTransactionByUser = (user) => {
     });
   });
 };
+
 transaction.getPaidTransactionByUser = (user) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
@@ -65,6 +69,7 @@ transaction.getTotalPaidTransactionByUser = (user) => {
     });
   });
 };
+
 transaction.getTotalOwedTransactionByUser = (user) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
@@ -77,21 +82,52 @@ transaction.getTotalOwedTransactionByUser = (user) => {
     });
   });
 };
-transaction.addTransaction = (users, grpName, transaction) => {
+
+transaction.getTotalOwedTransactionByUserInGroup = (user) => {
   return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `Select t.owed_name,g.grp_name,sum(t.amount) as total_amt from transactions as t join grps as g on t.grp_id=g.grp_id where t.paid_by='${user}' AND t.status='PENDING' group by t.owed_name,t.grp_id`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+
+transaction.getTotalOweTransactionByUserInGroup = (user) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `Select t.paid_by,g.grp_name,sum(t.amount) as total_amt from transactions as t join grps as g on g.grp_id=t.grp_id where t.owed_name='${user}' AND t.status='PENDING' group by t.paid_by,t.grp_id`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+
+transaction.addTransaction = (users, grpId, transaction) => {
+  return new Promise((resolve, reject) => {
+    let tran_id = makeid();
     let amt = parseFloat(transaction.amount) / users.length;
     let createDate = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
-    console.log(createDate);
     con.query("USE main;");
     users.forEach((element) => {
       if (element.user_name !== transaction.user) {
-        var sql = `Insert into transactions (tran_name,amount,paid_by,grp_name,owed_name,created_on,bill_amt,status) values ('${transaction.description}',${amt},'${transaction.user}','${grpName}','${element.user_name}','${createDate}','${transaction.amount}','PENDING')`;
-        con.query(sql, function (error, result, fields) {
-          if (error) {
-            return reject(error);
-          }
-          return resolve(result);
-        });
+        if (users.length > 0) {
+          var sql = `Insert into transactions (transaction_id,tran_name,amount,paid_by,grp_id,owed_name,created_on,bill_amt,status) values ('${tran_id}','${transaction.description}',${amt},'${transaction.user}','${grpId}','${element.user_name}','${createDate}','${transaction.amount}','PENDING')`;
+          con.query(sql, function (error, result, fields) {
+            if (error) {
+              return reject(error);
+            }
+            return resolve(result);
+          });
+        } else {
+          return reject("No more users are there in group");
+        }
       }
     });
   });
@@ -109,10 +145,10 @@ transaction.transactionSettle = (transaction) => {
   });
 };
 
-transaction.transactionStatus = (transaction) => {
+transaction.userGroupBalanceOwed = (grp_id, user_name) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
-    var sql = `select * from transactions where (paid_by='${transaction.user}' OR owed_name='${transaction.user}') AND status="PENDING" AND grp_name='${transaction.group}'`;
+    var sql = `select sum(amount) as total from transactions where grp_id=${grp_id} and owed_name='${user_name}' and status='PENDING'`;
     con.query(sql, function (error, result, fields) {
       if (error) {
         return reject(error);
@@ -122,4 +158,39 @@ transaction.transactionStatus = (transaction) => {
   });
 };
 
+transaction.userGroupBalancePaid = (grp_id, user_name) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `select sum(amount) as total from transactions where grp_id=${grp_id} and paid_by='${user_name}' and status='PENDING'`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+
+transaction.transactionStatus = (transaction) => {
+  return new Promise((resolve, reject) => {
+    con.query("USE main;");
+    var sql = `select * from transactions where (paid_by='${transaction.user}' OR owed_name='${transaction.user}') AND status="PENDING" AND grp_id='${transaction.group}'`;
+    con.query(sql, function (error, result, fields) {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+};
+function makeid() {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < 10; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 module.exports = transaction;

@@ -11,10 +11,28 @@ class ActivityService {
     }
   };
 
-  addActivity = async (description, user) => {
+  addActivity = async (description, user, grp_name) => {
     try {
-      let search = await activityDb.addActivity(description, user);
+      let search = await activityDb.addActivity(description, user, grp_name);
       return "User added successfully";
+    } catch (e) {
+      return e;
+    }
+  };
+
+  getActivitiesSortLast = async (user) => {
+    try {
+      let search = await activityDb.getUserActivitiesLast(user);
+      return "User added successfully";
+    } catch (e) {
+      return e;
+    }
+  };
+
+  getActivitiesByGroup = async (groupId, user) => {
+    try {
+      let search = await activityDb.getActivitiesByGroup(groupId, user);
+      return search;
     } catch (e) {
       return e;
     }

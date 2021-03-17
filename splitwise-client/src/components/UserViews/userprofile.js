@@ -13,14 +13,14 @@ class UserProfile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      email: '',
-      phone: '',
-      default_currency: '',
-      lang: '',
-      timezone: '',
+      name: this.props.user.name,
+      email: this.props.user.email,
+      phone: this.props.user.phone,
+      default_currency: this.props.user.default_currency,
+      lang: this.props.user.lang,
+      timezone: this.props.user.timezone,
       selectedFile: '',
-      img: '',
+      image_path: '',
     };
   }
 
@@ -33,14 +33,15 @@ class UserProfile extends React.Component {
       lang: this.props.user.lang,
       timezone: this.props.user.timezone,
       selectedFile: '',
-      img: '',
+      image_path: '',
     });
   }
 
   onFileChange = (event) => {
     // Update the state
-    this.setState({ selectedFile: event });
-    this.onFileUpload();
+    this.setState({ selectedFile: event }, () => {
+      this.onFileUpload();
+    });
   };
 
   onFileUpload = () => {
@@ -56,9 +57,7 @@ class UserProfile extends React.Component {
         { responseType: 'blob' }
       )
       .then((res) => {
-        this.setState({
-          img: res.data.Location,
-        });
+        this.props.user.image_path = res.data.Location;
       })
       .catch((error) => {
         return error;
@@ -119,13 +118,14 @@ class UserProfile extends React.Component {
   handleSave = (e) => {
     e.preventDefault();
     const data = {
+      id: this.props.user.id,
       name: this.state.name,
       email: this.state.email,
       phone: this.state.phone,
       default_currency: this.state.default_currency,
       lang: this.state.language,
       timezone: this.state.timezone,
-      image_path: this.state.img,
+      image_path: this.state.image_path,
       username: this.props.user.username,
     };
     this.props.updateUserProfile(data);
@@ -165,7 +165,7 @@ class UserProfile extends React.Component {
                       height="250"
                       className="img-fluid"
                       alt=""
-                      src={this.state.user.image_path}
+                      src={this.props.user.image_path}
                     />
                   )}
                   <div>

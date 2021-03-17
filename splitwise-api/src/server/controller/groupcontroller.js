@@ -23,7 +23,7 @@ exports.createGroup = async (req, res) => {
       var json = { data: [], message: "Group Created Successfully!" };
       res.json(json);
     } else {
-      var json = { data: [], message: "Group already present!" };
+      var json = { data: [], message: "" + group };
       res.json(json);
     }
   } catch (e) {

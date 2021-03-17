@@ -17,9 +17,9 @@ class Participants {
       console.log(e);
     }
   };
-  getParticipant = async (grpName) => {
+  getParticipant = async (grpId) => {
     try {
-      let participants = await participantDb.getParticipant(grpName);
+      let participants = await participantDb.getParticipant(grpId);
       return participants;
     } catch (e) {
       console.log(e);

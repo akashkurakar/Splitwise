@@ -4,7 +4,7 @@ const ActivityService = require("../services/ActivityService");
 const user = require("../models/usermodel");
 const transaction = require("../models/transactionmodel");
 let activityService = new ActivityService();
-const UserService = require("./userService");
+const UserService = require("./UserService");
 let userService = new UserService();
 
 const participantSerice = new ParticipantSerice();

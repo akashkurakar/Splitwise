@@ -6,7 +6,7 @@ const ParticipantSerice = require("../services/participantservice");
 
 const ActivityService = require("../services/ActivityService");
 
-const UserService = require("../services/userService");
+const UserService = require("../services/UserService");
 const { ids } = require("webpack");
 
 let groupService = new GroupService();

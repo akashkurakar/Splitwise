@@ -35,13 +35,13 @@ class Notifications extends React.Component {
   approveRequest = (grpId) => {
     axios.defaults.withCredentials = true;
     const data = {
-      user: this.props.user.name,
+      user: this.props.user.id,
       grp_id: grpId,
     };
     axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
       if (response.status === 200) {
         this.props.getNotifications(this.props.user);
-        this.props.getGroups(this.props.user);
+        this.props.getGroups(this.props.user.id);
       } else {
         // error
       }

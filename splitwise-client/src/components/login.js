@@ -94,6 +94,7 @@ class Login extends React.Component {
                   <input
                     type="email"
                     id="email"
+                    data-testid="email"
                     onChange={this.emailChangeHandler}
                     className="form-control"
                     placeholder="email"
@@ -105,6 +106,7 @@ class Login extends React.Component {
                   <input
                     type="password"
                     id="password"
+                    data-testid="password"
                     onChange={this.passwordChangeHandler}
                     className="form-control"
                     placeholder="Password"
@@ -116,6 +118,7 @@ class Login extends React.Component {
                     size="medium"
                     className={classes.margin}
                     type="submit"
+                    data-testid="login"
                     style={{
                       float: 'left',
                       'background-color': '#ff652f',

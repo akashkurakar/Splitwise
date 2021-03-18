@@ -63,6 +63,7 @@ class SelectGroup extends React.Component {
   handleModal = (modal) => {
     this.setState({ show: modal });
     this.getTransaction();
+    this.getBalances();
   };
 
   handleEditModal = () => {
@@ -153,7 +154,9 @@ class SelectGroup extends React.Component {
                     </Col>
                     <Col md={3}>
                       <div className="form-label-group">
-                        <Typography>{this.props.selectedGroup.grp_name}</Typography>
+                        <Typography data-testid="header">
+                          {this.props.selectedGroup.grp_name}
+                        </Typography>
                       </div>
                     </Col>
 
@@ -181,6 +184,7 @@ class SelectGroup extends React.Component {
                         type="submit"
                         id="location"
                         onClick={this.handleEditModal}
+                        data-testid="edit group"
                       >
                         Edit Group
                       </Button>

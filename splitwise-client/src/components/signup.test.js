@@ -1,18 +1,20 @@
-/* eslint-disable no-undef */
 /* eslint-disable arrow-body-style */
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import '@testing-library/jest-dom';
+import { jest } from '@jest/globals';
 import alert from '../redux/reducers/AlertReducers';
-import Login from './login';
+import SignUp from './signup';
 import user from '../redux/reducers/Userreducer';
 import dashboard from '../redux/reducers/DashboardReducers';
 import groups from '../redux/reducers/GroupReducer';
 import transactions from '../redux/reducers/TransactionReducer';
 import notifications from '../redux/reducers/NotificationReducer';
 import '@testing-library/jest-dom/extend-expect';
+
+afterEach(cleanup);
 
 const rootreducer = combineReducers({
   user,
@@ -39,29 +41,35 @@ function renderWithredux(
   return { ...render(<Provider store={store}>{component}</Provider>) };
 }
 
-describe('Login', () => {
-  it('finds title', () => {
-    const { getByTestId } = renderWithredux(<Login />);
+describe('SignUp', () => {
+  it('check header', () => {
+    const { getByTestId } = renderWithredux(<SignUp />);
     const elem = getByTestId('header');
-    expect(elem.innerHTML).toBe('WELCOME TO SPLITWISE');
+    expect(elem.innerHTML).toBe('Hi there! Sign me up!');
   });
 
-  it('click edit button', () => {
-    renderWithredux(<Login />);
-    fireEvent.change(screen.getByTestId('email'), { target: { value: 'akash@gmail.com' } });
-    expect(screen.getByTestId('email').value).toBe('akash@gmail.com');
+  it('check name field', () => {
+    renderWithredux(<SignUp />);
+    fireEvent.change(screen.getByTestId('name'), { target: { value: 'thomas' } });
+    expect(screen.getByTestId('name').value).toBe('thomas');
   });
 
-  it('click edit button', () => {
-    renderWithredux(<Login />);
+  it('check email field', () => {
+    renderWithredux(<SignUp />);
+    fireEvent.change(screen.getByTestId('email'), { target: { value: 'thomas@gmail.com' } });
+    expect(screen.getByTestId('email').value).toBe('thomas@gmail.com');
+  });
+
+  it('check for password field', () => {
+    renderWithredux(<SignUp />);
     fireEvent.change(screen.getByTestId('password'), { target: { value: 'akash' } });
     expect(screen.getByTestId('password').value).toBe('akash');
   });
 
-  /* it('click signup button', () => {
+  it('click signup button', () => {
     const handleClick = jest.fn();
-    renderWithredux(<Login loginUser="" />);
-    fireEvent.click(screen.getByTestId('login'));
+    renderWithredux(<SignUp />);
+    fireEvent.click(screen.getByTestId('signup'));
     expect(handleClick).not.toHaveBeenCalled();
-  }); */
+  });
 });

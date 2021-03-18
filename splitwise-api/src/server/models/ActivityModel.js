@@ -31,7 +31,7 @@ activities.getUserActivitiesLast = async (userid) => {
 activities.addActivity = async (description, user, groupName) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
-    var sql = `Insert into activities(user_name,description,grp_name) values ('${user}','${description}','${groupName}')`;
+    var sql = `Insert into activities(user_name,description,grp_id) values ('${user}','${description}','${groupName}')`;
     con.query(sql, function (error, result, fields) {
       if (error) {
         return reject(error);
@@ -44,7 +44,7 @@ activities.addActivity = async (description, user, groupName) => {
 activities.getActivitiesByGroup = async (grp_id, userid) => {
   return new Promise((resolve, reject) => {
     con.query("USE main;");
-    var sql = `select * from activities where grp_name='${grp_id}' AND user_name=${userid} order by created_on asc`;
+    var sql = `select * from activities where grp_id='${grp_id}' AND user_name=${userid} order by created_on asc`;
     con.query(sql, function (error, result, fields) {
       if (error) {
         return reject(error);

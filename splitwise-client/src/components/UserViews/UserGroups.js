@@ -16,6 +16,7 @@ import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
 import { Redirect } from 'react-router-dom';
 import axios from 'axios';
+import { Typography } from '@material-ui/core';
 import SelectGroup from './SelectGroup';
 import * as userNotifications from '../../redux/actions/NotificationAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
@@ -29,6 +30,7 @@ class UserGroups extends React.Component {
       groups: [],
       selectedGroup: '',
       redirect: null,
+      errorMessage: '',
     };
   }
 
@@ -38,20 +40,22 @@ class UserGroups extends React.Component {
     });
   }
 
-  handleLeaveGroup = (grpid) => {
+  handleLeaveGroup = async (grpid) => {
     axios.defaults.withCredentials = true;
     const data = {
       user: this.props.user.id,
       group: grpid,
     };
-    axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
+    await axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
       if (response.status === 200) {
         const res = response.data;
         if (res.message === 'Group Left Successfully') {
           this.props.getNotifications(this.props.user.id);
           this.props.getGroups(this.props.user.id);
         } else {
-          // error
+          this.setState({
+            errorMessage: res.message,
+          });
         }
       } else {
         // error
@@ -64,13 +68,13 @@ class UserGroups extends React.Component {
     this.approveRequest(e.target.value);
   };
 
-  approveRequest = (grpId) => {
+  approveRequest = async (grpId) => {
     axios.defaults.withCredentials = true;
     const data = {
       user: this.props.user.id,
       grp_id: grpId,
     };
-    axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
+    await axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
       if (response.status === 200) {
         this.props.getNotifications(this.props.user.id);
         this.props.getGroups(this.props.user.id);
@@ -103,7 +107,7 @@ class UserGroups extends React.Component {
               <table style={{ width: '100%' }}>
                 <tr>
                   <td style={{ width: '50%' }}>
-                    <h2>My Groups</h2>
+                    <h2 data-testid="header">My Groups</h2>
                   </td>
                 </tr>
               </table>
@@ -112,7 +116,11 @@ class UserGroups extends React.Component {
         </div>
         <Row>
           <Col md={12}>
-            {' '}
+            {this.state.errorMessage !== '' && (
+              <div className="alert alert-danger" role="alert">
+                {this.state.errorMessage}
+              </div>
+            )}{' '}
             <Autocomplete
               freeSolo
               id="free-solo-2-demo"
@@ -120,7 +128,13 @@ class UserGroups extends React.Component {
               options={this.state.groups.map((option) => option.grp_name)}
               onChange={(event, value) => this.handleSelectedGroup(value)}
               renderInput={(params) => (
-                <TextField {...params} label="Search Group" margin="normal" />
+                <TextField
+                  data-testid="seach-box"
+                  {...params}
+                  label="Search Group"
+                  margin="normal"
+                  placeholder="Search Group"
+                />
               )}
             />
           </Col>
@@ -135,12 +149,30 @@ class UserGroups extends React.Component {
                     <ListItem>
                       <ListItemAvatar>
                         <Avatar>
-                          <img src={r.image_path} className="img-fluid" alt="" />
+                          {r.image_path !== '' ? (
+                            <img src={r.image_path} className="img-fluid" alt="" />
+                          ) : (
+                            <img
+                              src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
+                              className="img-fluid"
+                              alt=""
+                            />
+                          )}
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={r.grp_name}
-                        secondary={r.created_by}
+                        data-testid="grp_name"
+                        primary={<Typography>{r.grp_name}</Typography>}
+                        secondary={
+                          <Typography className="header-label">
+                            Created by:
+                            {
+                              this.props.users.filter(
+                                (user) => user.id === parseInt(r.created_by, 10)
+                              )[0].name
+                            }
+                          </Typography>
+                        }
                         onClick={() => r.status === 'active' && this.handleSelectedGroup(r)}
                       />
                       {r.status === 'PENDING' ? (
@@ -171,7 +203,11 @@ class UserGroups extends React.Component {
                   ))
               ) : (
                 <ListItem>
-                  <ListItemText primary="No groups available" className="header-label" />
+                  <ListItemText
+                    data-testid="default-message"
+                    primary="No groups available"
+                    className="header-label"
+                  />
                 </ListItem>
               )}
             </List>
@@ -189,12 +225,14 @@ UserGroups.propTypes = {
   selectedGroup: PropTypes.func.isRequired,
   user: PropTypes.string.isRequired,
   notifications: PropTypes.objectOf.isRequired,
+  users: PropTypes.objectOf.isRequired,
 };
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     alert: state.alert,
     groups: state.groups,
+    users: state.users,
   };
 };
 

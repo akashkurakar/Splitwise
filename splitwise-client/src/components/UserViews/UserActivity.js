@@ -35,10 +35,11 @@ class UserActivity extends React.Component {
   }
 
   handleSelectedGrp = (e) => {
+    const grpid = this.props.groups.filter((grp) => grp.grp_name === e.target.value)[0].grp_id;
     this.setState({
       selectedGroup: e.target.value,
     });
-    this.getRecentActivitiesByGroup(e.target.value);
+    this.getRecentActivitiesByGroup(grpid);
   };
 
   handleSelectedSort = (e) => {
@@ -180,7 +181,11 @@ class UserActivity extends React.Component {
                 ))
               ) : (
                 <ListItem button>
-                  <ListItemText id="item1" primary="No Transactions" />
+                  <ListItemText
+                    id="item1"
+                    clasName="header-label"
+                    primary="No Activitites at this moment"
+                  />
                   <ListItemSecondaryAction />
                 </ListItem>
               )}

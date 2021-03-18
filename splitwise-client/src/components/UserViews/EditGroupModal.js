@@ -155,7 +155,7 @@ class EditGroupModal extends React.Component {
       .then((response) => {
         if (response.status === 200) {
           if (response.data === 'Group updated successfully!') {
-            this.props.getGroups(this.props.user.name);
+            this.props.getGroups(this.props.user.id);
             this.setState({
               errorMessage: response.data,
               members: [
@@ -205,9 +205,9 @@ class EditGroupModal extends React.Component {
                 <Col md={4}>
                   {' '}
                   <form onSubmit={this.onFileUpload} encType="multipart/form-data">
-                    {this.state.group.image_path !== '' ? (
+                    {this.state.group.image_path !== '' || this.state.imgUrl !== '' ? (
                       <img
-                        src={this.state.group.image_path}
+                        src={this.state.imgUrl}
                         width="150"
                         height="150"
                         className="img-fluid"

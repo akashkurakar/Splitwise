@@ -85,13 +85,13 @@ class TransactionService {
             activityService.addActivity(
               `${owner.name} added expense as ${transaction.description} in ${transaction.grpName}`,
               user.user_name,
-              transaction.grpName
+              transaction.grpId
             );
           } else {
             activityService.addActivity(
               `You paid for ${transaction.description} in ${transaction.grpName}`,
               user.user_name,
-              transaction.grpName
+              transaction.grpId
             );
           }
         }

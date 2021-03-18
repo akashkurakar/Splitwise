@@ -186,6 +186,7 @@ class UserProfile extends React.Component {
                     <input
                       type="name"
                       id="name"
+                      data-testid="name"
                       onChange={this.nameChangeHandler}
                       className="form-control"
                       placeholder="Name"
@@ -202,6 +203,7 @@ class UserProfile extends React.Component {
                     <input
                       type="email"
                       id="email"
+                      data-testid="email"
                       onChange={this.emailChangeHandler}
                       className="form-control"
                       placeholder="Email"
@@ -218,6 +220,7 @@ class UserProfile extends React.Component {
                     <input
                       type="phone"
                       id="phone"
+                      data-testid="phone"
                       onChange={this.phoneChangeHandler}
                       className="form-control"
                       placeholder="phone"
@@ -244,6 +247,7 @@ class UserProfile extends React.Component {
                       onChange={this.handleCurrencySelect}
                       value={this.state.default_currency}
                       className="form-control"
+                      data-testid="currency"
                       id="sel2"
                     >
                       <option value="USD">USD</option>
@@ -259,6 +263,7 @@ class UserProfile extends React.Component {
                       onChange={this.handleTimezoneSelect}
                       value={this.state.timezone}
                       className="form-control"
+                      data-testid="timezone"
                       id="sel2"
                     >
                       <option value="GMT">(GMT)GMT(Greenwich Mean Time)</option>
@@ -274,6 +279,7 @@ class UserProfile extends React.Component {
                       onChange={this.handleLanguageSelect}
                       value={this.state.lang}
                       className="form-control"
+                      data-testid="language"
                       id="sel2"
                     >
                       <option value="ENGLISH">English</option>
@@ -288,6 +294,7 @@ class UserProfile extends React.Component {
                       className="btn btn-lg btn-success btn-block text-uppercase"
                       type="submit"
                       id="location"
+                      data-testid="save"
                       style={{ float: 'left', 'background-color': '#ff652f' }}
                     >
                       Save
@@ -303,8 +310,8 @@ class UserProfile extends React.Component {
   }
 }
 UserProfile.propTypes = {
-  alert: PropTypes.objectOf.isRequired,
-  user: PropTypes.objectOf.isRequired,
+  alert: PropTypes.func.isRequired,
+  user: PropTypes.func.isRequired,
   updateUserProfile: PropTypes.func.isRequired,
   getUser: PropTypes.func.isRequired,
 };

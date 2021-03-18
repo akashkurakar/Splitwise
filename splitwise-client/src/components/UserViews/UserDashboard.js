@@ -157,7 +157,7 @@ class DashboardMiddle extends React.Component {
                 <Card.Body>
                   <Row>
                     <Col md={4}>
-                      <h2>Dashboard</h2>
+                      <h2 data-testid="header">Dashboard</h2>
                     </Col>
                     <Col md={4} />
                     <Col md={4}>
@@ -177,7 +177,7 @@ class DashboardMiddle extends React.Component {
                   <Row>
                     <Col md={4}>
                       <medium className="text-muted">Total Balance</medium>
-                      <h6 style={{ color: 'green' }}>
+                      <h6 style={{ color: 'green' }} data-testid="balance">
                         {converter(this.props.user.default_currency).format(
                           this.state.balances.balance
                         )}
@@ -186,7 +186,7 @@ class DashboardMiddle extends React.Component {
 
                     <Col md={4}>
                       <medium className="text-muted">You Owe</medium>
-                      <h6 style={{ color: 'red' }}>
+                      <h6 style={{ color: 'red' }} data-testid="paidAmount">
                         {converter(this.props.user.default_currency).format(
                           this.state.balances.paidAmount
                         )}
@@ -194,7 +194,7 @@ class DashboardMiddle extends React.Component {
                     </Col>
                     <Col md={4}>
                       <medium className="text-muted">You are Owed</medium>
-                      <h6 style={{ color: 'green' }}>
+                      <h6 style={{ color: 'green' }} data-testid="owedAmount">
                         {converter(this.props.user.default_currency).format(
                           this.state.balances.owedAmount
                         )}

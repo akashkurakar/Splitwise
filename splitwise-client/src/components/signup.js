@@ -79,7 +79,9 @@ class SignUp extends React.Component {
               ) : null}
               <div id="card-body" className="card-body">
                 <Typography>
-                  <h3 className="card-title text-center">Hi there! Sign me up!</h3>
+                  <h3 className="card-title text-center" data-testid="header">
+                    Hi there! Sign me up!
+                  </h3>
                   <form className="form-signin" onSubmit={this.handleSignUp}>
                     {errorMessage && <p>User already present! Please sign in</p>}
                     <div className="form-label-group">
@@ -90,6 +92,7 @@ class SignUp extends React.Component {
                         id="name"
                         className="form-control"
                         placeholder="Full Name"
+                        data-testid="name"
                       />
                     </div>
                     <div className="form-label-group">
@@ -100,6 +103,7 @@ class SignUp extends React.Component {
                         onChange={this.emailChangeHandler}
                         className="form-control"
                         placeholder="email"
+                        data-testid="email"
                         required
                       />
                     </div>
@@ -110,6 +114,7 @@ class SignUp extends React.Component {
                       onChange={this.passwordChangeHandler}
                       className="form-control"
                       placeholder="Password"
+                      data-testid="password"
                       required
                     />
                     <div>
@@ -117,6 +122,7 @@ class SignUp extends React.Component {
                         className="nav-link button-green-submit text-uppercase"
                         type="submit"
                         id="location"
+                        data-testid="signup"
                       >
                         Sign me up!
                       </button>

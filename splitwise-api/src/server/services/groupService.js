@@ -42,7 +42,7 @@ class GroupService {
           let activity = await activityService.addActivity(
             `${owner.name} created group ${groupObj.grp_name}`,
             userData.id,
-            groupObj.grp_name
+            search[0].grp_id
           );
         }
 

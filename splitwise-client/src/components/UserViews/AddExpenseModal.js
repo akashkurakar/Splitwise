@@ -50,7 +50,7 @@ class AddExpenseModal extends React.Component {
     this.props.show(false);
   };
 
-  handleAddExpenses = () => {
+  handleAddExpenses = async () => {
     axios.defaults.withCredentials = true;
     const data = {
       user: this.state.user.id,
@@ -59,7 +59,7 @@ class AddExpenseModal extends React.Component {
       description: this.state.description,
       amount: this.state.amount,
     };
-    axios.post(`${constants.baseUrl}/api/transactions`, data).then((response) => {
+    await axios.post(`${constants.baseUrl}/api/transactions`, data).then((response) => {
       if (response.status === 200) {
         if (response.data.message === 'Expenses added successfully!') {
           this.setState({
@@ -79,7 +79,13 @@ class AddExpenseModal extends React.Component {
 
   render() {
     return (
-      <Modal show={this.state.show} onHide={this.handleClose} backdrop="static" keyboard={false}>
+      <Modal
+        data-testid="add-expense"
+        show={this.state.show}
+        onHide={this.handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
         <Modal.Header style={{ 'background-color': '#5bc5a7' }} closeButton>
           <Modal.Title style={{ color: 'white' }}>Add Expense</Modal.Title>
         </Modal.Header>

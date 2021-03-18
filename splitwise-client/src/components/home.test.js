@@ -1,10 +1,9 @@
 /* eslint-disable arrow-body-style */
-import { render } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import React from 'react';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
 import { combineReducers } from 'redux';
 import alert from '../redux/reducers/AlertReducers';
 import Home from './home';

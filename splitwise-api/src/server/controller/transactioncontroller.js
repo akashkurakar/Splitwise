@@ -63,8 +63,8 @@ exports.addTransaction = async (req, res) => {
   const transaction = req.body;
   try {
     let result = await transactionService.addTransaction(transaction);
-    res.json({ data: [], message: result });
-    res.send();
+    //res.json({ data: [], message: result });
+    res.status(200).send({ data: [], message: result });
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

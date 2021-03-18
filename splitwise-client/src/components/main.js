@@ -11,6 +11,7 @@ import MainContent from './Dashboard/MainContent';
 import CreateGroup from './UserViews/CreateGroup';
 import UserProfile from './UserViews/UserProfile';
 import SelectGroup from './UserViews/SelectGroup';
+import UserHeader from './Dashboard/UserHeader';
 
 class Main extends React.Component {
   constructor(props) {
@@ -27,6 +28,7 @@ class Main extends React.Component {
         <Route exact path="/" component={Home} />
         <Route path="/signup" component={Signup} />
         <Route path="/activity" component={Activity} />
+        <Route path="/header" component={UserHeader} />
         <Route path="/creategroup" component={CreateGroup} />
         <Route path="/userprofile" component={UserProfile} />
         <Route path="/selectgroup" component={SelectGroup} />

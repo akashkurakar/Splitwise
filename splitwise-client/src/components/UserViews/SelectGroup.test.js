@@ -34,6 +34,7 @@ function reducer(state = initialReducerState, action) {
       return state;
   }
 }
+
 function renderWithredux(
   component,
   { initialState, store = createStore(reducer, initialState) } = {}

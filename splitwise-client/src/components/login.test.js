@@ -57,11 +57,4 @@ describe('Login', () => {
     fireEvent.change(screen.getByTestId('password'), { target: { value: 'akash' } });
     expect(screen.getByTestId('password').value).toBe('akash');
   });
-
-  /* it('click signup button', () => {
-    const handleClick = jest.fn();
-    renderWithredux(<Login loginUser="" />);
-    fireEvent.click(screen.getByTestId('login'));
-    expect(handleClick).not.toHaveBeenCalled();
-  }); */
 });

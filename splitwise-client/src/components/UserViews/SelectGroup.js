@@ -29,6 +29,7 @@ class SelectGroup extends React.Component {
       errorMessage: '',
       showEdit: false,
       userSummary: [],
+      selectedGroup: '',
     };
   }
 
@@ -36,8 +37,14 @@ class SelectGroup extends React.Component {
     this.getBalances();
     this.setState({
       transactions: this.props.transactions,
+      selectedGroup: this.props.selectedGroup,
     });
     this.getTransaction();
+  };
+
+  componentDidUpdate = () => {
+    this.getBalances();
+    // this.getTransaction();
   };
 
   getBalances = () => {
@@ -130,7 +137,7 @@ class SelectGroup extends React.Component {
                   <Row>
                     <Col md={2}>
                       <form onSubmit={this.onFileUpload} encType="multipart/form-data">
-                        {this.props.selectedGroup.image_path !== '' ? (
+                        {this.state.selectedGroup.image_path !== '' ? (
                           <Avatar
                             src={this.props.selectedGroup.image_path}
                             className="img-fluid"
@@ -154,7 +161,7 @@ class SelectGroup extends React.Component {
                     </Col>
                     <Col md={3}>
                       <div className="form-label-group">
-                        <Typography data-testid="header">
+                        <Typography data-testid="header" onChange={this.loadBalances}>
                           {this.props.selectedGroup.grp_name}
                         </Typography>
                       </div>
@@ -228,6 +235,7 @@ class SelectGroup extends React.Component {
                                     {convertDate(r.created_on)}
                                   </Typography>
                                 }
+                                onChange={this.loadBalances}
                               />
                             </Col>
                             <Col md={3} style={{ 'text-align': 'end' }}>

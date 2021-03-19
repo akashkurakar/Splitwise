@@ -9,7 +9,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PropTypes from 'prop-types';
@@ -27,18 +26,14 @@ class UserGroups extends React.Component {
     super(props);
     this.state = {
       navigate: false,
-      groups: [],
       selectedGroup: '',
       redirect: null,
+      groups: this.props.groups,
       errorMessage: '',
     };
   }
 
-  componentDidMount() {
-    this.setState({
-      groups: this.props.groups,
-    });
-  }
+  componentDidMount() {}
 
   handleLeaveGroup = async (grpid) => {
     axios.defaults.withCredentials = true;
@@ -88,6 +83,19 @@ class UserGroups extends React.Component {
     this.props.selectedGroup(e);
   };
 
+  handleSearchGroup = (e) => {
+    if (e.target.value !== '') {
+      const searchedGroups = this.props.groups.filter((grp) =>
+        grp.grp_name.toLowerCase().includes(e.target.value.toLowerCase())
+      );
+      this.setState({ groups: searchedGroups });
+    } else {
+      this.setState({ groups: this.props.groups });
+    }
+
+    // this.props.selectedGroup(e);
+  };
+
   render() {
     if (this.state.redirect) {
       return <Redirect to={this.state.redirect} />;
@@ -121,29 +129,20 @@ class UserGroups extends React.Component {
                 {this.state.errorMessage}
               </div>
             )}{' '}
-            <Autocomplete
-              freeSolo
-              id="free-solo-2-demo"
-              disableClearable
-              options={this.state.groups.map((option) => option.grp_name)}
-              onChange={(event, value) => this.handleSelectedGroup(value)}
-              renderInput={(params) => (
-                <TextField
-                  data-testid="seach-box"
-                  {...params}
-                  label="Search Group"
-                  margin="normal"
-                  placeholder="Search Group"
-                />
-              )}
+            <TextField
+              data-testid="seach-box"
+              label="Search Group"
+              margin="normal"
+              placeholder="Search Group"
+              onChange={(event) => this.handleSearchGroup(event)}
             />
           </Col>
         </Row>
         <Row>
           <Col md={12}>
             <List dense className={classes.root}>
-              {this.props.groups.filter((r) => r.status !== 'left').length > 0 ? (
-                this.props.groups
+              {this.state.groups.filter((r) => r.status !== 'left').length > 0 ? (
+                this.state.groups
                   .filter((r) => r.status !== 'left')
                   .map((r) => (
                     <ListItem>
@@ -224,7 +223,6 @@ UserGroups.propTypes = {
   groups: PropTypes.objectOf.isRequired,
   selectedGroup: PropTypes.func.isRequired,
   user: PropTypes.string.isRequired,
-  notifications: PropTypes.objectOf.isRequired,
   users: PropTypes.objectOf.isRequired,
 };
 const mapStatetoProps = (state) => {

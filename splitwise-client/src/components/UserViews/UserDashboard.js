@@ -18,7 +18,6 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import PaymentModal from './PaymentModal';
-import photo from '../../static/images/avatar/person.png';
 import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
 import RightSideBar from '../Dashboard/DashboardRightSidebar';
@@ -151,204 +150,226 @@ class DashboardMiddle extends React.Component {
     return (
       <>
         <Row>
-          <Col md={9}>
+          <Col md={12}>
             <Row>
-              <Card style={{ 'background-color': '#eeeeee', width: '100%' }} className="card">
-                <Card.Body>
-                  <Row>
-                    <Col md={4}>
-                      <h2 data-testid="header">Dashboard</h2>
-                    </Col>
-                    <Col md={4} />
-                    <Col md={4}>
-                      <Button
-                        style={{
-                          'background-color': '#5bc5a7',
-                          'border-color': '#5bc5a7',
-                        }}
-                        type="submit"
-                        id="location"
-                        onClick={this.handleModal}
-                      >
-                        Settle Up
-                      </Button>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={4}>
-                      <medium className="text-muted">Total Balance</medium>
-                      <h6 style={{ color: 'green' }} data-testid="balance">
-                        {converter(this.props.user.default_currency).format(
-                          this.state.balances.balance
-                        )}
-                      </h6>
-                    </Col>
+              <Col md={9}>
+                <Row>
+                  <Card style={{ 'background-color': '#eeeeee', width: '100%' }} className="card">
+                    <Card.Body>
+                      <Row>
+                        <Col md={4}>
+                          <h2 data-testid="header">Dashboard</h2>
+                        </Col>
+                        <Col md={4} />
+                        <Col md={4}>
+                          <Button
+                            style={{
+                              'background-color': '#5bc5a7',
+                              'border-color': '#5bc5a7',
+                            }}
+                            type="submit"
+                            id="location"
+                            onClick={this.handleModal}
+                          >
+                            Settle Up
+                          </Button>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md={4}>
+                          <medium className="text-muted">Total Balance</medium>
+                          <h6 style={{ color: 'green' }} data-testid="balance">
+                            {converter(this.props.user.default_currency).format(
+                              this.state.balances.balance
+                            )}
+                          </h6>
+                        </Col>
 
-                    <Col md={4}>
-                      <medium className="text-muted">You Owe</medium>
-                      <h6 style={{ color: 'red' }} data-testid="paidAmount">
-                        {converter(this.props.user.default_currency).format(
-                          this.state.balances.paidAmount
-                        )}
-                      </h6>
-                    </Col>
-                    <Col md={4}>
-                      <medium className="text-muted">You are Owed</medium>
-                      <h6 style={{ color: 'green' }} data-testid="owedAmount">
-                        {converter(this.props.user.default_currency).format(
-                          this.state.balances.owedAmount
-                        )}
-                      </h6>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-            </Row>
-            <Row>
-              <Col style={{ 'background-color': '#ffffff' }} md={5}>
-                <large
-                  className="text-muted header-label"
-                  color="textSecondary"
-                  display="block"
-                  variant="caption"
-                >
-                  You owe
-                </large>
-                <List dense>
-                  {this.state.oweList.length > 0 ? (
-                    this.state.oweList.map((trans) => (
-                      <ListItem button>
-                        <ListItemAvatar>
-                          <Avatar alt={`Avatar n°${1}`} src={photo} />
-                        </ListItemAvatar>
-                        <ListItemText
-                          id="item1"
-                          primary={this.props.users
-                            .filter((us) => us.id === trans.paid_by)
-                            .map((r) => {
-                              return r.name;
-                            })}
-                          secondary={
-                            <ul>
-                              <Typography>
-                                Owe you&nbsp;
-                                {converter(this.props.user.default_currency).format(
-                                  trans.total_amt
-                                )}
-                              </Typography>
-                              {this.state.oweList.length > 0
-                                ? this.state.oweList
-                                    .filter((grp) => grp.paid_by === trans.paid_by)
-                                    .map((trans1) => (
-                                      <li>
-                                        <div>
-                                          <Typography
-                                            component="span"
-                                            variant="body2"
-                                            className="header-label"
-                                          >
-                                            You owe&nbsp;
-                                            {converter(this.props.user.default_currency).format(
-                                              trans1.total_amt
-                                            )}
-                                            &nbsp; for '{trans1.grp_name}'
-                                          </Typography>
-                                        </div>
-                                      </li>
-                                    ))
-                                : null}
-                            </ul>
-                          }
-                        />
-                        <Divider light />
-                      </ListItem>
-                    ))
-                  ) : (
-                    <ListItem>
-                      <ListItemText
-                        id="item1"
-                        className="header-label"
-                        primary="You do not owe anything!"
-                      />
+                        <Col md={4}>
+                          <medium className="text-muted">You Owe</medium>
+                          <h6 style={{ color: 'red' }} data-testid="paidAmount">
+                            {converter(this.props.user.default_currency).format(
+                              this.state.balances.paidAmount
+                            )}
+                          </h6>
+                        </Col>
+                        <Col md={4}>
+                          <medium className="text-muted">You are Owed</medium>
+                          <h6 style={{ color: 'green' }} data-testid="owedAmount">
+                            {converter(this.props.user.default_currency).format(
+                              this.state.balances.owedAmount
+                            )}
+                          </h6>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+                </Row>
+                <Row>
+                  <Col style={{ 'background-color': '#ffffff' }} md={5}>
+                    <large
+                      className="text-muted header-label"
+                      color="textSecondary"
+                      display="block"
+                      variant="caption"
+                    >
+                      You owe
+                    </large>
+                    <List dense>
+                      {this.state.oweList.length > 0 ? (
+                        this.state.oweList.map((trans) => (
+                          <ListItem button>
+                            <ListItemAvatar>
+                              <Avatar
+                                alt={`Avatar n°${trans.user}`}
+                                src={this.props.users
+                                  .filter((us) => us.id === trans.paid_by)
+                                  .map((r1) => {
+                                    return r1.image_path;
+                                  })}
+                              />
+                            </ListItemAvatar>
+                            <ListItemText
+                              id="item1"
+                              primary={this.props.users
+                                .filter((us) => us.id === trans.paid_by)
+                                .map((r) => {
+                                  return r.name;
+                                })}
+                              secondary={
+                                <ul>
+                                  <Typography>
+                                    Owe you&nbsp;
+                                    {converter(this.props.user.default_currency).format(
+                                      trans.total_amt
+                                    )}
+                                  </Typography>
+                                  {this.state.oweList.length > 0
+                                    ? this.state.oweList
+                                        .filter((grp) => grp.paid_by === trans.paid_by)
+                                        .map((trans1) => (
+                                          <li>
+                                            <div>
+                                              <Typography
+                                                component="span"
+                                                variant="body2"
+                                                className="header-label"
+                                              >
+                                                You owe&nbsp;
+                                                {converter(this.props.user.default_currency).format(
+                                                  trans1.total_amt
+                                                )}
+                                                &nbsp; for '{trans1.grp_name}'
+                                              </Typography>
+                                            </div>
+                                          </li>
+                                        ))
+                                    : null}
+                                </ul>
+                              }
+                            />
+                            <Divider light />
+                          </ListItem>
+                        ))
+                      ) : (
+                        <ListItem>
+                          <ListItemText
+                            id="item1"
+                            className="header-label"
+                            primary="You do not owe anything!"
+                          />
 
-                      <ListItemSecondaryAction />
-                    </ListItem>
-                  )}
-                </List>
+                          <ListItemSecondaryAction />
+                        </ListItem>
+                      )}
+                    </List>
+                  </Col>
+
+                  <Divider orientation="vertical" flexItem />
+
+                  <Col style={{ 'background-color': '#ffffff' }} md={5}>
+                    <large className="text-muted header-label">You are owed</large>
+                    <List dense>
+                      {this.state.owedList.length > 0 ? (
+                        this.state.owedList.map((user) => (
+                          <ListItem alignItems="flex-start" button>
+                            <ListItemAvatar>
+                              <Avatar
+                                alt={`Avatar n°${user.user}`}
+                                src={this.props.users
+                                  .filter((us) => us.id === user.owed_name)
+                                  .map((r1) => {
+                                    return r1.image_path;
+                                  })}
+                              />
+                            </ListItemAvatar>
+                            <ListItemText
+                              id="item1"
+                              primary={this.props.users
+                                .filter((us) => us.id === user.owed_name)
+                                .map((r) => {
+                                  return r.name;
+                                })}
+                              secondary={
+                                <ul>
+                                  <Typography>
+                                    Owes you&nbsp;
+                                    {converter(this.props.user.default_currency).format(
+                                      user.total_amt
+                                    )}
+                                  </Typography>
+                                  {this.state.owedList.length > 0
+                                    ? this.state.owedList
+                                        .filter((grp) => grp.owed_name === user.owed_name)
+                                        .map((trans1) => (
+                                          <li>
+                                            <div>
+                                              <Typography
+                                                component="span"
+                                                variant="body2"
+                                                className="header-label"
+                                              >
+                                                Owes you &nbsp;
+                                                {converter(this.props.user.default_currency).format(
+                                                  trans1.total_amt
+                                                )}
+                                                &nbsp; for '{trans1.grp_name}'
+                                              </Typography>
+                                            </div>
+                                          </li>
+                                        ))
+                                    : null}
+                                </ul>
+                              }
+                            />
+
+                            <Divider />
+                            <ListItemSecondaryAction />
+                          </ListItem>
+                        ))
+                      ) : (
+                        <ListItem>
+                          <ListItemText
+                            id="item1"
+                            className="header-label"
+                            primary="You did not owe anything!"
+                          />
+                          <ListItemSecondaryAction />
+                        </ListItem>
+                      )}
+                    </List>
+                  </Col>
+                </Row>
               </Col>
-
-              <Divider orientation="vertical" flexItem />
-
-              <Col style={{ 'background-color': '#ffffff' }} md={5}>
-                <large className="text-muted header-label">You are owed</large>
-                <List dense>
-                  {this.state.owedList.length > 0 ? (
-                    this.state.owedList.map((user) => (
-                      <ListItem alignItems="flex-start" button>
-                        <ListItemAvatar>
-                          <Avatar alt={`Avatar n°${1}`} src={photo} />
-                        </ListItemAvatar>
-                        <ListItemText
-                          id="item1"
-                          primary={this.props.users
-                            .filter((us) => us.id === user.owed_name)
-                            .map((r) => {
-                              return r.name;
-                            })}
-                          secondary={
-                            <ul>
-                              <Typography>
-                                Owes you&nbsp;
-                                {converter(this.props.user.default_currency).format(user.total_amt)}
-                              </Typography>
-                              {this.state.owedList.length > 0
-                                ? this.state.owedList
-                                    .filter((grp) => grp.owed_name === user.owed_name)
-                                    .map((trans1) => (
-                                      <li>
-                                        <div>
-                                          <Typography
-                                            component="span"
-                                            variant="body2"
-                                            className="header-label"
-                                          >
-                                            Owes you &nbsp;
-                                            {converter(this.props.user.default_currency).format(
-                                              trans1.total_amt
-                                            )}
-                                            &nbsp; for '{trans1.grp_name}'
-                                          </Typography>
-                                        </div>
-                                      </li>
-                                    ))
-                                : null}
-                            </ul>
-                          }
-                        />
-
-                        <Divider />
-                        <ListItemSecondaryAction />
-                      </ListItem>
-                    ))
-                  ) : (
-                    <ListItem>
-                      <ListItemText
-                        id="item1"
-                        className="header-label"
-                        primary="You did not owe anything!"
-                      />
-                      <ListItemSecondaryAction />
-                    </ListItem>
-                  )}
-                </List>
+              <Col md={3}>
+                <RightSideBar data={this.state.balances} screen="dashboard" />
               </Col>
             </Row>
-          </Col>
-          <Col md={3}>
-            <RightSideBar data={this.state.balances} screen="dashboard" />
+            {this.state.show && (
+              <PaymentModal show={this.handleModal} data={this.state.modalData} />
+            )}
           </Col>
         </Row>
-        {this.state.show && <PaymentModal show={this.handleModal} data={this.state.modalData} />}
       </>
     );
   }

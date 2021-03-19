@@ -124,16 +124,14 @@ class TransactionService {
   transactionSettle = async (transaction) => {
     try {
       let users = await tranDb.transactionSettle(transaction);
+      let user1 = await userService.getUserById(transaction.user1);
+      let user2 = await userService.getUserById(transaction.user2);
       activityService.addActivity(
-        `${transaction.user2} settled up with you`,
+        `${user2} settled up with you`,
         transaction.user1,
         ""
       );
-      activityService.addActivity(
-        `You paid ${transaction.user1}`,
-        transaction.user2,
-        ""
-      );
+      activityService.addActivity(`You paid ${user1}`, transaction.user2, "");
       return "Transaction Settled";
     } catch (e) {
       console.log(e);

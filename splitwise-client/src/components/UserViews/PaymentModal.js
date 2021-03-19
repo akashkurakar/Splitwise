@@ -122,7 +122,9 @@ class PaymentModal extends React.Component {
               <Col md={4}>
                 <TextField
                   id="standard-basic"
-                  value={converter(this.props.user.default_currency).format(this.props.data.amount)}
+                  value={converter(this.props.user.default_currency).format(
+                    Math.abs(this.props.data.amount)
+                  )}
                 />
               </Col>
             </Row>

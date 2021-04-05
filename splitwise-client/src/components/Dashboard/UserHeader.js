@@ -25,6 +25,24 @@ class UserHeader extends React.Component {
     this.props.logoutUser(this.state.user);
   };
 
+  handleProfilelick = (e) => {
+    e.preventDefault();
+    const step = 8;
+    this.props.getStep(step);
+  };
+
+  handleGroupClick = (e) => {
+    e.preventDefault();
+    const step = 9;
+    this.props.getStep(step);
+  };
+
+  handleHome = (e) => {
+    e.preventDefault();
+    const step = 1;
+    this.props.getStep(step);
+  };
+
   render() {
     return (
       <>
@@ -44,7 +62,7 @@ class UserHeader extends React.Component {
                 <form className="form-inline my-2 my-lg-0">
                   <div>
                     <Link to="/dashboard" style={{ color: 'white' }}>
-                      <Typography>Home</Typography>
+                      <Typography onClick={this.handleHome}>Home</Typography>
                     </Link>
                   </div>
 
@@ -55,8 +73,8 @@ class UserHeader extends React.Component {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        <Dropdown.Item href="/userprofile">My Profile</Dropdown.Item>
-                        <Dropdown.Item href="creategroup">Create Group</Dropdown.Item>
+                        <Dropdown.Item onClick={this.handleProfilelick}>My Profile</Dropdown.Item>
+                        <Dropdown.Item onClick={this.handleGroupClick}>Create Group</Dropdown.Item>
                         <Dropdown.Item onClick={this.handleLogout}>Logout</Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
@@ -74,6 +92,7 @@ class UserHeader extends React.Component {
 UserHeader.propTypes = {
   logoutUser: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
+  getStep: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {

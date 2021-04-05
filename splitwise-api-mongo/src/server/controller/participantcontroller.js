@@ -1,7 +1,3 @@
-const ParticipantService = require("../services/participantservice");
-
-let participantService = new ParticipantService();
-
 exports.addParticipant = async (req, res) => {
   const participant = req.body;
   try {

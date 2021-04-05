@@ -59,13 +59,13 @@ class PaymentModal extends React.Component {
   handleAddExpenses = (e) => {
     e.preventDefault();
     const data = {
-      user1: this.props.user.id,
+      user1: this.props.user._id,
       user2: this.props.data.user,
     };
     axios.defaults.withCredentials = true;
     axios.post(`${constants.baseUrl}/api/transactions/settle`, data).then((response) => {
       if (response.status === 200) {
-        if (response.data === 'Transaction Settled') {
+        if (response.message === 'Transaction Settled') {
           this.props.getTransaction(this.props.user.id);
           this.handleClose(false);
         } else if (response.data === 'Invalid Credentials!') {
@@ -101,7 +101,7 @@ class PaymentModal extends React.Component {
                   id="free-solo-2-demo"
                   disableClearable
                   value={
-                    this.props.users.filter((user) => user.id === this.props.data.user)[0].name
+                    this.props.users.filter((user) => user._id === this.props.data.user)[0].name
                   }
                   options={this.state.users.map((option) => option)}
                   onChange={(event, value) => this.handleUser(value)}
@@ -123,7 +123,9 @@ class PaymentModal extends React.Component {
                 <TextField
                   id="standard-basic"
                   value={converter(this.props.user.default_currency).format(
-                    Math.abs(this.props.data.amount)
+                    this.props.data.amount < 0
+                      ? this.props.data.amount * -1
+                      : this.props.data.amount
                   )}
                 />
               </Col>

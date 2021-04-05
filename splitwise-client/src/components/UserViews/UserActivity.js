@@ -17,6 +17,7 @@ import { Typography } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import NativeSelect from '@material-ui/core/NativeSelect';
+import TablePagination from '@material-ui/core/TablePagination';
 import { convertDate } from '../../constants/CommonService';
 import constants from '../../constants/Constants';
 
@@ -27,6 +28,9 @@ class UserActivity extends React.Component {
       activities: {},
       selectedGroup: '',
       selectedSort: 'First',
+      page: 1,
+      rows: 10,
+      totalRows: 100,
     };
   }
 
@@ -53,18 +57,23 @@ class UserActivity extends React.Component {
   };
 
   getRecentActivitiesByUser = () => {
-    const userId = this.props.user.id;
+    const userId = this.props.user._id;
     axios.defaults.withCredentials = true;
-    axios.get(`${constants.baseUrl}/api/activities?user=${userId}`).then((response) => {
-      if (response.status === 200) {
-        const { data } = response;
-        this.setState({
-          activities: data,
-        });
-      } else {
-        // error
-      }
-    });
+    axios
+      .get(
+        `${constants.baseUrl}/api/activities?user=${userId}&page=${this.state.page}&rows=${this.state.rows}`
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          const { data } = response.data;
+          this.setState({
+            activities: data,
+            totalRows: response.data.totalRows,
+          });
+        } else {
+          // error
+        }
+      });
   };
 
   getRecentActivitiesByGroup = (groupId) => {
@@ -75,9 +84,10 @@ class UserActivity extends React.Component {
       )
       .then((response) => {
         if (response.status === 200) {
-          const { data } = response;
+          const { data } = response.data;
           this.setState({
             activities: data,
+            totalRows: response.data.totalRows,
           });
         } else {
           // error
@@ -86,18 +96,37 @@ class UserActivity extends React.Component {
   };
 
   getRecentActivitiesLastByUser = () => {
-    const userId = this.props.user.id;
+    const userId = this.props.user._id;
     axios.defaults.withCredentials = true;
     axios.get(`${constants.baseUrl}/api/activities/?user=${userId}`).then((response) => {
       if (response.status === 200) {
-        const { data } = response;
+        const { data } = response.data;
         this.setState({
           activities: data,
+          totalRows: response.data.totalRows,
         });
       } else {
         // error
       }
     });
+  };
+
+  handleChangePage = (e) => {
+    this.setState({ page: e.target.value });
+    if (this.selectedGroup === 'All') {
+      this.getRecentActivitiesByUser();
+    } else {
+      this.getRecentActivitiesByGroup();
+    }
+  };
+
+  handleChangeRowsPerPage = (event) => {
+    this.setState({ rows: parseInt(event.target.value, 10), page: 0 });
+    if (this.selectedGroup === 'All') {
+      this.getRecentActivitiesByUser();
+    } else {
+      this.getRecentActivitiesByGroup();
+    }
   };
 
   render() {
@@ -173,7 +202,7 @@ class UserActivity extends React.Component {
                     <ListItemText
                       id="item1"
                       primary={trans.description}
-                      secondary={convertDate(trans.created_on)}
+                      secondary={convertDate(trans.createdAt)}
                     />
 
                     <ListItemSecondaryAction />
@@ -192,6 +221,14 @@ class UserActivity extends React.Component {
             </List>
           </Col>
         </Row>
+        <TablePagination
+          component="div"
+          count={this.state.totalRows}
+          page={this.state.page}
+          onChangePage={this.handleChangePage}
+          rowsPerPage={this.state.rows}
+          onChangeRowsPerPage={this.handleChangeRowsPerPage}
+        />
       </>
     );
   }

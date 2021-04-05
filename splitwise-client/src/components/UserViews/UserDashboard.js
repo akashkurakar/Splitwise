@@ -41,21 +41,21 @@ class DashboardMiddle extends React.Component {
   }
 
   componentDidMount = () => {
-    this.props.getUsers(this.props.user.id);
+    this.props.getUsers(this.props.user._id);
     this.getBalances();
     this.getTotalTransactionByUser();
-    this.props.getUser(this.props.user.id);
+    this.props.getUser(this.props.user._id);
   };
 
   handleModal = (e) => {
     if (this.state.owedList.length > 0) {
       if (this.state.oweList.length > 0) {
         const amt = this.state.oweList.filter(
-          (data) => data.paid_by === this.state.owedList[0].owed_name
+          (data) => data.owed_name === this.state.owedList[0].paid_by
         )[0].total_amt;
         this.setState({
           modalData: {
-            user: this.state.owedList[0].owed_name,
+            user: this.state.owedList[0].paid_by,
             amount: parseFloat(amt - this.state.owedList[0].total_amt),
           },
         });
@@ -63,7 +63,7 @@ class DashboardMiddle extends React.Component {
       } else {
         this.setState({
           modalData: {
-            user: this.state.owedList[0].owed_name,
+            user: this.state.owedList[0].paid_by,
             amount: parseFloat(this.state.owedList[0].total_amt),
           },
         });
@@ -72,11 +72,11 @@ class DashboardMiddle extends React.Component {
     } else if (this.state.oweList.length > 0) {
       if (this.state.owedList.length > 0) {
         const amt = this.state.owedList.filter(
-          (data) => data.owed_name === this.state.oweList[0].owed_name
+          (data) => data.paid_by === this.state.oweList[0].owed_name
         )[0].total_amt;
         this.setState({
           modalData: {
-            user: this.state.oweList[0].paid_by,
+            user: this.state.oweList[0].owed_name,
             amount: this.state.oweList[0].total_amt + amt,
           },
         });
@@ -84,7 +84,7 @@ class DashboardMiddle extends React.Component {
       } else {
         this.setState({
           modalData: {
-            user: this.state.oweList[0].paid_by,
+            user: this.state.oweList[0].owed_name,
             amount: this.state.oweList[0].total_amt,
           },
         });
@@ -95,15 +95,16 @@ class DashboardMiddle extends React.Component {
     }
     this.getTotalTransactionByUser();
     this.getBalances();
-    this.props.getTransaction(this.props.user.id);
+    this.props.getTransaction(this.props.user._id);
   };
 
   handleClose = () => {
     this.setState({ show: false });
+    this.getBalances();
   };
 
   getBalances = () => {
-    const userId = this.props.user.id;
+    const userId = this.props.user._id;
     axios.defaults.withCredentials = true;
     axios.get(`${constants.baseUrl}/api/balances/?user=${userId}`).then((response) => {
       if (response.status === 200) {
@@ -118,7 +119,7 @@ class DashboardMiddle extends React.Component {
   };
 
   getTotalTransactionByUser = () => {
-    const userId = this.props.user.id;
+    const userId = this.props.user._id;
     axios.defaults.withCredentials = true;
     axios.get(`${constants.baseUrl}/api/transactions/data/?user=${userId}`).then((response) => {
       if (response.status === 200) {
@@ -223,7 +224,7 @@ class DashboardMiddle extends React.Component {
                               <Avatar
                                 alt={`Avatar n°${trans.user}`}
                                 src={this.props.users
-                                  .filter((us) => us.id === trans.paid_by)
+                                  .filter((us) => us._id === trans.paid_by)
                                   .map((r1) => {
                                     return r1.image_path;
                                   })}
@@ -232,7 +233,7 @@ class DashboardMiddle extends React.Component {
                             <ListItemText
                               id="item1"
                               primary={this.props.users
-                                .filter((us) => us.id === trans.paid_by)
+                                .filter((us) => us._id === trans.owed_name)
                                 .map((r) => {
                                   return r.name;
                                 })}
@@ -259,7 +260,13 @@ class DashboardMiddle extends React.Component {
                                                 {converter(this.props.user.default_currency).format(
                                                   trans1.total_amt
                                                 )}
-                                                &nbsp; for '{trans1.grp_name}'
+                                                &nbsp; for '{' '}
+                                                {
+                                                  this.props.groups.filter(
+                                                    (grp) => grp._id === trans1.grp_id
+                                                  )[0].grp_name
+                                                }
+                                                '
                                               </Typography>
                                             </div>
                                           </li>
@@ -297,7 +304,7 @@ class DashboardMiddle extends React.Component {
                               <Avatar
                                 alt={`Avatar n°${user.user}`}
                                 src={this.props.users
-                                  .filter((us) => us.id === user.owed_name)
+                                  .filter((us) => us._id === user.paid_by)
                                   .map((r1) => {
                                     return r1.image_path;
                                   })}
@@ -306,7 +313,7 @@ class DashboardMiddle extends React.Component {
                             <ListItemText
                               id="item1"
                               primary={this.props.users
-                                .filter((us) => us.id === user.owed_name)
+                                .filter((us) => us._id === user.paid_by)
                                 .map((r) => {
                                   return r.name;
                                 })}
@@ -333,7 +340,13 @@ class DashboardMiddle extends React.Component {
                                                 {converter(this.props.user.default_currency).format(
                                                   trans1.total_amt
                                                 )}
-                                                &nbsp; for '{trans1.grp_name}'
+                                                &nbsp; for '
+                                                {
+                                                  this.props.groups.filter(
+                                                    (grp) => grp._id === trans1.grp_id
+                                                  )[0].grp_name
+                                                }
+                                                '
                                               </Typography>
                                             </div>
                                           </li>
@@ -380,6 +393,7 @@ DashboardMiddle.propTypes = {
   users: PropTypes.objectOf.isRequired,
   getUsers: PropTypes.func.isRequired,
   getUser: PropTypes.func.isRequired,
+  groups: PropTypes.objectOf.isRequired,
 };
 const mapStatetoProps = (state) => {
   return {

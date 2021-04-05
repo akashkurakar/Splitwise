@@ -1,8 +1,8 @@
-const TransactionService = require("../services/transactionservice");
 const Transaction = require("../models/transactionmodel");
 const Group = require("../models/groupmodel");
+const Activity = require("../models/ActivityModel");
+const User = require("../models/usermodel");
 const mongoose = require("mongoose");
-let transactionService = new TransactionService();
 
 exports.getTransaction = async (req, res) => {
   let user = req.query.user;
@@ -47,13 +47,65 @@ exports.getTransaction = async (req, res) => {
 exports.getGroupBalances = async (req, res) => {
   let transaction = req.body;
   try {
-    res.json(await transactionService.getGroupBalances(transaction));
-    res.end();
+    const group = await Group.aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(transaction.grp_id) } },
+      {
+        $lookup: {
+          from: "participants",
+          localField: "participants",
+          foreignField: "_id",
+          as: "participants",
+        },
+      },
+    ]);
+    const data = [];
+    for (let participant of group[0].participants) {
+      const owedAmount = await Transaction.aggregate([
+        {
+          $match: {
+            owed_name: participant.user_name,
+            status: "PENDING",
+            grp_id: mongoose.Types.ObjectId(transaction.grp_id),
+          },
+        },
+        {
+          $group: {
+            _id: "$owed_name",
+            total_amt: { $sum: "$amount" },
+            owed_name: { $first: "$owed_name" },
+          },
+        },
+      ]);
+      const paidAmount = await Transaction.aggregate([
+        {
+          $match: {
+            paid_by: participant.user_name,
+            status: "PENDING",
+            grp_id: mongoose.Types.ObjectId(transaction.grp_id),
+          },
+        },
+        {
+          $group: {
+            _id: "$paid_by",
+            total_amt: { $sum: "$amount" },
+            paid_by: { $first: "$paid_by" },
+          },
+        },
+      ]);
+      let sum = 0;
+      if (owedAmount[0] !== undefined && owedAmount[0].total_amt != null) {
+        sum = sum + owedAmount[0].total_amt;
+      }
+      if (paidAmount[0] !== undefined && paidAmount[0].total_amt != null) {
+        sum = sum - paidAmount[0].total_amt;
+      }
+      data.push({ user: participant.user_name, total: sum });
+    }
+    res.json(data);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
   }
-  res.end();
 };
 
 exports.getBalances = async (req, res) => {
@@ -98,7 +150,6 @@ exports.getBalances = async (req, res) => {
         owedAmount: 0.0,
       };
       res.json(result);
-      res.send(json);
     } else if (paidAmount.length === 0) {
       let balance = parseFloat(owedAmount[0]["total_amt"]);
       result = {
@@ -107,7 +158,6 @@ exports.getBalances = async (req, res) => {
         paidAmount: 0.0,
       };
       res.json(result);
-      res.send(json);
     } else {
       var json = { data: [], message: "" };
       res.send(json);
@@ -123,6 +173,7 @@ exports.addTransaction = async (req, res) => {
   const transaction = req.body;
   try {
     const tran_id = makeid();
+    const activities = [];
     const group = await Group.findById({
       _id: transaction.grpId,
     }).populate({
@@ -131,8 +182,14 @@ exports.addTransaction = async (req, res) => {
     const newExpense = [];
     for (let participant of group.participants) {
       const tran = {};
+      const user = User.findById({ _id: transaction.user });
       if (participant.user_name.toString() !== transaction.user) {
+        const activity = new Activity();
         if (participant.status === "active") {
+          activity.activity_name = "transaction added";
+          activity.grp_id = transaction.grpId;
+          activity.user_name = participant.user_name;
+          activity.description = `${user.name} added expense as ${transaction.description} in ${group.grp_name}`;
           tran.tran_name = transaction.description;
           tran.amount = transaction.amount / group.participants.length;
           tran.bill_amt = transaction.amount;
@@ -142,7 +199,13 @@ exports.addTransaction = async (req, res) => {
           tran.status = "PENDING";
           tran.grp_id = transaction.grpId;
           newExpense.push(tran);
+        } else {
+          activity.activity_name = "transaction added";
+          activity.grp_id = transaction.grpId;
+          activity.user_name = transaction.user;
+          activity.description = `You paid for ${transaction.description} in ${group.grp_name}`;
         }
+        activities.push(activity);
         //  group.transactions.push(tran);
       }
     }
@@ -154,6 +217,7 @@ exports.addTransaction = async (req, res) => {
       return res.status(200).json(json);
     }
     let groupTransactions = await Transaction.insertMany(newExpense);
+    await Activity.insertMany(activities);
     await Group.findByIdAndUpdate(
       { _id: transaction.grpId },
       {
@@ -268,6 +332,46 @@ exports.transactionSettle = async (req, res) => {
       },*/
       {
         $set: { status: "settled" },
+      },
+      { upsert: true }
+    ).then((response, err) => {
+      if (err) {
+        var json = {
+          data: [],
+          message: "Error while settling transactions!",
+        };
+        return res.status(200).json(json);
+      }
+      var json = {
+        data: response,
+        message: "Transaction Settled",
+      };
+      res.status(200).json(json);
+    });
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+};
+
+exports.updateTransaction = async (req, res) => {
+  const transaction = req.body;
+  try {
+    const expense = await Transaction.find({
+      transaction_id: transaction.transaction_id,
+    });
+
+    let newBillAmt = parseInt(transaction.bill_amt / (expense.length + 1));
+    await Transaction.updateMany(
+      {
+        transaction_id: transaction.transaction_id,
+      },
+      {
+        $set: {
+          bill_amt: transaction.bill_amt,
+          amount: newBillAmt,
+          tran_name: transaction.tran_name,
+        },
       },
       { upsert: true }
     ).then((response, err) => {

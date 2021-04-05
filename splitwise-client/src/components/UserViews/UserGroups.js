@@ -38,15 +38,15 @@ class UserGroups extends React.Component {
   handleLeaveGroup = async (grpid) => {
     axios.defaults.withCredentials = true;
     const data = {
-      user: this.props.user.id,
+      user: this.props.user._id,
       group: grpid,
     };
     await axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
       if (response.status === 200) {
         const res = response.data;
         if (res.message === 'Group Left Successfully') {
-          this.props.getNotifications(this.props.user.id);
-          this.props.getGroups(this.props.user.id);
+          this.props.getNotifications(this.props.user._id);
+          this.props.getGroups(this.props.user._id);
         } else {
           this.setState({
             errorMessage: res.message,
@@ -58,21 +58,21 @@ class UserGroups extends React.Component {
     });
   };
 
-  handleApprove = (e) => {
-    e.preventDefault();
-    this.approveRequest(e.target.value);
+  handleApprove = (grpId, participantId) => {
+    this.approveRequest(grpId, participantId);
   };
 
-  approveRequest = async (grpId) => {
+  approveRequest = async (grpId, participantId) => {
     axios.defaults.withCredentials = true;
     const data = {
-      user: this.props.user.id,
+      user: this.props.user._id,
       grp_id: grpId,
+      participant_id: participantId,
     };
     await axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
       if (response.status === 200) {
-        this.props.getNotifications(this.props.user.id);
-        this.props.getGroups(this.props.user.id);
+        this.props.getNotifications(this.props.user._id);
+        this.props.getGroups(this.props.user._id);
       } else {
         // error
       }
@@ -141,65 +141,65 @@ class UserGroups extends React.Component {
         <Row>
           <Col md={12}>
             <List dense className={classes.root}>
-              {this.state.groups.filter((r) => r.status !== 'left').length > 0 ? (
-                this.state.groups
-                  .filter((r) => r.status !== 'left')
-                  .map((r) => (
-                    <ListItem>
-                      <ListItemAvatar>
-                        <Avatar>
-                          {r.image_path !== '' ? (
-                            <img src={r.image_path} className="img-fluid" alt="" />
-                          ) : (
-                            <img
-                              src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
-                              className="img-fluid"
-                              alt=""
-                            />
-                          )}
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        data-testid="grp_name"
-                        primary={<Typography>{r.grp_name}</Typography>}
-                        secondary={
-                          <Typography className="header-label">
-                            Created by:
-                            {
-                              this.props.users.filter(
-                                (user) => user.id === parseInt(r.created_by, 10)
-                              )[0].name
-                            }
-                          </Typography>
-                        }
-                        onClick={() => r.status === 'active' && this.handleSelectedGroup(r)}
-                      />
-                      {r.status === 'PENDING' ? (
-                        <Button
-                          variant="primary"
-                          style={{
-                            'background-color': '#5bc5a7',
-                            'border-color': '#5bc5a7',
-                          }}
-                          value={r.grp_id}
-                          onClick={this.handleApprove}
-                        >
-                          Accept
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="primary"
-                          style={{
-                            'background-color': '#ff652f',
-                            'border-color': '#5bc5a7',
-                          }}
-                          onClick={() => this.handleLeaveGroup(r.grp_id)}
-                        >
-                          Leave Group
-                        </Button>
-                      )}
-                    </ListItem>
-                  ))
+              {this.state.groups.filter((r) => r.participants.status !== 'left').length > 0 ? (
+                this.state.groups.map((g) =>
+                  g.participants
+                    .filter((p) => p.user_name === this.props.user._id && p.status !== 'left')
+                    .map((r) => (
+                      <ListItem>
+                        <ListItemAvatar>
+                          <Avatar>
+                            {g.image_path !== '' ? (
+                              <img src={r.image_path} className="img-fluid" alt="" />
+                            ) : (
+                              <img
+                                src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
+                                className="img-fluid"
+                                alt=""
+                              />
+                            )}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          data-testid="grp_name"
+                          primary={<Typography>{g.grp_name}</Typography>}
+                          secondary={
+                            <Typography className="header-label">
+                              Created by:
+                              {this.props.users.filter((user) => user._id === g.created_by)[0].name}
+                            </Typography>
+                          }
+                          onClick={() => g.status === 'active' && this.handleSelectedGroup(g)}
+                        />
+                        {r.status === 'PENDING' ? (
+                          <Button
+                            variant="primary"
+                            style={{
+                              'background-color': '#5bc5a7',
+                              'border-color': '#5bc5a7',
+                            }}
+                            value={g.grp_id}
+                            onClick={() => {
+                              this.handleApprove(g._id);
+                            }}
+                          >
+                            Accept
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="primary"
+                            style={{
+                              'background-color': '#ff652f',
+                              'border-color': '#5bc5a7',
+                            }}
+                            onClick={() => this.handleLeaveGroup(g._id, g.participants._id)}
+                          >
+                            Leave Group
+                          </Button>
+                        )}
+                      </ListItem>
+                    ))
+                )
               ) : (
                 <ListItem>
                   <ListItemText

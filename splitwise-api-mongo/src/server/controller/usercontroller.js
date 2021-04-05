@@ -1,11 +1,9 @@
-const UserService = require("../services/UserService");
 const User = require("../models/usermodel");
 
-let userService = new UserService();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
-const producer = require("../kafka-services/kafka-connect");
+const KafkaService = require("../kafka-services/kafka-producer");
 
 exports.login = async (req, res) => {
   const userObj = req.body;
@@ -17,16 +15,13 @@ exports.login = async (req, res) => {
           message: "User Not Present ! Please Sign Up!",
         };
         return res.status(400).json(json);
-        res.end();
       } else {
         if (bcrypt.compareSync(userObj.password, response[0].password)) {
-          var json = { data: response[0], message: "Invalid Credentials" };
+          var json = { data: response[0], message: "Login Successfull" };
           res.status(200).json(json);
-          res.end();
         } else {
           var json = { data: [], message: "Invalid Credentials" };
           res.status(400).json(json);
-          res.end();
         }
       }
     });
@@ -38,40 +33,11 @@ exports.login = async (req, res) => {
 
 exports.signup = async (req, res) => {
   const userObj = req.body;
-  /* await producer
-      .send({
-        topic: "user-signup",
-        messages: [{ value: JSON.stringify(req.body) }],
-      })
-      .then((response, err) => {
-        console.log(response);
-      });
-
-    
-    kafka.make_request("user", req.body, function (err, results) {
-      console.log("in result");
-      console.log(results);
-      if (err) {
-        console.log("Inside err");
-        res.json({
-          status: "error",
-          msg: "System Error, Try Again.",
-        });
-      } else {
-        console.log("Inside else");
-        res.json({
-          updatedList: results,
-        });
-
-        res.end();
-      }
-    });*/
-
   try {
     var password = bcrypt.hashSync(userObj.password, salt);
     userObj.password = password;
     const usr = new User(userObj);
-    //  / await KafkaService.sendRecord({ topic: "user", data: userObj });
+    await KafkaService.sendRecord({ topic: "user", data: userObj });
     await usr.save((err, user) => {
       if (err) {
         var json = {
@@ -170,14 +136,12 @@ exports.user = async (req, res) => {
           message: "User Not Present ! Please Sign Up!",
         };
         return res.status(400).json(json);
-        res.end();
       } else {
         var json = {
           data: response[0],
           message: "",
         };
         return res.status(200).json(json);
-        res.end();
       }
     });
   } catch (e) {
@@ -187,25 +151,64 @@ exports.user = async (req, res) => {
 };
 
 exports.users = async (req, res) => {
-  const user = req.query;
+  const name = req.query.name;
+  const email = req.query.email;
   try {
-    const usr = User.find().then((response, err) => {
-      if (response.length == 0) {
-        var json = {
-          data: [],
-          message: "User Not Present ! Please Sign Up!",
-        };
-        return res.status(400).json(json);
-        res.end();
-      } else {
-        var json = {
-          data: response,
-          message: "",
-        };
-        return res.status(200).json(json);
-        res.end();
-      }
-    });
+    if (name !== undefined) {
+      await User.find({ name: { $regex: name, $options: "i" } }).then(
+        (response, err) => {
+          if (response.length == 0) {
+            var json = {
+              data: [],
+              message: "User Not Present ! Please Sign Up!",
+            };
+            res.status(400).json(json);
+          } else {
+            var json = {
+              data: response,
+              message: "",
+            };
+            res.status(200).json(json);
+          }
+        }
+      );
+    } else if (email !== undefined) {
+      await User.find({ email: { $regex: email, $options: "i" } }).then(
+        (response, err) => {
+          if (response.length == 0) {
+            var json = {
+              data: [],
+              message: "User Not Present ! Please Sign Up!",
+            };
+            res.status(400).json(json);
+          } else {
+            var json = {
+              data: response,
+              message: "",
+            };
+            res.status(200).json(json);
+          }
+        }
+      );
+    } else {
+      await User.find().then((response, err) => {
+        if (response.length == 0) {
+          var json = {
+            data: [],
+            message: "User Not Present ! Please Sign Up!",
+          };
+          res.status(400).json(json);
+          res.end();
+        } else {
+          var json = {
+            data: response,
+            message: "",
+          };
+          res.status(200).json(json);
+          res.end();
+        }
+      });
+    }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

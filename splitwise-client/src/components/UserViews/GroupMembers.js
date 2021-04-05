@@ -32,28 +32,43 @@ class GroupMembers extends React.Component {
     if (this.props.user === undefined) {
       this.setState({ isLoggedIn: false });
     }
-    this.getUser();
+    // this.getUser();
   }
 
-  handleName = (name, index) => {
+  handleName = (e, index) => {
+    this.getNames(e.target.value);
     const rows = this.state.members;
     if (rows[index] === undefined) {
-      rows.push({ name, email: '' });
+      rows.push({ name: e.target.value, email: '' });
     } else {
-      rows[index].name = name;
+      rows[index].name = e.target.value;
     }
     this.setState({
       members: rows,
     });
   };
 
-  getUser = () => {
+  /* getUser = () => {
     axios.defaults.withCredentials = true;
     axios.get(`${constants.baseUrl}/api/users/`).then((response) => {
       if (response.status === 200) {
-        const { data } = response;
+        const res = response.data.data;
         this.setState({
-          users: data,
+          users: res,
+        });
+      } else {
+        // error
+      }
+    });
+  }; */
+
+  getNames = (name) => {
+    axios.defaults.withCredentials = true;
+    axios.get(`${constants.baseUrl}/api/users/?name=${name}`).then((response) => {
+      if (response.status === 200) {
+        const res = response.data.data;
+        this.setState({
+          users: res,
         });
       } else {
         // error
@@ -62,6 +77,7 @@ class GroupMembers extends React.Component {
   };
 
   handleEmail = (id, e) => {
+    this.getEmails(e.target.value);
     const members = this.state.members;
     if (this.state.members[id] === undefined) {
       members.push({ name: '', email: e.target.value });
@@ -70,6 +86,20 @@ class GroupMembers extends React.Component {
     }
     this.setState({
       members,
+    });
+  };
+
+  getEmails = (name) => {
+    axios.defaults.withCredentials = true;
+    axios.get(`${constants.baseUrl}/api/users/?email=${name}`).then((response) => {
+      if (response.status === 200) {
+        const res = response.data.data;
+        this.setState({
+          users: res,
+        });
+      } else {
+        // error
+      }
     });
   };
 
@@ -126,13 +156,14 @@ class GroupMembers extends React.Component {
                       disableClearable
                       value={r.name}
                       options={this.state.users.map((option) => option.name)}
-                      onChange={(event, value) => this.handleName(value, index)}
+                      onBlur={(event) => this.handleName(event, index)}
                       renderInput={(params) => (
                         <TextField
                           // eslint-disable-next-line react/jsx-props-no-spreading
                           {...params}
                           label="Name"
                           margin="normal"
+                          onChange={(event) => this.handleName(event, index)}
                           InputProps={{ ...params.InputProps, type: 'search' }}
                           style={{ width: 200 }}
                           onBlur={this.onAddMember}
@@ -142,14 +173,27 @@ class GroupMembers extends React.Component {
                   </td>
                   <td>&nbsp;</td>
                   <td>
-                    <TextField
-                      label="Email Address"
+                    <Autocomplete
+                      freeSolo
                       id={`email-${index}`}
+                      disableClearable
                       value={r.email}
-                      margin="normal"
-                      style={{ width: 200 }}
-                      onChange={(event) => this.handleEmail(index, event)}
-                      onBlur={this.onAddMember}
+                      options={this.state.users.map((option) => option.email)}
+                      onBlur={(event) => this.handleEmail(index, event)}
+                      renderInput={(params) => (
+                        <TextField
+                          // eslint-disable-next-line react/jsx-props-no-spreading
+                          {...params}
+                          label="Email Address"
+                          id={`email-${index}`}
+                          value={r.email}
+                          margin="normal"
+                          style={{ width: 200 }}
+                          InputProps={{ ...params.InputProps, type: 'search' }}
+                          onChange={(event) => this.handleEmail(index, event)}
+                          onBlur={this.onAddMember}
+                        />
+                      )}
                     />
                   </td>
                 </tr>

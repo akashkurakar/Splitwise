@@ -8,7 +8,7 @@ export const getGroups = (userId) => async (dispatch) => {
   axios
     .get(`${constants.baseUrl}/api/groups/?id=${userId}`)
     .then((res) => {
-      dispatch({ type: 'USER_GROUPS_SUCCESS', payload: res.data });
+      dispatch({ type: 'USER_GROUPS_SUCCESS', payload: res.data.data });
       dispatch({ type: 'ALERT_CLEAR', message: '' });
     })
     .catch((error) => {

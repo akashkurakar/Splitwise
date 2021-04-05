@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import UserHeader from '../Dashboard/UserHeader';
 import * as userActions from '../../redux/actions/UserAction';
 import constants from '../../constants/Constants';
 
@@ -135,7 +134,6 @@ class UserProfile extends React.Component {
   render() {
     return (
       <>
-        <UserHeader />
         <div>
           <div className="container">
             {this.props.alert.message !== '' && this.props.alert.message !== undefined ? (

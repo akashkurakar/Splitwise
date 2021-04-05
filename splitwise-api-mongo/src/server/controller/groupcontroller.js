@@ -1,23 +1,9 @@
-const GroupService = require("../services/groupService");
-
-const InvitationSerice = require("../services/invitationservice");
-
-const ParticipantSerice = require("../services/participantservice");
-
-const ActivityService = require("../services/ActivityService");
-
-const UserService = require("../services/UserService");
 const mongoose = require("mongoose");
 const { ids } = require("webpack");
 const Group = require("../models/groupmodel");
 const { user } = require("./usercontroller");
 const Participants = require("../models/participantmodel");
 const User = require("../models/usermodel");
-let groupService = new GroupService();
-
-let participantSerice = new ParticipantSerice();
-
-let activityService = new ActivityService();
 
 exports.createGroup = async (req, res) => {
   const groupObj = req.body;
@@ -89,10 +75,20 @@ exports.getGroups = async (req, res) => {
           as: "participants",
         },
       },
-      { $unwind: { path: "$participants" } },
       {
-        $match: {
-          "participants.user_name": user,
+        $lookup: {
+          from: "comments",
+          localField: "comments",
+          foreignField: "_id",
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "transactions",
+          foreignField: "_id",
+          as: "transactions",
         },
       },
     ]);

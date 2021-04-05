@@ -13,7 +13,7 @@ app.use(express.static("./public"));
 
 const port = 3001;
 
-const { connect } = require("./kafka-services/kafka-connect");
+const connect = require("./kafka-services/kafka-connect");
 
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 

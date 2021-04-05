@@ -1,10 +1,10 @@
-import kafka from "kafka-node";
+const kafka = require("kafka-node");
 
-const client = new kafka.Client("http://localhost:9092");
+const client = new kafka.KafkaClient("http://localhost:9092");
 
 const topics = [
   {
-    topic: "webevents.dev",
+    topic: "user",
   },
 ];
 const options = {
@@ -14,22 +14,22 @@ const options = {
   encoding: "buffer",
 };
 
-const consumer = new kafka.HighLevelConsumer(client, topics, options);
+const consumer = new kafka.Consumer(client, topics, options);
 
 consumer.on("message", function (message) {
   // Read string into a buffer.
   var buf = new Buffer(message.value, "binary");
   var decodedMessage = JSON.parse(buf.toString());
-
+  console.log(decodedMessage);
   //Events is a Sequelize Model Object.
-  return Events.create({
+  /* return Events.create({
     id: decodedMessage.id,
     type: decodedMessage.type,
     userId: decodedMessage.userId,
     sessionId: decodedMessage.sessionId,
     data: JSON.stringify(decodedMessage.data),
     createdAt: new Date(),
-  });
+  });*/
 });
 
 consumer.on("error", function (err) {

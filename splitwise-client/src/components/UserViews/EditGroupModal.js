@@ -30,7 +30,7 @@ class EditGroupModal extends React.Component {
         { name: '', email: '' },
       ],
       grp_id: this.props.group.grp_id,
-      users: [],
+
       imgUrl: this.props.group.image_path,
       group: '',
       selectedFile: '',
@@ -41,7 +41,7 @@ class EditGroupModal extends React.Component {
 
   componentDidMount() {
     this.setState({ group: this.props.group });
-    this.getUser();
+    //  this.getUser();
   }
 
   handleClose = () => {
@@ -120,7 +120,7 @@ class EditGroupModal extends React.Component {
     this.setState({ members: rows });
   };
 
-  getUser = () => {
+  /* getUser = () => {
     axios.defaults.withCredentials = true;
     axios.get(`${constants.baseUrl}/api/users/`).then((response) => {
       if (response.status === 200) {
@@ -132,7 +132,7 @@ class EditGroupModal extends React.Component {
         // error
       }
     });
-  };
+  }; */
 
   handleEditGroup = async (e) => {
     e.preventDefault();
@@ -144,7 +144,7 @@ class EditGroupModal extends React.Component {
     }
     const data = {
       grp_name: this.state.grp_name,
-      user: this.props.user.name,
+      user: this.props.user._id,
       users: this.state.members,
       imgPath: this.state.imgUrl,
       grp_id: this.state.grp_id,
@@ -287,7 +287,7 @@ class EditGroupModal extends React.Component {
                                   id={`name-${index}`}
                                   disableClearable
                                   value={r.name}
-                                  options={this.state.users.map((option) => option.name)}
+                                  options={this.props.users.map((option) => option.name)}
                                   onChange={(event, value) => this.handleName(value, index)}
                                   renderInput={(params) => (
                                     <TextField
@@ -352,6 +352,7 @@ EditGroupModal.propTypes = {
   getGroups: PropTypes.func.isRequired,
   showEdit: PropTypes.func.isRequired,
   group: PropTypes.objectOf.isRequired,
+  users: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -360,6 +361,7 @@ const mapStatetoProps = (state) => {
     transactions: state.transactions,
     alert: state.alert,
     groups: state.groups,
+    users: state.users,
   };
 };
 

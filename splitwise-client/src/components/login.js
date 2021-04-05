@@ -19,7 +19,7 @@ class Login extends React.Component {
       email: '',
       password: '',
     };
-    if (this.props.user.name !== undefined) {
+    if (this.props.user._id !== undefined) {
       window.location.href = './dashboard';
     }
   }
@@ -82,7 +82,7 @@ class Login extends React.Component {
               >
                 WELCOME TO SPLITWISE
               </h5>
-              <form className="form-signin" onSubmit={this.handleLogin}>
+              <form data-testid="alert" className="form-signin" onSubmit={this.handleLogin}>
                 {this.props.alert.message && this.props.alert.message.response !== undefined ? (
                   <div className="alert alert-danger" role="alert">
                     {this.props.alert.message.response.data.message}
@@ -113,12 +113,12 @@ class Login extends React.Component {
                     required
                   />
                 </div>
-                <div className="clearfix">
+                <div role="button" className="clearfix">
                   <Button
+                    data-testid="Login"
                     size="medium"
                     className={classes.margin}
                     type="submit"
-                    data-testid="login"
                     style={{
                       float: 'left',
                       'background-color': '#ff652f',

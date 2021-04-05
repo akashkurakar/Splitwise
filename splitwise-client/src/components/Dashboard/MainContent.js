@@ -17,6 +17,7 @@ import Notification from '../UserViews/Notifications';
 import * as userActions from '../../redux/actions/UserAction';
 import * as transactionAction from '../../redux/actions/TransactionAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
+import UserProfile from '../UserViews/UserProfile';
 
 class MainContent extends React.Component {
   constructor(props) {
@@ -27,9 +28,9 @@ class MainContent extends React.Component {
       transactions: [],
       balances: [],
     };
-    this.props.getGroups(this.props.user.id);
+    this.props.getGroups(this.props.user._id);
     this.handleCallback = this.handleCallback.bind(this);
-    if (this.props.user.name === undefined) {
+    if (this.props.user._id === undefined) {
       window.location.href = './login';
     }
   }
@@ -50,29 +51,40 @@ class MainContent extends React.Component {
   render() {
     return (
       <>
-        <UserHeader />
+        <UserHeader getStep={this.handleCallback} />
         <div>
           <Container>
-            <Row>
-              <Col style={{ 'background-color': '#ffffff' }} md={3}>
-                <LeftSideBar
-                  getStep={this.handleCallback}
-                  selectedGroup={this.handleSelectedGroup}
-                />
-              </Col>
-              <Col md={9}>
-                {this.state.step === 1 ? <UserDashboard balances={this.state.balances} /> : null}
-                {this.state.step === 2 ? <Activity transactions={this.state.transactions} /> : null}
-                {this.state.step === 4 ? <CreateGroup /> : null}
-                {this.state.step === 5 ? (
-                  <UserGroups selectedGroup={this.handleSelectedGroup} />
-                ) : null}
-                {this.state.step === 6 ? (
-                  <SelectGroup selectedGroup={this.state.selectedGroup} />
-                ) : null}
-                {this.state.step === 7 && <Notification />}
-              </Col>
-            </Row>
+            {this.state.step !== 8 && this.state.step !== 9 ? (
+              <Row>
+                <Col style={{ 'background-color': '#ffffff' }} md={3}>
+                  <LeftSideBar
+                    getStep={this.handleCallback}
+                    selectedGroup={this.handleSelectedGroup}
+                  />
+                </Col>
+                <Col md={9}>
+                  {this.state.step === 1 ? <UserDashboard balances={this.state.balances} /> : null}
+                  {this.state.step === 2 ? (
+                    <Activity transactions={this.state.transactions} />
+                  ) : null}
+                  {this.state.step === 4 ? <CreateGroup /> : null}
+                  {this.state.step === 5 ? (
+                    <UserGroups selectedGroup={this.handleSelectedGroup} />
+                  ) : null}
+                  {this.state.step === 6 ? (
+                    <SelectGroup selectedGroup={this.state.selectedGroup} />
+                  ) : null}
+                  {this.state.step === 7 && <Notification />}
+                </Col>
+              </Row>
+            ) : (
+              <Row>
+                <Col md={12}>
+                  {this.state.step === 8 && <UserProfile />}
+                  {this.state.step === 9 && <CreateGroup />}
+                </Col>
+              </Row>
+            )}
           </Container>
         </div>
       </>

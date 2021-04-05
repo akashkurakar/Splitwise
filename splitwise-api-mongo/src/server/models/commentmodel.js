@@ -1,29 +1,26 @@
 const mongoose = require("mongoose");
 
-const activitySchema = new mongoose.Schema(
+const commentSchema = new mongoose.Schema(
   {
-    activity_name: {
+    transaction_id: {
       type: String,
       required: true,
     },
-    grp_id: {
+    comment: {
       type: String,
       required: true,
     },
-    description: {
-      type: String,
-      required: true,
-    },
-    user_name: {
+    comment_by: {
       type: String,
       required: true,
     },
     status: {
       type: String,
+      required: true,
     },
   },
   { timestamps: true }
 );
 
-const comments = mongoose.model("Activity", activitySchema);
+const comments = mongoose.model("Comments", commentSchema);
 module.exports = comments;

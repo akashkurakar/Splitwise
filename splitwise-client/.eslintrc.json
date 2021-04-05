@@ -6,7 +6,8 @@
     "prettier/prettier": ["error"],
     "arrow-body-style": ["error", "never"],
     "react/jsx-filename-extension": [1,{"extensions": [".js", ".jsx"] }],
-    "react/destructuring-assignment": ["error", "never"]
+    "react/destructuring-assignment": ["error", "never"],
+    "no-underscore-dangle": ["off", { "allow": ["_id"] }]
 
   },
    "settings": {

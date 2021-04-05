@@ -9,4 +9,4 @@ const connect = async () => {
   await producer.connect();
 };
 
-module.exports = producer;
+module.exports = connect;

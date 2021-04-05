@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-boolean-value */
 import './App.css';
 import React from 'react';
 import { Router } from 'react-router-dom';

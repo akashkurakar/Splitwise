@@ -163,40 +163,42 @@ class LeftSideBar extends React.Component {
               </div>
             </div>
             {this.props.groups.length > 0
-              ? this.props.groups
-                  .filter((r) => r.status === 'active')
-                  .map((r, index) => (
-                    <li>
-                      <div
-                        className="card-body"
-                        style={{ padding: '0', height: '1rem' }}
-                        value={r.grp_name}
-                      >
-                        <Typography onClick={() => this.handleGroupClick(index)}>
-                          {r.image_path !== '' ? (
-                            <img
-                              src={r.image_path}
-                              width="20"
-                              height="20"
-                              className="img-fluid"
-                              alt=""
-                            />
-                          ) : (
-                            <img
-                              width="20"
-                              height="20"
-                              className="img-fluid"
-                              alt=""
-                              src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
-                            />
-                          )}
-                          &nbsp;
-                          {r.grp_name}
-                        </Typography>
-                      </div>
-                      <div className="dropdown-divider" />
-                    </li>
-                  ))
+              ? this.props.groups.map((p) =>
+                  p.participants
+                    .filter((r) => r.user_name === this.props.user._id && r.status === 'active')
+                    .map((r, index) => (
+                      <li>
+                        <div
+                          className="card-body"
+                          style={{ padding: '0', height: '1rem' }}
+                          value={p.grp_name}
+                        >
+                          <Typography onClick={() => this.handleGroupClick(index)}>
+                            {p.image_path !== '' ? (
+                              <img
+                                src={r.image_path}
+                                width="20"
+                                height="20"
+                                className="img-fluid"
+                                alt=""
+                              />
+                            ) : (
+                              <img
+                                width="20"
+                                height="20"
+                                className="img-fluid"
+                                alt=""
+                                src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
+                              />
+                            )}
+                            &nbsp;
+                            {p.grp_name}
+                          </Typography>
+                        </div>
+                        <div className="dropdown-divider" />
+                      </li>
+                    ))
+                )
               : null}
           </ul>
         </div>
@@ -208,6 +210,7 @@ LeftSideBar.propTypes = {
   getStep: PropTypes.func.isRequired,
   selectedGroup: PropTypes.func.isRequired,
   groups: PropTypes.string.isRequired,
+  user: PropTypes.objectOf.isRequired,
 };
 const mapStatetoProps = (state) => ({
   user: state.user,

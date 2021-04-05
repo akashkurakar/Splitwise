@@ -36,6 +36,9 @@ const TransactionController = require("../controller/transactioncontroller");
 const ParticipantController = require("../controller/participantcontroller");
 
 const ActivityController = require("../controller/ActivityController");
+
+const CommentController = require("../controller/CommentController");
+
 const { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } = require("constants");
 
 router.post("/login", jsonParser, UserController.login);
@@ -77,6 +80,16 @@ router.get("/transactions/", jsonParser, TransactionController.getTransaction);
 router.get("/balances/", jsonParser, TransactionController.getBalances);
 
 router.post("/transactions", jsonParser, TransactionController.addTransaction);
+
+router.post("/comment/post", jsonParser, CommentController.addComment);
+
+router.get("/comments/", jsonParser, CommentController.getComments);
+
+router.post(
+  "/transactions/update",
+  jsonParser,
+  TransactionController.updateTransaction
+);
 
 router.post(
   "/transactions/groupbalances",

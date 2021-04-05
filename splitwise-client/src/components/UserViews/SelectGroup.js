@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable no-undef */
 /* eslint-disable arrow-body-style */
 import React from 'react';
@@ -9,15 +11,23 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
-import { makeStyles } from '@material-ui/core/styles';
+
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Divider from '@material-ui/core/Divider';
+import Container from 'react-bootstrap/Container';
+import CommentBox from './CommentBox';
 import AddExpenseModal from './AddExpenseModal';
+import EditExpenseModal from './EditExpenseModal';
 import { converter, convertDate } from '../../constants/CommonService';
 import EditGroupModal from './EditGroupModal';
+import * as groupsActions from '../../redux/actions/GroupsActions';
 import constants from '../../constants/Constants';
 
 class SelectGroup extends React.Component {
@@ -28,18 +38,21 @@ class SelectGroup extends React.Component {
       transactions: [],
       errorMessage: '',
       showEdit: false,
+      showEditExpense: false,
       userSummary: [],
       selectedGroup: '',
+      transaction: [],
+      panel: '',
+      // comments: '',
     };
   }
 
   componentDidMount = () => {
     this.getBalances();
+    this.getTransaction(this.props.selectedGroup._id);
     this.setState({
-      transactions: this.props.transactions,
       selectedGroup: this.props.selectedGroup,
     });
-    this.getTransaction();
   };
 
   componentDidUpdate = () => {
@@ -49,13 +62,15 @@ class SelectGroup extends React.Component {
 
   getBalances = () => {
     axios.defaults.withCredentials = true;
-    const data = { grp_id: this.props.selectedGroup.grp_id };
+    const data = { grp_id: this.props.selectedGroup._id };
     axios.post(`${constants.baseUrl}/api/transactions/groupbalances/`, data).then((response) => {
       if (response.status === 200) {
         const res = response.data;
-        this.setState({
-          userSummary: res,
-        });
+        if (JSON.stringify(this.state.userSummary) !== JSON.stringify(res)) {
+          this.setState({
+            userSummary: res,
+          });
+        }
       } else {
         // error
       }
@@ -69,8 +84,9 @@ class SelectGroup extends React.Component {
 
   handleModal = (modal) => {
     this.setState({ show: modal });
-    this.getTransaction();
-    this.getBalances();
+    this.getTransaction(this.props.selectedGroup._id);
+    // this.props.getGroups(this.props.user._id);
+    // this.getBalances();
   };
 
   handleEditModal = () => {
@@ -80,38 +96,30 @@ class SelectGroup extends React.Component {
     // this.getTransaction();
   };
 
-  handleLeaveGroup = (e) => {
-    e.preventDefault();
-    axios.defaults.withCredentials = true;
-    const data = {
-      user: this.props.user.id,
-      group: this.props.selectedGroup.grp_name,
-    };
-    axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
-      if (response.status === 200) {
-        const res = response.data;
-        if (res.message === 'Group Left Successfully') {
-          window.location.href = './dashboard';
-        } else if (res.message === 'You cant leave group without clearing dues.') {
-          this.setState({
-            errorMessage: 'You cant leave group without clearing dues.',
-          });
-        }
-      } else {
-        // error
-      }
+  handleEditExpenseModal = (index) => {
+    // eslint-disable-next-line react/no-access-state-in-setstate
+    const modal = !this.state.showEditExpense;
+    this.setState({ showEditExpense: modal, transaction: index.trans });
+    //  this.getTransaction();
+  };
+
+  handleChange = (r) => () => {
+    // const expanded = !this.state.expanded;
+    this.setState({
+      panel: r,
     });
+    // this.getComments(tranId);
   };
 
   getTransaction = () => {
     axios.defaults.withCredentials = true;
     axios
-      .get(`${constants.baseUrl}/api/transactions/?id=${this.props.selectedGroup.grp_id}`)
+      .get(`${constants.baseUrl}/api/transactions/?id=${this.props.selectedGroup._id}`)
       .then((response) => {
         if (response.status === 200) {
           const { data } = response;
           this.setState({
-            transactions: data,
+            transactions: data.data,
           });
         } else {
           // error
@@ -119,14 +127,21 @@ class SelectGroup extends React.Component {
       });
   };
 
+  getComments = (tranId) => {
+    axios.defaults.withCredentials = true;
+    axios.get(`${constants.baseUrl}/api/comments/?id=${tranId}`).then((response) => {
+      if (response.status === 200) {
+        const { data } = response;
+        this.setState({
+          transactions: data.data,
+        });
+      } else {
+        // error
+      }
+    });
+  };
+
   render() {
-    const classes = makeStyles((theme) => ({
-      root: {
-        width: '100%',
-        maxWidth: 360,
-        backgroundColor: theme.palette.background.paper,
-      },
-    }));
     return (
       <>
         <Row>
@@ -206,111 +221,133 @@ class SelectGroup extends React.Component {
                       {this.state.errorMessage}
                     </div>
                   ) : null}
-                  <List component="nav" className={classes.root} style={{ width: '100%' }}>
-                    {this.state.transactions.filter(
-                      (grp) => grp.grp_id === this.props.selectedGroup.grp_id
-                    ).length > 0 ? (
-                      this.state.transactions
-                        .filter((grp) => grp.grp_id === this.props.selectedGroup.grp_id)
-                        .map((r) => (
-                          <ListItem style={{ width: '100%' }} button>
-                            <Col md={1.5}>
-                              <ListItemAvatar>
-                                <div className="date">
-                                  <img
-                                    src="https://s3.amazonaws.com/splitwise/uploads/category/icon/square_v2/uncategorized/general@2x.png"
-                                    width="100"
-                                    height="100"
-                                    className="img-fluid"
-                                    alt=""
-                                  />
-                                </div>
-                              </ListItemAvatar>
-                            </Col>
-                            <Col md={5}>
-                              <ListItemText
-                                primary={r.tran_name}
-                                secondary={
-                                  <Typography className="header-label">
-                                    {convertDate(r.created_on)}
-                                  </Typography>
-                                }
-                                onChange={this.loadBalances}
+                  {this.state.transactions.length > 0 ? (
+                    this.state.transactions.map((r) => (
+                      <Accordion
+                        expanded={this.state.panel === r.trans.transaction_id}
+                        id={r.trans.transaction_id}
+                        onChange={this.handleChange(r.trans.transaction_id)}
+                      >
+                        <AccordionSummary aria-controls="panel1bh-content" id="panel1bh-header">
+                          <Col md={1.5}>
+                            <Avatar src="https://s3.amazonaws.com/splitwise/uploads/category/icon/square_v2/uncategorized/general@2x.png" />
+                          </Col>
+                          <Col md={5}>
+                            <Typography>{r.trans.tran_name}</Typography>
+                            <Typography className="header-label">
+                              {' '}
+                              {convertDate(r.trans.createdAt)}
+                            </Typography>
+                          </Col>
+                          <Col md={3} style={{ 'text-align': 'end' }}>
+                            {' '}
+                            {r.trans.status === 'PENDING' &&
+                              (r.trans.paid_by === this.props.user._id ? (
+                                <Typography
+                                  style={{
+                                    color: '#5bc5a7',
+                                  }}
+                                >
+                                  You paid{' '}
+                                  {converter(this.props.user.default_currency).format(
+                                    r.trans.bill_amt
+                                  )}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  style={{
+                                    color: '#ff652f',
+                                  }}
+                                >
+                                  {this.props.users
+                                    .filter((us) => us._id === r.trans.paid_by)
+                                    .map((r1) => {
+                                      return r1.name;
+                                    })}{' '}
+                                  paid{' '}
+                                  {converter(this.props.user.default_currency).format(
+                                    r.trans.bill_amt
+                                  )}{' '}
+                                </Typography>
+                              ))}
+                          </Col>
+                          <Col md={4}>
+                            {r.trans.paid_by === this.props.user._id ? (
+                              <Typography className="header-label">
+                                You will get back{' '}
+                                {converter(this.props.user.default_currency).format(
+                                  r.trans.bill_amt - r.trans.amount
+                                )}
+                              </Typography>
+                            ) : (
+                              <Typography className="header-label">
+                                you owe{' '}
+                                {this.props.users
+                                  .filter((us) => us._id === r.trans.paid_by)
+                                  .map((r1) => {
+                                    return r1.name;
+                                  })}{' '}
+                                &nbsp;
+                                {converter(this.props.user.default_currency).format(r.trans.amount)}
+                              </Typography>
+                            )}
+                          </Col>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Container>
+                            <Row>
+                              <Col md={1.5}>
+                                <Avatar src="https://s3.amazonaws.com/splitwise/uploads/category/icon/square_v2/uncategorized/general@2x.png" />
+                              </Col>
+                              <Col md={7}>
+                                <Typography>{r.trans.tran_name}</Typography>
+                                <Typography>
+                                  {' '}
+                                  {converter(this.props.user.default_currency).format(
+                                    r.trans.bill_amt
+                                  )}
+                                </Typography>
+                                <Typography
+                                  className="header-label"
+                                  styles={{ 'font-size': '12px' }}
+                                >
+                                  Added by{' '}
+                                  {this.props.users
+                                    .filter((us) => us._id === r.trans.paid_by)
+                                    .map((r1) => {
+                                      return r1.name;
+                                    })}{' '}
+                                  on {convertDate(r.trans.createdAt)}
+                                </Typography>
+                                <Button
+                                  variant="primary"
+                                  style={{
+                                    'background-color': '#ff652f',
+                                    'border-color': '#5bc5a7',
+                                  }}
+                                  className="btn btn-2 btn-success pull-right text-uppercase"
+                                  type="submit"
+                                  id="location"
+                                  onClick={() => this.handleEditExpenseModal(r)}
+                                >
+                                  Edit Expense
+                                </Button>
+                              </Col>
+                            </Row>
+                            <Divider />
+                            <Row>
+                              <CommentBox
+                                transaction={r.trans.transaction_id}
+                                group={this.props.selectedGroup._id}
                               />
-                            </Col>
-                            <Col md={3} style={{ 'text-align': 'end' }}>
-                              {r.status === 'PENDING' && (
-                                <ListItemText
-                                  primary=""
-                                  secondary={
-                                    r.paid_by === this.props.user.id ? (
-                                      <Typography
-                                        style={{
-                                          'text-transform': 'uppercase',
-                                          color: '#5bc5a7',
-                                        }}
-                                      >
-                                        you paid{' '}
-                                        {converter(this.props.user.default_currency).format(
-                                          r.bill_amt
-                                        )}
-                                      </Typography>
-                                    ) : (
-                                      <Typography
-                                        style={{
-                                          'text-transform': 'uppercase',
-                                          color: '#ff652f',
-                                        }}
-                                      >
-                                        {this.props.users
-                                          .filter((us) => us.id === r.paid_by)
-                                          .map((r1) => {
-                                            return r1.name;
-                                          })}{' '}
-                                        paid{' '}
-                                        {converter(this.props.user.default_currency).format(
-                                          r.bill_amt
-                                        )}{' '}
-                                      </Typography>
-                                    )
-                                  }
-                                />
-                              )}
-                            </Col>
-                            <Col md={4}>
-                              <ListItemText
-                                primary=""
-                                secondary={
-                                  r.paid_by === this.props.user.id ? (
-                                    <Typography className="header-label">
-                                      you will get back{' '}
-                                      {converter(this.props.user.default_currency).format(
-                                        r.bill_amt - r.amount
-                                      )}
-                                    </Typography>
-                                  ) : (
-                                    <Typography className="header-label">
-                                      you owe{' '}
-                                      {this.props.users
-                                        .filter((us) => us.id === r.paid_by)
-                                        .map((r1) => {
-                                          return r1.name;
-                                        })}{' '}
-                                      &nbsp;
-                                      {converter(this.props.user.default_currency).format(r.amount)}
-                                    </Typography>
-                                  )
-                                }
-                              />
-                            </Col>
-                          </ListItem>
-                        ))
-                    ) : (
-                      <ListItem>
-                        <ListItemText primary="No transactions!" />
-                      </ListItem>
-                    )}
-                  </List>
+                            </Row>
+                          </Container>
+                        </AccordionDetails>
+                      </Accordion>
+                    ))
+                  ) : (
+                    <Typography className="header-label">NO Transactions</Typography>
+                  )}
                 </Col>
               </Row>
             </Row>
@@ -327,7 +364,7 @@ class SelectGroup extends React.Component {
                           <Avatar
                             alt={`Avatar n°${trans.user}`}
                             src={this.props.users
-                              .filter((us) => us.id === trans.user)
+                              .filter((us) => us._id === trans.user)
                               .map((r1) => {
                                 return r1.image_path;
                               })}
@@ -337,7 +374,7 @@ class SelectGroup extends React.Component {
                         <ListItemText
                           id="item1"
                           primary={this.props.users
-                            .filter((us) => us.id === trans.user)
+                            .filter((us) => us._id === trans.user)
                             .map((r1) => {
                               return r1.name;
                             })}
@@ -377,6 +414,12 @@ class SelectGroup extends React.Component {
         {this.state.showEdit && (
           <EditGroupModal showEdit={this.handleEditModal} group={this.props.selectedGroup} />
         )}
+        {this.state.showEditExpense && (
+          <EditExpenseModal
+            showEditExpense={this.handleEditExpenseModal}
+            transaction={this.state.transaction}
+          />
+        )}
       </>
     );
   }
@@ -386,7 +429,7 @@ SelectGroup.propTypes = {
   selectedGroup: PropTypes.func.isRequired,
   groups: PropTypes.objectOf.isRequired,
   users: PropTypes.func.isRequired,
-  transactions: PropTypes.objectOf.isRequired,
+  // transactions: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -398,4 +441,7 @@ const mapStatetoProps = (state) => {
     users: state.users,
   };
 };
-export default connect(mapStatetoProps)(SelectGroup);
+const mapDispatchToProps = {
+  getGroups: groupsActions.getGroups,
+};
+export default connect(mapStatetoProps, mapDispatchToProps)(SelectGroup);

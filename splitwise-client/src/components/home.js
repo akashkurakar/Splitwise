@@ -11,7 +11,7 @@ import Header from '../header';
 class Home extends React.Component {
   constructor(props) {
     super(props);
-    if (this.props.user.name !== undefined) {
+    if (this.props.user._id !== undefined) {
       window.location.href = './dashboard';
     }
   }

@@ -7,7 +7,7 @@ export const getUsers = () => async (dispatch) => {
   axios
     .get(`${constants.baseUrl}/api/users/`)
     .then((res) => {
-      dispatch({ type: 'USER_LIST_SUCCESS', payload: res.data });
+      dispatch({ type: 'USER_LIST_SUCCESS', payload: res.data.data });
       dispatch({ type: 'ALERT_CLEAR', message: '' });
     })
     .catch((error) => {

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import * as groupsActions from '../../redux/actions/GroupsActions';
-import UserHeader from '../Dashboard/UserHeader';
+
 import GroupMembers from './GroupMembers';
 import constants from '../../constants/Constants';
 
@@ -79,7 +79,7 @@ class CreateGroup extends React.Component {
     }
     const data = {
       grp_name: this.state.grpName,
-      id: this.state.user.id,
+      id: this.state.user._id,
       users: this.state.members,
       imgPath: this.state.imgUrl,
     };
@@ -112,7 +112,6 @@ class CreateGroup extends React.Component {
   render() {
     return (
       <>
-        <UserHeader />
         <div className="flex_container blank_page clearfix">
           <div className="card">
             <div className="row no-gutters">

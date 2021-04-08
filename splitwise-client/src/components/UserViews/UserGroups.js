@@ -229,7 +229,7 @@ const mapStatetoProps = (state) => {
   return {
     user: state.user,
     alert: state.alert,
-    groups: state.groups,
+    groups: state.groups.groups,
     users: state.users,
   };
 };

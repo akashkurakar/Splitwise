@@ -4,7 +4,12 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
 const KafkaService = require("../kafka-services/kafka-producer");
+const jwt = require("jsonwebtoken");
+const secret = "cmpe273_secret_key";
 
+const { auth } = require("../utils/passport");
+
+auth();
 exports.login = async (req, res) => {
   const userObj = req.body;
   try {
@@ -14,14 +19,23 @@ exports.login = async (req, res) => {
           data: [],
           message: "User Not Present ! Please Sign Up!",
         };
-        return res.status(400).json(json);
+        return res.status(401).json(json);
       } else {
         if (bcrypt.compareSync(userObj.password, response[0].password)) {
-          var json = { data: response[0], message: "Login Successfull" };
-          res.status(200).json(json);
+          const payload = { user_id: response[0]._id };
+          const token = jwt.sign(payload, secret, {
+            expiresIn: 1008000,
+          });
+          var json = {
+            token: "JWT " + token,
+            data: response[0],
+            message: "Login Successfull",
+          };
+          res.status(200).end(JSON.stringify(json));
+          //res.status(200).json(token);
         } else {
           var json = { data: [], message: "Invalid Credentials" };
-          res.status(400).json(json);
+          res.status(401).json(json);
         }
       }
     });

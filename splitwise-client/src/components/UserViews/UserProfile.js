@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as userActions from '../../redux/actions/UserAction';
 import constants from '../../constants/Constants';
+import UserHeader from '../Dashboard/UserHeader';
 
 class UserProfile extends React.Component {
   constructor(props) {
@@ -134,6 +135,7 @@ class UserProfile extends React.Component {
   render() {
     return (
       <>
+        <UserHeader />
         <div>
           <div className="container">
             {this.props.alert.message !== '' && this.props.alert.message !== undefined ? (
@@ -309,7 +311,7 @@ class UserProfile extends React.Component {
 }
 UserProfile.propTypes = {
   alert: PropTypes.func.isRequired,
-  user: PropTypes.func.isRequired,
+  user: PropTypes.objectOf.isRequired,
   updateUserProfile: PropTypes.func.isRequired,
   getUser: PropTypes.func.isRequired,
 };

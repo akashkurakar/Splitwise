@@ -9,8 +9,8 @@ import Button from '@material-ui/core/Button';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Typography } from '@material-ui/core';
-import Header from '../header';
 import * as userActions from '../redux/actions/UserAction';
+import Header from '../header';
 
 class Login extends React.Component {
   constructor(props) {
@@ -19,9 +19,9 @@ class Login extends React.Component {
       email: '',
       password: '',
     };
-    if (this.props.user._id !== undefined) {
+    /* if (this.props.user._id !== undefined) {
       window.location.href = './dashboard';
-    }
+    } */
   }
 
   componentWillUnmount() {}
@@ -143,7 +143,6 @@ class Login extends React.Component {
 Login.propTypes = {
   alert: PropTypes.func.isRequired,
   loginUser: PropTypes.func.isRequired,
-  user: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {

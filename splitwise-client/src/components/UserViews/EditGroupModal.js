@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable arrow-body-style */
@@ -12,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import CloseIcon from '@material-ui/icons/Close';
 import * as transactionActions from '../../redux/actions/TransactionAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
 import constants from '../../constants/Constants';
@@ -23,12 +25,8 @@ class EditGroupModal extends React.Component {
       showEdit: this.props.showEdit,
       errorMessage: '',
       grp_name: this.props.group.grp_name,
-      members: [
-        { name: '', email: '' },
-        { name: '', email: '' },
-        { name: '', email: '' },
-        { name: '', email: '' },
-      ],
+      members: [{ name: '', email: '' }],
+      users: [],
       grp_id: this.props.group.grp_id,
 
       imgUrl: this.props.group.image_path,
@@ -83,33 +81,61 @@ class EditGroupModal extends React.Component {
     });
   };
 
-  handleName = (name, index) => {
-    const rows = this.state.members;
-    if (rows[index] === undefined) {
-      rows.push({ name, email: '' });
-    } else {
-      rows[index].name = name;
-    }
-    this.setState({
-      members: rows,
+  handleName = (e) => {
+    this.getNames(e.target.value);
+  };
+
+  handleEmail = (e, id) => {
+    this.getEmail(e.target.value, id);
+  };
+  /*
+  handleName = (e) => {
+    this.getNames(e.target.value);
+  };
+
+  handleEmail = (e) => {
+    this.getEmail(e.target.value,index);
+  };
+*/
+
+  addName = (name, index) => {
+    this.setState((prevState) => {
+      const rows = prevState.members;
+      const email = this.state.users.filter((user) => user.name === name.target.value)[0].email;
+      if (rows[index] === undefined) {
+        rows.push({ name, email: '' });
+      } else {
+        rows[index].name = name;
+        rows[index].email = email;
+      }
+      return {
+        members: rows,
+      };
+    });
+  };
+
+  addEmail = (e, id) => {
+    this.setState((prevState) => {
+      const members = prevState.members;
+      let name = '';
+      if (e !== 0) {
+        name = prevState.users.filter((user) => user.email === e)[0].name;
+      }
+      if (prevState.members[id] === undefined) {
+        members.push({ name: '', email: e });
+      } else {
+        members[id].email = e;
+        members[id].name = name;
+      }
+      return {
+        members,
+      };
     });
   };
 
   handleMembers = (childData) => {
     this.setState({
       members: childData,
-    });
-  };
-
-  handleEmail = (id, e) => {
-    const members = this.state.members;
-    if (this.state.members[id] === undefined) {
-      members.push({ name: '', email: e.target.value });
-    } else {
-      members[id].email = e.target.value;
-    }
-    this.setState({
-      members,
     });
   };
 
@@ -133,6 +159,13 @@ class EditGroupModal extends React.Component {
       }
     });
   }; */
+  removeMember = (e, index) => {
+    this.setState((prevState) => {
+      const rows = prevState.members;
+      rows.splice(index, 1);
+      return { members: rows };
+    });
+  };
 
   handleEditGroup = async (e) => {
     e.preventDefault();
@@ -149,7 +182,8 @@ class EditGroupModal extends React.Component {
       imgPath: this.state.imgUrl,
       grp_id: this.state.grp_id,
     };
-    axios.defaults.withCredentials = true;
+    this.props.editGroup(data);
+    /* axios.defaults.withCredentials = true;
     axios
       .put(`${constants.baseUrl}/api/group/`, data)
       .then((response) => {
@@ -183,7 +217,21 @@ class EditGroupModal extends React.Component {
         this.setState({
           errorMessage: res.message,
         });
-      });
+      }); */
+  };
+
+  getNames = (name) => {
+    axios.defaults.withCredentials = true;
+    axios.get(`${constants.baseUrl}/api/users/?name=${name}`).then((response) => {
+      if (response.status === 200) {
+        const res = response.data.data;
+        this.setState({
+          users: res,
+        });
+      } else {
+        // error
+      }
+    });
   };
 
   render() {
@@ -255,73 +303,93 @@ class EditGroupModal extends React.Component {
                     <div>
                       <div className="dropdown-divider" />
                       <Typography className="header-label">Group Members</Typography>
-                      <form className="form-signin" onSubmit={this.handleLogin}>
-                        <table>
+                      <table>
+                        <tr>
+                          <td>
+                            <img
+                              src="https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-grey1-50px.png"
+                              width="20"
+                              height="20"
+                              alt=""
+                            />
+                          </td>
+                          <td>
+                            <Typography>{this.props.user.name}</Typography>
+                          </td>
+                        </tr>
+                        {this.state.members.map((r, index) => (
                           <tr>
                             <td>
                               <img
                                 src="https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-grey1-50px.png"
-                                width="20"
-                                height="20"
+                                width="30"
+                                height="30"
+                                className="img-fluid"
                                 alt=""
                               />
                             </td>
                             <td>
-                              <Typography>{this.props.user.name}</Typography>
+                              <Autocomplete
+                                freeSolo
+                                id={`name-${index}`}
+                                disableClearable
+                                value={r.name}
+                                options={this.state.users.map((option) => option.name)}
+                                onKeyPress={(event) => this.handleName(event, index)}
+                                renderInput={(params) => (
+                                  <TextField
+                                    // eslint-disable-next-line react/jsx-props-no-spreading
+                                    {...params}
+                                    label="Name"
+                                    margin="normal"
+                                    InputProps={{ ...params.InputProps, type: 'search' }}
+                                    style={{ width: 200 }}
+                                    onBlur={(event) => this.addName(event, index)}
+                                    pattern="^\s*$"
+                                    required
+                                  />
+                                )}
+                              />
                             </td>
+                            <td>&nbsp;</td>
+                            <td>
+                              <Autocomplete
+                                freeSolo
+                                id={`name-${index}`}
+                                disableClearable
+                                value={r.email}
+                                options={this.state.users.map((option) => option.email)}
+                                onChange={(event, value) => this.handleEmail(value, index)}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Email Address"
+                                    value={r.email}
+                                    margin="normal"
+                                    style={{ width: 200 }}
+                                    InputProps={{
+                                      ...params.InputProps,
+                                      type: 'search',
+                                      pattern: '[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,}$',
+                                    }}
+                                    onChange={(event) => this.addEmail(event, index)}
+                                    type="email"
+                                  />
+                                )}
+                              />
+                            </td>
+                            {index > 0 && (
+                              <td>
+                                <CloseIcon onClick={(event) => this.removeMember(event, index)} />
+                              </td>
+                            )}
                           </tr>
-                          {this.state.members.map((r, index) => (
-                            <tr>
-                              <td>
-                                <img
-                                  src="https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-grey1-50px.png"
-                                  width="30"
-                                  height="30"
-                                  className="img-fluid"
-                                  alt=""
-                                />
-                              </td>
-                              <td>
-                                <Autocomplete
-                                  freeSolo
-                                  id={`name-${index}`}
-                                  disableClearable
-                                  value={r.name}
-                                  options={this.props.users.map((option) => option.name)}
-                                  onChange={(event, value) => this.handleName(value, index)}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      // eslint-disable-next-line react/jsx-props-no-spreading
-                                      {...params}
-                                      label="Name"
-                                      margin="normal"
-                                      InputProps={{ ...params.InputProps, type: 'search' }}
-                                      style={{ width: 200 }}
-                                      onBlur={this.onAddMember}
-                                    />
-                                  )}
-                                />
-                              </td>
-                              <td>&nbsp;</td>
-                              <td>
-                                <TextField
-                                  label="Email Address"
-                                  id={`email-${index}`}
-                                  value={r.email}
-                                  margin="normal"
-                                  style={{ width: 200 }}
-                                  onChange={(event) => this.handleEmail(index, event)}
-                                  onBlur={this.onAddMember}
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </table>
+                        ))}
+                      </table>
 
-                        <a href="/#" onClick={this.addMember}>
-                          +Add Member
-                        </a>
-                      </form>
+                      <a href="/#" onClick={this.addMember}>
+                        +Add Member
+                      </a>
                     </div>
                     <div>
                       <button
@@ -353,6 +421,7 @@ EditGroupModal.propTypes = {
   showEdit: PropTypes.func.isRequired,
   group: PropTypes.objectOf.isRequired,
   users: PropTypes.objectOf.isRequired,
+  editGroup: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -360,7 +429,7 @@ const mapStatetoProps = (state) => {
     user: state.user,
     transactions: state.transactions,
     alert: state.alert,
-    groups: state.groups,
+    groups: state.groups.groups,
     users: state.users,
   };
 };
@@ -368,6 +437,7 @@ const mapStatetoProps = (state) => {
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
   getGroups: groupsActions.getGroups,
+  editGroup: groupsActions.editGroup,
 };
 
 export default connect(mapStatetoProps, mapDispatchToProps)(EditGroupModal);

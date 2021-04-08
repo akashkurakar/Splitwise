@@ -3,6 +3,8 @@ import axios from 'axios';
 import constants from '../../constants/Constants';
 
 const getTotalBalances = (user) => async (dispatch) => {
+  axios.defaults.headers.common.authorization = localStorage.getItem('token');
+
   await axios
     .get(`${constants.baseUrl}/api/transactions/data/?user=${user}`)
     .then((res) => {

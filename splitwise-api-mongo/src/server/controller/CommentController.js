@@ -34,10 +34,22 @@ exports.addComment = async (req, res) => {
 };
 
 exports.deleteComments = async (req, res) => {
-  const user = req.query;
+  const comment = req.query.id;
   try {
-    let groups = await activityService.getActivities(user);
-    res.json(groups);
+    await Comments.deleteOne({ _id: comment }).then((response, err) => {
+      if (err) {
+        var json = {
+          data: [],
+          message: "Not able to delete comment!",
+        };
+        return res.status(200).json(json);
+      }
+      var json = {
+        data: response,
+        message: "Comment deleted successfully!",
+      };
+      res.status(200).json(json);
+    });
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -50,6 +62,7 @@ exports.getComments = async (req, res) => {
   try {
     const comments = await Comments.find({
       transaction_id: tran_id,
+      status: "active",
     }).then((comments) => {
       var json = {
         data: comments,

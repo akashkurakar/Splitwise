@@ -28,7 +28,7 @@ class UserActivity extends React.Component {
       activities: {},
       selectedGroup: '',
       selectedSort: 'First',
-      page: 1,
+      page: 0,
       rows: 10,
       totalRows: 100,
     };
@@ -80,7 +80,7 @@ class UserActivity extends React.Component {
     axios.defaults.withCredentials = true;
     axios
       .get(
-        `${constants.baseUrl}/api/activities/group/?userid=${this.props.user.id}&&groupid=${groupId}`
+        `${constants.baseUrl}/api/activities/group/?userid=${this.props.user.id}&&groupid=${groupId}&page=${this.state.page}&rows=${this.state.rows}`
       )
       .then((response) => {
         if (response.status === 200) {
@@ -111,18 +111,22 @@ class UserActivity extends React.Component {
     });
   };
 
-  handleChangePage = (e) => {
-    this.setState({ page: e.target.value });
-    if (this.selectedGroup === 'All') {
-      this.getRecentActivitiesByUser();
+  handleChangePage = (e, newpage) => {
+    e.preventDefault();
+    if (this.selectedGroup === undefined) {
+      this.setState({ page: newpage }, () => {
+        this.getRecentActivitiesByUser();
+      });
     } else {
-      this.getRecentActivitiesByGroup();
+      this.setState({ page: newpage }, () => {
+        this.getRecentActivitiesByGroup();
+      });
     }
   };
 
   handleChangeRowsPerPage = (event) => {
     this.setState({ rows: parseInt(event.target.value, 10), page: 0 });
-    if (this.selectedGroup === 'All') {
+    if (this.selectedGroup === undefined) {
       this.getRecentActivitiesByUser();
     } else {
       this.getRecentActivitiesByGroup();
@@ -241,7 +245,7 @@ UserActivity.propTypes = {
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
-    groups: state.groups,
+    groups: state.groups.groups,
   };
 };
 export default connect(mapStatetoProps)(UserActivity);

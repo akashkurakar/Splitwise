@@ -5,12 +5,26 @@ exports.getActivities = async (req, res) => {
   const user = req.query;
   const page = req.query.page;
   const rows = req.query.rows;
+  const grpId = req.query.groupid;
   try {
-    const totalRows = await Activity.find({ user_name: user.user });
-    const activities = await Activity.find({ user_name: user.user })
-      .skip((page - 1) * rows)
-      .limit(parseInt(rows));
-
+    let activities = [];
+    let totalRows = 0;
+    if (grpId !== undefined) {
+      totalRows = await Activity.find({ user_name: user.user });
+      activities = await Activity.find({
+        user_name: user.user,
+        grp_id: grpId,
+      })
+        .skip(page * rows)
+        .limit(parseInt(rows));
+    } else {
+      totalRows = await Activity.find({ user_name: user.user });
+      activities = await Activity.find({
+        user_name: user.user,
+      })
+        .skip(page * rows)
+        .limit(parseInt(rows));
+    }
     var json = {
       data: activities,
       totalRows: totalRows.length,

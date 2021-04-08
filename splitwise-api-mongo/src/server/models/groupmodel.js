@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const transactions = require("./transactionmodel");
 
 const groupSchema = new mongoose.Schema(
   {

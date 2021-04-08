@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import * as userActions from '../../redux/actions/UserAction';
+import history from '../../history';
 
 class UserHeader extends React.Component {
   constructor(props) {
@@ -27,20 +28,17 @@ class UserHeader extends React.Component {
 
   handleProfilelick = (e) => {
     e.preventDefault();
-    const step = 8;
-    this.props.getStep(step);
+    history.push('/userprofile');
   };
 
   handleGroupClick = (e) => {
     e.preventDefault();
-    const step = 9;
-    this.props.getStep(step);
+    history.push('/creategroup');
   };
 
   handleHome = (e) => {
     e.preventDefault();
-    const step = 1;
-    this.props.getStep(step);
+    history.push('/dashboard');
   };
 
   render() {
@@ -71,7 +69,6 @@ class UserHeader extends React.Component {
                       <Dropdown.Toggle className="header-user" id="dropdown-basic">
                         {this.state.user.name}
                       </Dropdown.Toggle>
-
                       <Dropdown.Menu>
                         <Dropdown.Item onClick={this.handleProfilelick}>My Profile</Dropdown.Item>
                         <Dropdown.Item onClick={this.handleGroupClick}>Create Group</Dropdown.Item>
@@ -92,7 +89,6 @@ class UserHeader extends React.Component {
 UserHeader.propTypes = {
   logoutUser: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
-  getStep: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {

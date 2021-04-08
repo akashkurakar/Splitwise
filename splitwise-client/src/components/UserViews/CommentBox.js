@@ -74,12 +74,13 @@ class CommentBox extends React.Component {
 
   removeComments = (e, index) => {
     axios.defaults.withCredentials = true;
-    axios.get(`${constants.baseUrl}/api/comments/?id=${index}`).then((response) => {
+    axios.get(`${constants.baseUrl}/api/comment/delete?id=${index}`).then((response) => {
       if (response.status === 200) {
         const { data } = response;
         this.setState({
           comments: data.data,
         });
+        this.getComments();
       } else {
         // error
       }
@@ -129,6 +130,7 @@ class CommentBox extends React.Component {
             aria-label="maximum height"
             placeholder=""
             defaultValue=""
+            value={this.state.value}
             onChange={this.handleComment}
           />
           <div>

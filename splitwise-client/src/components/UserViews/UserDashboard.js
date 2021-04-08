@@ -41,8 +41,8 @@ class DashboardMiddle extends React.Component {
   }
 
   componentDidMount = () => {
+    this.getBalances(this.props.user._id);
     this.props.getUsers(this.props.user._id);
-    this.getBalances();
     this.getTotalTransactionByUser();
     this.props.getUser(this.props.user._id);
   };
@@ -94,13 +94,13 @@ class DashboardMiddle extends React.Component {
       this.setState({ show: false });
     }
     this.getTotalTransactionByUser();
-    this.getBalances();
+    this.getBalances(this.props.user._id);
     this.props.getTransaction(this.props.user._id);
   };
 
   handleClose = () => {
     this.setState({ show: false });
-    this.getBalances();
+    this.getBalances(this.props.user._id);
   };
 
   getBalances = () => {
@@ -181,7 +181,7 @@ class DashboardMiddle extends React.Component {
                           <medium className="text-muted">Total Balance</medium>
                           <h6 style={{ color: 'green' }} data-testid="balance">
                             {converter(this.props.user.default_currency).format(
-                              this.state.balances.balance
+                              parseFloat(this.state.balances.balance)
                             )}
                           </h6>
                         </Col>
@@ -242,7 +242,7 @@ class DashboardMiddle extends React.Component {
                                   <Typography>
                                     Owe you&nbsp;
                                     {converter(this.props.user.default_currency).format(
-                                      trans.total_amt
+                                      parseFloat(trans.total_amt)
                                     )}
                                   </Typography>
                                   {this.state.oweList.length > 0
@@ -399,7 +399,7 @@ const mapStatetoProps = (state) => {
   return {
     user: state.user,
     transactions: state.transactions,
-    groups: state.groups,
+    groups: state.groups.groups,
     users: state.users,
     // dashboard:state.dashboard
   };

@@ -55,10 +55,13 @@ class LeftSideBar extends React.Component {
     e.preventDefault();
   };
 
-  handleGroupClick = (e) => {
+  handleGroupClick = (name) => {
     const step = 6;
     this.props.getStep(step);
-    this.props.selectedGroup(this.props.groups.filter((d) => d.status === 'active')[e]);
+
+    this.props.selectedGroup(
+      this.props.groups.filter((d) => d.status === 'active' && d.grp_name === name)[0]
+    );
   };
 
   render() {
@@ -166,14 +169,14 @@ class LeftSideBar extends React.Component {
               ? this.props.groups.map((p) =>
                   p.participants
                     .filter((r) => r.user_name === this.props.user._id && r.status === 'active')
-                    .map((r, index) => (
+                    .map((r) => (
                       <li>
                         <div
                           className="card-body"
                           style={{ padding: '0', height: '1rem' }}
                           value={p.grp_name}
                         >
-                          <Typography onClick={() => this.handleGroupClick(index)}>
+                          <Typography onClick={() => this.handleGroupClick(p.grp_name)}>
                             {p.image_path !== '' ? (
                               <img
                                 src={r.image_path}
@@ -212,9 +215,10 @@ LeftSideBar.propTypes = {
   groups: PropTypes.string.isRequired,
   user: PropTypes.objectOf.isRequired,
 };
+
 const mapStatetoProps = (state) => ({
   user: state.user,
   alert: state.alert,
-  groups: state.groups,
+  groups: state.groups.groups,
 });
 export default connect(mapStatetoProps)(LeftSideBar);

@@ -92,7 +92,6 @@ exports.getGroups = async (req, res) => {
         },
       },
     ]);
-    console.log(result);
     if (result.length == 0) {
       var json = {
         data: [],
@@ -213,8 +212,39 @@ exports.leaveGroup = async (req, res) => {
 
 exports.updateGroups = async (req, res) => {
   const group = req.body;
+  const participants = [];
   try {
-    await Group.save(group).then((response, err) => {
+    let oldGroup = await Group.find({ grp_name: group.grp_name });
+    if (group.users.length > 0) {
+      for (let usr of group.users) {
+        if (usr.name !== "") {
+          const user = await User.findOne({ name: usr.name });
+          const userid = user._id.toString();
+          const status = "PENDING";
+          if (oldGroup.participants.contains(userid)) {
+            var json = {
+              data: [],
+              message: "User already present in group!",
+            };
+            return res.status(200).json(json);
+          }
+          participants.push({ user_name: userid, status: status });
+        } else {
+          var json = {
+            data: [],
+            message: "Add at least one user!",
+          };
+          return res.status(200).json(json);
+        }
+      }
+      let groupParticipants = await Participants.insertMany(participants);
+      groupParticipants.forEach((element) => {
+        oldGroup.participants.push(element);
+      });
+    }
+    oldGroup.name = group.grp_name;
+    oldGroup.image_url = group.imgPath;
+    await Group.findByIdAndUpdate(oldGroup).then((response, err) => {
       if (err) {
         var json = {
           data: [],
@@ -228,7 +258,6 @@ exports.updateGroups = async (req, res) => {
       };
       res.status(200).json(json);
     });
-    res.json(groups);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

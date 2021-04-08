@@ -1,6 +1,9 @@
+/* eslint-disable no-undef */
+/* eslint-disable camelcase */
 /* eslint-disable arrow-body-style */
 import axios from 'axios';
 import storage from 'redux-persist/lib/storage';
+import jwt_decode from 'jwt-decode';
 import history from '../../history';
 import constants from '../../constants/Constants';
 
@@ -14,23 +17,29 @@ export function userProfileSuccess(user) {
   return { type: 'USER_PROFILE_SUCCESS', user };
 }
 export function clearAlert() {
-  history.push('/login');
   return { type: 'ALERT_CLEAR', message: '' };
 }
-export function logoutUser(user) {
-  history.push('/login');
+export function logoutUser(user, dispatch) {
   clearAlert(user);
   storage.removeItem('persist:root');
-  return { type: 'LOGOUT_USER', data: '' };
+  dispatch({ type: 'LOGOUT_USER', data: '' });
+  axios.defaults.headers.common.authorization = localStorage.removeItem('token');
+  history.push('/login');
 }
 
 export const loginUser = (user) => async (dispatch) => {
   await axios
     .post(`${constants.baseUrl}/api/login`, user)
     .then((res) => {
-      dispatch({ type: 'LOGIN_USER_SUCCESS', payload: res.data.data });
-      dispatch({ type: 'ALERT_CLEAR', message: '' });
-      history.push('/dashboard');
+      const decoded = jwt_decode(res.data.token.split(' ')[1], { payload: true });
+      if (decoded) {
+        localStorage.setItem('token', res.data.token);
+        dispatch({ type: 'LOGIN_USER_SUCCESS', payload: res.data.data });
+        history.push('/dashboard');
+        dispatch({ type: 'ALERT_CLEAR', message: '' });
+      } else {
+        dispatch({ type: 'ALERT_ERROR', message: res.data.message });
+      }
     })
     .catch((error) => {
       dispatch({ type: 'ALERT_ERROR', message: error });
@@ -38,6 +47,8 @@ export const loginUser = (user) => async (dispatch) => {
 };
 
 export const getUser = (id) => async (dispatch) => {
+  axios.defaults.headers.common.authorization = localStorage.getItem('token');
+
   await axios
     .get(`${constants.baseUrl}/api/user/id?id=${id}`)
     .then((res) => {
@@ -50,6 +61,8 @@ export const getUser = (id) => async (dispatch) => {
 };
 
 export const signupUser = (user) => async (dispatch) => {
+  axios.defaults.headers.common.authorization = localStorage.getItem('token');
+
   await axios
     .put(`${constants.baseUrl}/api/signup`, user)
     .then((res) => {
@@ -61,7 +74,10 @@ export const signupUser = (user) => async (dispatch) => {
       dispatch({ type: 'ALERT_ERROR', message: error });
     });
 };
+
 export const updateUserProfile = (user) => async (dispatch) => {
+  axios.defaults.headers.common.authorization = localStorage.getItem('token');
+
   await axios
     .post(`${constants.baseUrl}/api/user/update`, user)
     .then((res) => {

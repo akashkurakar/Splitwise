@@ -1,9 +1,27 @@
+/* eslint-disable arrow-body-style */
 import React from 'react';
 import Container from '@material-ui/core/Container';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { connect } from 'react-redux';
+import * as userActions from './redux/actions/UserAction';
+
 // eslint-disable-next-line react/prefer-stateless-function
 class Header extends React.Component {
+  constructor() {
+    super();
+    this.state = { isLogout: true };
+  }
+
+  handleLogout = () => {
+    this.props.logoutUser(this.props.user);
+    this.props.user = [];
+    this.setState({ isLogout: true });
+    this.forceUpdate();
+  };
+
   render() {
     return (
       <header style={{ 'max-height': '50px', 'background-color': '#5bc5a7' }}>
@@ -18,7 +36,7 @@ class Header extends React.Component {
                 alt=""
               />
             </a>
-            {this.props.user === undefined ? (
+            {this.state.isLogout ? (
               <form className="form-inline my-2 my-lg-0">
                 <div>
                   <a size="medium" href="/login" className="nav-link btn-green" type="button">
@@ -36,7 +54,35 @@ class Header extends React.Component {
                   </a>
                 </div>
               </form>
-            ) : null}
+            ) : (
+              <form className="form-inline my-2 my-lg-0">
+                <div>
+                  <Link to="/dashboard" style={{ color: 'white' }}>
+                    <Typography onClick={this.handleHome}>Home</Typography>
+                  </Link>
+                </div>
+
+                <div>
+                  <Dropdown>
+                    <Dropdown.Toggle className="header-user" id="dropdown-basic">
+                      {this.props.user.name}
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Link to="/userprofile" style={{ color: 'white' }}>
+                        <Typography> My Profile</Typography>
+                      </Link>
+                      <Link to="/creategroup" style={{ color: 'white' }}>
+                        <Typography> Create Group</Typography>
+                      </Link>
+                      <Link to="/login" style={{ color: 'white' }}>
+                        <Typography onClick={this.handleLogout}>Logout</Typography>
+                      </Link>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              </form>
+            )}
           </nav>
         </Container>
       </header>
@@ -46,5 +92,15 @@ class Header extends React.Component {
 
 Header.propTypes = {
   user: PropTypes.objectOf.isRequired,
+  logoutUser: PropTypes.func.isRequired,
 };
-export default Header;
+
+const mapStatetoProps = (state) => ({
+  user: state.user,
+  alert: state.alert,
+});
+
+const mapDispatchToProps = {
+  logoutUser: userActions.logoutUser,
+};
+export default connect(mapStatetoProps, mapDispatchToProps)(Header);

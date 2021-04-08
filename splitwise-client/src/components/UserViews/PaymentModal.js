@@ -65,7 +65,7 @@ class PaymentModal extends React.Component {
     axios.defaults.withCredentials = true;
     axios.post(`${constants.baseUrl}/api/transactions/settle`, data).then((response) => {
       if (response.status === 200) {
-        if (response.message === 'Transaction Settled') {
+        if (response.data.message === 'Transaction Settled') {
           this.props.getTransaction(this.props.user.id);
           this.handleClose(false);
         } else if (response.data === 'Invalid Credentials!') {

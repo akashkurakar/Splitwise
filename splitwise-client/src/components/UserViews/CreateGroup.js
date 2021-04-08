@@ -8,6 +8,7 @@ import * as groupsActions from '../../redux/actions/GroupsActions';
 
 import GroupMembers from './GroupMembers';
 import constants from '../../constants/Constants';
+import UserHeader from '../Dashboard/UserHeader';
 
 class CreateGroup extends React.Component {
   constructor() {
@@ -83,35 +84,14 @@ class CreateGroup extends React.Component {
       users: this.state.members,
       imgPath: this.state.imgUrl,
     };
-    axios.defaults.withCredentials = true;
-    axios
-      .post(`${constants.baseUrl}/api/group/create`, data)
-      .then((response) => {
-        if (response.status === 200) {
-          if (response.data.message === 'Group Created Successfully!') {
-            this.props.getGroups(this.props.user.id);
-            this.setState({
-              errorMessage: '',
-            });
-
-            window.location.href = './dashboard';
-          } else {
-            this.setState({
-              errorMessage: response.data.message,
-            });
-          }
-        }
-      })
-      .catch((res) => {
-        this.setState({
-          errorMessage: res.message,
-        });
-      });
+    this.props.createGroups(data);
+    this.props.getGroups(this.props.user._id);
   };
 
   render() {
     return (
       <>
+        <UserHeader />
         <div className="flex_container blank_page clearfix">
           <div className="card">
             <div className="row no-gutters">
@@ -194,15 +174,17 @@ class CreateGroup extends React.Component {
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
-    groups: state.groups,
+    groups: state.groups.groups,
   };
 };
 const mapDispatchToProps = {
   getGroups: groupsActions.getGroups,
+  createGroups: groupsActions.createGroups,
 };
 
 CreateGroup.propTypes = {
   getGroups: PropTypes.func.isRequired,
+  createGroups: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
 };
 

@@ -6,18 +6,20 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import LeftSideBar from './LeftSidebar';
 import Activity from '../UserViews/UserActivity';
 import UserDashboard from '../UserViews/UserDashboard';
 import CreateGroup from '../UserViews/CreateGroup';
 import UserGroups from '../UserViews/UserGroups';
 import SelectGroup from '../UserViews/SelectGroup';
-import UserHeader from './UserHeader';
 import Notification from '../UserViews/Notifications';
 import * as userActions from '../../redux/actions/UserAction';
 import * as transactionAction from '../../redux/actions/TransactionAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
 import UserProfile from '../UserViews/UserProfile';
+import UserHeader from './UserHeader';
+import constants from '../../constants/Constants';
 
 class MainContent extends React.Component {
   constructor(props) {
@@ -36,7 +38,9 @@ class MainContent extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getTransaction(this.props.user.id);
+    this.props.getTransaction(this.props.user._id);
+    this.props.getGroups(this.props.user._id);
+    this.getBalances(this.props.user._id);
   }
 
   handleCallback = (childData) => {
@@ -46,12 +50,29 @@ class MainContent extends React.Component {
   handleSelectedGroup = (selectedGroup) => {
     this.setState({ step: 6 });
     this.setState({ selectedGroup });
+    this.props.getGroupTransaction(selectedGroup._id);
+    this.props.getBalances(selectedGroup._id);
+  };
+
+  getBalances = () => {
+    const userId = this.props.user._id;
+    axios.defaults.withCredentials = true;
+    axios.get(`${constants.baseUrl}/api/balances/?user=${userId}`).then((response) => {
+      if (response.status === 200) {
+        const { data } = response;
+        this.setState({
+          balances: data,
+        });
+      } else {
+        // error
+      }
+    });
   };
 
   render() {
     return (
       <>
-        <UserHeader getStep={this.handleCallback} />
+        <UserHeader />
         <div>
           <Container>
             {this.state.step !== 8 && this.state.step !== 9 ? (
@@ -93,20 +114,25 @@ class MainContent extends React.Component {
 }
 MainContent.propTypes = {
   getGroups: PropTypes.func.isRequired,
-  getTransaction: PropTypes.func.isRequired,
+  getGroupTransaction: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
+  getTransaction: PropTypes.func.isRequired,
+  getBalances: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
-    groups: state.groups,
+    groups: state.groups.groups,
   };
 };
 const mapDispatchToProps = {
   loginUser: userActions.loginUser,
   getGroups: groupsActions.getGroups,
-  getTransaction: transactionAction.getTransaction,
+  getGroupTransaction: transactionAction.getGroupTransaction,
+  getTransaction: transactionAction.getGroupTransaction,
+  getBalances: groupsActions.getBalances,
+  getUserBalances: transactionAction.getUserBalances,
 };
 
 export default connect(mapStatetoProps, mapDispatchToProps)(MainContent);

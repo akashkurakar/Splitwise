@@ -1,11 +1,4 @@
-const con = require("../db/db");
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
-let user = {};
-const salt = bcrypt.genSaltSync(saltRounds);
 const mongoose = require("mongoose");
-const groups = require("./groupmodel");
-const transactions = require("./transactionmodel");
 
 const userSchema = new mongoose.Schema(
   {

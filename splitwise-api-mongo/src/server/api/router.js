@@ -3,6 +3,7 @@
 const express = require("express");
 
 const AWS = require("aws-sdk");
+
 const bodyParser = require("body-parser");
 
 var jsonParser = bodyParser.json();
@@ -10,6 +11,8 @@ var jsonParser = bodyParser.json();
 const path = require("path");
 
 const multer = require("multer");
+
+const { checkAuth } = require("../utils/passport");
 
 const s3 = new AWS.S3({
   accessKeyId: "AKIAXUQ3XVLVMAMGZHYT",
@@ -45,7 +48,7 @@ router.post("/login", jsonParser, UserController.login);
 
 router.put("/signup", jsonParser, UserController.signup);
 
-router.post("/user/update", jsonParser, UserController.update);
+router.post("/user/update", jsonParser, checkAuth, UserController.update);
 
 router.get("/user/", UserController.userByEmail);
 
@@ -53,69 +56,144 @@ router.get("/user/id", UserController.userById);
 
 router.get("/users/", UserController.users);
 
-router.post("/group/create", jsonParser, GroupController.createGroup);
+router.post(
+  "/group/create",
+  jsonParser,
+  checkAuth,
+  GroupController.createGroup
+);
 
-router.post("/group/leave", jsonParser, GroupController.leaveGroup);
+router.post("/group/leave", jsonParser, checkAuth, GroupController.leaveGroup);
 
-router.get("/groups/", jsonParser, GroupController.getGroups);
+router.get("/groups/", jsonParser, checkAuth, GroupController.getGroups);
 
-router.put("/group/", jsonParser, GroupController.updateGroups);
+router.put("/group/", jsonParser, checkAuth, GroupController.updateGroups);
 
-router.get("/groups/all", jsonParser, GroupController.getAllGroups);
+router.get("/groups/all", jsonParser, checkAuth, GroupController.getAllGroups);
 
-router.post("/groups/request", jsonParser, GroupController.approveGroupRequest);
+router.post(
+  "/groups/request",
+  jsonParser,
+  checkAuth,
+  GroupController.approveGroupRequest
+);
 
-router.post("/notify/send", jsonParser, InvitationController.sendInvitation);
+router.post(
+  "/notify/send",
+  jsonParser,
+  checkAuth,
+  InvitationController.sendInvitation
+);
 
-router.get("/notify/", jsonParser, InvitationController.sendInvitation);
+router.get(
+  "/notify/",
+  jsonParser,
+  checkAuth,
+  InvitationController.sendInvitation
+);
 
 router.get(
   "/notifications/",
   jsonParser,
+  checkAuth,
   InvitationController.getInvitationList
 );
 
-router.get("/transactions/", jsonParser, TransactionController.getTransaction);
+router.get(
+  "/transactions/",
+  jsonParser,
+  checkAuth,
+  TransactionController.getTransaction
+);
 
-router.get("/balances/", jsonParser, TransactionController.getBalances);
+router.get(
+  "/balances/",
+  jsonParser,
+  checkAuth,
+  TransactionController.getBalances
+);
 
-router.post("/transactions", jsonParser, TransactionController.addTransaction);
+router.post(
+  "/transactions",
+  jsonParser,
+  checkAuth,
+  TransactionController.addTransaction
+);
 
-router.post("/comment/post", jsonParser, CommentController.addComment);
+router.post(
+  "/comment/post",
+  jsonParser,
+  checkAuth,
+  CommentController.addComment
+);
 
-router.get("/comments/", jsonParser, CommentController.getComments);
+router.get("/comments/", jsonParser, checkAuth, CommentController.getComments);
 
 router.post(
   "/transactions/update",
   jsonParser,
+  checkAuth,
+  TransactionController.updateTransaction
+);
+
+router.get(
+  "/comment/delete",
+  jsonParser,
+  checkAuth,
+  CommentController.deleteComments
+);
+
+router.post(
+  "/transactions/update",
+  jsonParser,
+  checkAuth,
   TransactionController.updateTransaction
 );
 
 router.post(
   "/transactions/groupbalances",
   jsonParser,
+  checkAuth,
   TransactionController.getGroupBalances
 );
 
-router.post("/participant", jsonParser, ParticipantController.addParticipant);
+router.post(
+  "/participant",
+  jsonParser,
+  checkAuth,
+  ParticipantController.addParticipant
+);
 router.get(
   "/transactions/data",
   jsonParser,
+  checkAuth,
   TransactionController.getTotalPaidOwedTransactions
 );
 
 router.post(
   "/transactions/settle",
   jsonParser,
+  checkAuth,
   TransactionController.transactionSettle
 );
 
-router.get("/participants", jsonParser, ParticipantController.getParticipant);
+router.get(
+  "/participants",
+  jsonParser,
+  checkAuth,
+  ParticipantController.getParticipant
+);
 
-router.get("/activities", jsonParser, ActivityController.getActivities);
+router.get(
+  "/activities",
+  jsonParser,
+  checkAuth,
+  ActivityController.getActivities
+);
 router.get(
   "/activities/group",
   jsonParser,
+  checkAuth,
   ActivityController.getActivitiesByGroup
 );
 

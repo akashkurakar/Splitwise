@@ -4,6 +4,8 @@ import axios from 'axios';
 import constants from '../../constants/Constants';
 
 export const getUsers = () => async (dispatch) => {
+  axios.defaults.headers.common.authorization = localStorage.getItem('token');
+
   axios
     .get(`${constants.baseUrl}/api/users/`)
     .then((res) => {

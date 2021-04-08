@@ -5,7 +5,7 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import { connect } from 'react-redux';
-import axios from 'axios';
+
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -28,18 +28,16 @@ import EditExpenseModal from './EditExpenseModal';
 import { converter, convertDate } from '../../constants/CommonService';
 import EditGroupModal from './EditGroupModal';
 import * as groupsActions from '../../redux/actions/GroupsActions';
-import constants from '../../constants/Constants';
+import * as transactionsActions from '../../redux/actions/TransactionAction';
 
 class SelectGroup extends React.Component {
   constructor() {
     super();
     this.state = {
       show: false,
-      transactions: [],
       errorMessage: '',
       showEdit: false,
       showEditExpense: false,
-      userSummary: [],
       selectedGroup: '',
       transaction: [],
       panel: '',
@@ -48,32 +46,10 @@ class SelectGroup extends React.Component {
   }
 
   componentDidMount = () => {
-    this.getBalances();
-    this.getTransaction(this.props.selectedGroup._id);
+    this.props.getBalances(this.props.selectedGroup._id);
+    this.props.getGroupTransaction(this.props.selectedGroup._id);
     this.setState({
       selectedGroup: this.props.selectedGroup,
-    });
-  };
-
-  componentDidUpdate = () => {
-    this.getBalances();
-    // this.getTransaction();
-  };
-
-  getBalances = () => {
-    axios.defaults.withCredentials = true;
-    const data = { grp_id: this.props.selectedGroup._id };
-    axios.post(`${constants.baseUrl}/api/transactions/groupbalances/`, data).then((response) => {
-      if (response.status === 200) {
-        const res = response.data;
-        if (JSON.stringify(this.state.userSummary) !== JSON.stringify(res)) {
-          this.setState({
-            userSummary: res,
-          });
-        }
-      } else {
-        // error
-      }
     });
   };
 
@@ -84,9 +60,8 @@ class SelectGroup extends React.Component {
 
   handleModal = (modal) => {
     this.setState({ show: modal });
-    this.getTransaction(this.props.selectedGroup._id);
-    // this.props.getGroups(this.props.user._id);
-    // this.getBalances();
+    this.props.getGroupTransaction(this.props.selectedGroup._id);
+    this.props.getBalances(this.props.selectedGroup._id);
   };
 
   handleEditModal = () => {
@@ -109,36 +84,6 @@ class SelectGroup extends React.Component {
       panel: r,
     });
     // this.getComments(tranId);
-  };
-
-  getTransaction = () => {
-    axios.defaults.withCredentials = true;
-    axios
-      .get(`${constants.baseUrl}/api/transactions/?id=${this.props.selectedGroup._id}`)
-      .then((response) => {
-        if (response.status === 200) {
-          const { data } = response;
-          this.setState({
-            transactions: data.data,
-          });
-        } else {
-          // error
-        }
-      });
-  };
-
-  getComments = (tranId) => {
-    axios.defaults.withCredentials = true;
-    axios.get(`${constants.baseUrl}/api/comments/?id=${tranId}`).then((response) => {
-      if (response.status === 200) {
-        const { data } = response;
-        this.setState({
-          transactions: data.data,
-        });
-      } else {
-        // error
-      }
-    });
   };
 
   render() {
@@ -221,8 +166,8 @@ class SelectGroup extends React.Component {
                       {this.state.errorMessage}
                     </div>
                   ) : null}
-                  {this.state.transactions.length > 0 ? (
-                    this.state.transactions.map((r) => (
+                  {this.props.transactions.length > 0 ? (
+                    this.props.transactions.map((r) => (
                       <Accordion
                         expanded={this.state.panel === r.trans.transaction_id}
                         id={r.trans.transaction_id}
@@ -355,8 +300,8 @@ class SelectGroup extends React.Component {
           <Col md={4}>
             <List dense>
               <Typography className="header-label">GROUP BALANCES</Typography>
-              {this.state.userSummary.length > 0 ? (
-                this.state.userSummary.map(
+              {this.props.balances.length > 0 ? (
+                this.props.balances.map(
                   (trans) =>
                     trans.total !== 0 && (
                       <ListItem button>
@@ -427,21 +372,27 @@ class SelectGroup extends React.Component {
 SelectGroup.propTypes = {
   user: PropTypes.objectOf.isRequired,
   selectedGroup: PropTypes.func.isRequired,
+  getBalances: PropTypes.func.isRequired,
+  getGroupTransaction: PropTypes.func.isRequired,
   groups: PropTypes.objectOf.isRequired,
+  balances: PropTypes.objectOf.isRequired,
   users: PropTypes.func.isRequired,
-  // transactions: PropTypes.objectOf.isRequired,
+  transactions: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     alert: state.alert,
-    groups: state.groups,
-    transactions: state.transactions,
+    groups: state.groups.groups,
+    transactions: state.transactions.group,
     users: state.users,
+    balances: state.groups.balances,
   };
 };
 const mapDispatchToProps = {
   getGroups: groupsActions.getGroups,
+  getBalances: groupsActions.getBalances,
+  getGroupTransaction: transactionsActions.getGroupTransaction,
 };
 export default connect(mapStatetoProps, mapDispatchToProps)(SelectGroup);

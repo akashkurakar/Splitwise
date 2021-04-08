@@ -10,17 +10,22 @@ exports.getTransaction = async (req, res) => {
   try {
     let paidAmount = "";
     if (user !== undefined) {
-      result = await Transaction.find({ paid_by: user, owed_name: user });
+      result = await Transaction.find({
+        paid_by: user,
+        owed_name: user,
+      });
     } else {
       // mongoose.set("debug", true);
 
       await await Transaction.aggregate([
+        { $sort: { createdAt: 1 } },
         {
           $match: {
             grp_id: mongoose.Types.ObjectId(groupName),
             status: "PENDING",
           },
         },
+        { $sort: { updated_at: -1 } },
         { $group: { _id: "$transaction_id", trans: { $first: "$$ROOT" } } },
       ]).then((response, err) => {
         if (err) {
@@ -324,12 +329,6 @@ exports.transactionSettle = async (req, res) => {
           },
         ],
       },
-      /*{
-        paid_by: transaction.user1,
-        owed_name: transaction.user2,
-        paid_by: transaction.user2,
-        owed_name: transaction.user1,
-      },*/
       {
         $set: { status: "settled" },
       },
@@ -342,6 +341,20 @@ exports.transactionSettle = async (req, res) => {
         };
         return res.status(200).json(json);
       }
+
+      const activities = [];
+      const activity = new Activity();
+      activity.activity_name = "transaction settled";
+      activity.grp_id = "";
+      activity.user_name = transaction.user1;
+      activity.description = `${transaction.user2} settled up woth you`;
+      activities.push(activity);
+      activity.activity_name = "transaction settled";
+      activity.grp_id = "";
+      activity.user_name = transaction.user2;
+      activity.description = `${transaction.user1} settled up woth you`;
+      activities.push(activity);
+      Activity.insertMany(activities);
       var json = {
         data: response,
         message: "Transaction Settled",

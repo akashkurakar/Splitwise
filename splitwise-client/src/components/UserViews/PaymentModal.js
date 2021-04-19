@@ -9,14 +9,12 @@ import Modal from 'react-bootstrap/Modal';
 import Container from 'react-bootstrap/Container';
 import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import axios from 'axios';
 import { connect } from 'react-redux';
 import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import PropTypes from 'prop-types';
 import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
-import constants from '../../constants/Constants';
 
 class PaymentModal extends React.Component {
   constructor(props) {
@@ -62,17 +60,22 @@ class PaymentModal extends React.Component {
       user1: this.props.user._id,
       user2: this.props.data.user,
     };
-    axios.defaults.withCredentials = true;
+
+    this.props.settleExpense(data).then(() => {
+      if (this.props.alert.message === 'Transaction Settled') {
+        this.handleClose(false);
+      }
+    });
+    /* axios.defaults.withCredentials = true;
     axios.post(`${constants.baseUrl}/api/transactions/settle`, data).then((response) => {
       if (response.status === 200) {
         if (response.data.message === 'Transaction Settled') {
           this.props.getTransaction(this.props.user.id);
-          this.handleClose(false);
         } else if (response.data === 'Invalid Credentials!') {
           // error
         }
       }
-    });
+    }); */
   };
 
   render() {
@@ -155,6 +158,8 @@ PaymentModal.propTypes = {
   user: PropTypes.objectOf.isRequired,
   getTransaction: PropTypes.func.isRequired,
   users: PropTypes.objectOf.isRequired,
+  settleExpense: PropTypes.func.isRequired,
+  alert: PropTypes.string.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -162,10 +167,12 @@ const mapStatetoProps = (state) => {
     user: state.user,
     transactions: state.transactions,
     users: state.users,
+    alert: state.alert,
   };
 };
 
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
+  settleExpense: transactionActions.settleExpense,
 };
 export default connect(mapStatetoProps, mapDispatchToProps)(PaymentModal);

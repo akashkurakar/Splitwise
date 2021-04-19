@@ -1,3 +1,4 @@
+/* eslint-disable react/no-did-update-set-state */
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import axios from 'axios';
@@ -13,14 +14,13 @@ import { Typography } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import constants from '../../constants/Constants';
+import * as commentActions from '../../redux/actions/CommentAction';
 import { convertDate } from '../../constants/CommonService';
 
 class CommentBox extends React.Component {
   constructor() {
     super();
     this.state = {
-      comments: [],
       comment: '',
     };
   }
@@ -35,7 +35,7 @@ class CommentBox extends React.Component {
     });
   };
 
-  addComment = () => {
+  addComment = async () => {
     axios.defaults.withCredentials = true;
     const data = {
       user: this.props.user._id,
@@ -43,48 +43,15 @@ class CommentBox extends React.Component {
       comment: this.state.comment,
       transaction_id: this.props.transaction,
     };
-    axios.post(`${constants.baseUrl}/api/comment/post`, data).then((response) => {
-      if (response.status === 200) {
-        const res = response.data;
-        if (res.message === 'Comment added successfully!') {
-          this.getComments();
-          this.state.comment = '';
-        }
-      } else {
-        // error
-      }
-    });
+    await this.props.addComments(data);
   };
 
-  getComments = () => {
-    axios.defaults.withCredentials = true;
-    axios
-      .get(`${constants.baseUrl}/api/comments/?id=${this.props.transaction}`)
-      .then((response) => {
-        if (response.status === 200) {
-          const { data } = response;
-          this.setState({
-            comments: data.data,
-          });
-        } else {
-          // error
-        }
-      });
+  getComments = async () => {
+    await this.props.getComments(this.props.transaction);
   };
 
-  removeComments = (e, index) => {
-    axios.defaults.withCredentials = true;
-    axios.get(`${constants.baseUrl}/api/comment/delete?id=${index}`).then((response) => {
-      if (response.status === 200) {
-        const { data } = response;
-        this.setState({
-          comments: data.data,
-        });
-        this.getComments();
-      } else {
-        // error
-      }
-    });
+  removeComments = async (e, index) => {
+    await this.props.removeComments(this.props.transaction, index);
   };
 
   render() {
@@ -97,8 +64,8 @@ class CommentBox extends React.Component {
             Notes and Comments
           </Typography>
           <List>
-            {this.state.comments.length > 0 ? (
-              this.state.comments.map((c) => (
+            {this.props.comments.length > 0 ? (
+              this.props.comments.map((c) => (
                 <ListItem>
                   <ListItemText
                     primary={
@@ -159,13 +126,24 @@ CommentBox.propTypes = {
   users: PropTypes.objectOf.isRequired,
   group: PropTypes.string.isRequired,
   transaction: PropTypes.string.isRequired,
+  addComments: PropTypes.func.isRequired,
+  getComments: PropTypes.func.isRequired,
+  removeComments: PropTypes.func.isRequired,
+  comments: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     users: state.users,
+    alert: state.alert,
+    comments: state.comments,
   };
 };
+const mapDispatchToProps = {
+  removeComments: commentActions.removeComments,
+  getComments: commentActions.getComments,
+  addComments: commentActions.addComments,
+};
 
-export default connect(mapStatetoProps)(CommentBox);
+export default connect(mapStatetoProps, mapDispatchToProps)(CommentBox);

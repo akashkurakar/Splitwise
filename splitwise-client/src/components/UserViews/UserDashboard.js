@@ -294,7 +294,7 @@ class DashboardMiddle extends React.Component {
 
                   <Divider orientation="vertical" flexItem />
 
-                  <Col style={{ 'background-color': '#ffffff' }} md={5}>
+                  <Col style={{ 'background-color': '#ffffff' }} md={6}>
                     <large className="text-muted header-label">You are owed</large>
                     <List dense>
                       {this.state.owedList.length > 0 ? (

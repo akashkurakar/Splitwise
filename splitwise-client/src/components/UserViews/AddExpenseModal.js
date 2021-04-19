@@ -15,7 +15,6 @@ import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
-import constants from '../../constants/Constants';
 import * as groupsActions from '../../redux/actions/GroupsActions';
 
 class AddExpenseModal extends React.Component {
@@ -26,6 +25,7 @@ class AddExpenseModal extends React.Component {
       user: this.props.user,
       amount: '',
       errorMessage: '',
+      successMessage: '',
       group: this.props.group,
     };
   }
@@ -60,22 +60,19 @@ class AddExpenseModal extends React.Component {
       description: this.state.description,
       amount: this.state.amount,
     };
-    await axios.post(`${constants.baseUrl}/api/transactions`, data).then((response) => {
-      if (response.status === 200) {
-        if (response.data.message === 'Expenses added successfully!') {
-          this.setState({
-            show: false,
-          });
-          this.props.getGroups(this.props.user._id);
-          this.handleClose();
-        } else {
-          this.setState({
-            show: true,
-            errorMessage: response.data.message,
-          });
-        }
-      }
-    });
+    await this.props.addExpense(data);
+    if (this.props.alert.message === 'Expenses added successfully!') {
+      this.setState({
+        show: false,
+        successMessage: this.props.alert.message,
+      });
+      this.props.getTransaction(this.props.user._id);
+    } else {
+      this.setState({
+        show: true,
+        errorMessage: this.props.alert.message,
+      });
+    }
   };
 
   render() {
@@ -93,6 +90,11 @@ class AddExpenseModal extends React.Component {
         <Modal.Body>
           {this.state.errorMessage !== '' && (
             <div className="alert alert-danger" role="alert">
+              {this.state.errorMessage}
+            </div>
+          )}
+          {this.state.successMessage !== '' && (
+            <div className="alert alert-success" role="alert">
               {this.state.errorMessage}
             </div>
           )}
@@ -161,19 +163,23 @@ AddExpenseModal.propTypes = {
   show: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
   group: PropTypes.objectOf.isRequired,
-  getGroups: PropTypes.func.isRequired,
+  addExpense: PropTypes.func.isRequired,
+  alert: PropTypes.objectOf.isRequired,
+  getTransaction: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     transactions: state.transactions,
+    alert: state.alert,
   };
 };
 
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
   getGroups: groupsActions.getGroups,
+  addExpense: transactionActions.addExpense,
 };
 
 export default connect(mapStatetoProps, mapDispatchToProps)(AddExpenseModal);

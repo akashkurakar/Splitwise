@@ -6,9 +6,11 @@ import { connect } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import UserHeader from '../Dashboard/UserHeader';
 import * as userActions from '../../redux/actions/UserAction';
 import constants from '../../constants/Constants';
-import UserHeader from '../Dashboard/UserHeader';
 
 class UserProfile extends React.Component {
   constructor(props) {
@@ -90,12 +92,18 @@ class UserProfile extends React.Component {
 
   emailFieldChangeHandler = (e) => {
     e.preventDefault();
-    document.getElementById('email').disabled = !document.getElementById('name').disabled;
+    if (!document.getElementById('email').disabled === true && this.state.email === '') {
+      return;
+    }
+    document.getElementById('email').disabled = !document.getElementById('email').disabled;
   };
 
   phoneFieldChangeHandler = (e) => {
     e.preventDefault();
-    document.getElementById('phone').disabled = !document.getElementById('name').disabled;
+    if (!document.getElementById('phone').disabled === true && this.state.phone === '') {
+      return;
+    }
+    document.getElementById('phone').disabled = !document.getElementById('phone').disabled;
   };
 
   handleCurrencySelect = (e) => {
@@ -119,7 +127,7 @@ class UserProfile extends React.Component {
   handleSave = (e) => {
     e.preventDefault();
     const data = {
-      id: this.props.user.id,
+      id: this.props.user._id,
       name: this.state.name,
       email: this.state.email,
       phone: this.state.phone,
@@ -149,7 +157,7 @@ class UserProfile extends React.Component {
               </div>
             ) : null}
             <div className="row">
-              <div className="col-3">
+              <Col md={3}>
                 <form onSubmit={this.onFileUpload} encType="multipart/form-data">
                   {this.state.image_path !== '' ? (
                     <img
@@ -177,131 +185,131 @@ class UserProfile extends React.Component {
                     />
                   </div>
                 </form>
-              </div>
-
-              <div className="col-3">
-                <form className="form-signin" onSubmit={this.handleLogin}>
-                  <div className="form-label-group">
-                    <Typography>Your Name</Typography>
-                    <input
-                      type="name"
-                      id="name"
-                      data-testid="name"
-                      onChange={this.nameChangeHandler}
-                      className="form-control"
-                      placeholder="Name"
-                      value={this.state.name}
-                      required
-                      disabled
-                    />
-                    <a href="/#" onClick={this.nameFieldChangeHandler}>
-                      Edit
-                    </a>
-                  </div>
-                  <div className="form-label-group">
-                    <Typography>Your email</Typography>
-                    <input
-                      type="email"
-                      id="email"
-                      data-testid="email"
-                      onChange={this.emailChangeHandler}
-                      className="form-control"
-                      placeholder="Email"
-                      value={this.state.email}
-                      required
-                      disabled
-                    />
-                    <a href="/#" onClick={this.emailFieldChangeHandler}>
-                      Edit
-                    </a>
-                  </div>
-                  <div className="form-label-group">
-                    <Typography>Your phone number</Typography>
-                    <input
-                      type="phone"
-                      id="phone"
-                      data-testid="phone"
-                      onChange={this.phoneChangeHandler}
-                      className="form-control"
-                      placeholder="phone"
-                      value={this.state.phone}
-                      disabled
-                      pattern="^(\([0-9]{3}\)|[0-9]{3}-)[0-9]{3}-[0-9]{4}$"
-                      required
-                    />
-                    <a href="/#" onClick={this.phoneFieldChangeHandler}>
-                      Edit
-                    </a>
-                  </div>
-                </form>
-              </div>
-              <div className="col-3">
-                <form className="form-signin" onSubmit={this.handleSave}>
-                  <div className="form-label-group">
-                    <Typography>Your Default Currency</Typography>
-                    <div>
-                      <medium className="text-muted">(For new expenses)</medium>
+              </Col>
+              <form className="form-signin" onSubmit={this.handleSave}>
+                <Row>
+                  <Col md={6}>
+                    <div className="form-label-group">
+                      <Typography>Your Name</Typography>
+                      <input
+                        type="name"
+                        id="name"
+                        data-testid="name"
+                        onChange={this.nameChangeHandler}
+                        className="form-control"
+                        placeholder="Name"
+                        value={this.state.name}
+                        required
+                        disabled
+                      />
+                      <a href="/#" onClick={this.nameFieldChangeHandler}>
+                        Edit
+                      </a>
                     </div>
+                    <div className="form-label-group">
+                      <Typography>Your email</Typography>
+                      <input
+                        type="email"
+                        id="email"
+                        data-testid="email"
+                        onChange={this.emailChangeHandler}
+                        className="form-control"
+                        placeholder="Email"
+                        value={this.state.email}
+                        required
+                        disabled
+                      />
+                      <a href="/#" onClick={this.emailFieldChangeHandler}>
+                        Edit
+                      </a>
+                    </div>
+                    <div className="form-label-group">
+                      <Typography>Your phone number</Typography>
+                      <input
+                        type="phone"
+                        id="phone"
+                        data-testid="phone"
+                        onChange={this.phoneChangeHandler}
+                        className="form-control"
+                        placeholder="123-456-7890"
+                        value={this.state.phone}
+                        disabled
+                        pattern="^(\([0-9]{3}\)|[0-9]{3}-)[0-9]{3}-[0-9]{4}$"
+                        maxLength="12"
+                        required
+                      />
+                      <a href="/#" onClick={this.phoneFieldChangeHandler}>
+                        Edit
+                      </a>
+                    </div>
+                  </Col>
+                  <Col md={6}>
+                    <div className="form-label-group">
+                      <Typography>Your Default Currency</Typography>
+                      <div>
+                        <medium className="text-muted">(For new expenses)</medium>
+                      </div>
 
-                    <select
-                      onChange={this.handleCurrencySelect}
-                      value={this.state.default_currency}
-                      className="form-control"
-                      data-testid="currency"
-                      id="sel2"
-                    >
-                      <option value="USD">USD</option>
-                      <option value="KWD">KWD</option>
-                      <option value="BHD">BHD</option>
-                      <option value="GBP">GBP</option>
-                      <option value="CAD">CAD</option>
-                    </select>
-                  </div>
-                  <div className="form-label-group">
-                    <Typography>Your timezone</Typography>
-                    <select
-                      onChange={this.handleTimezoneSelect}
-                      value={this.state.timezone}
-                      className="form-control"
-                      data-testid="timezone"
-                      id="sel2"
-                    >
-                      <option value="GMT">(GMT)GMT(Greenwich Mean Time)</option>
-                      <option value="IST">(IST)GMT+5:30(Indian Standard Time)</option>
-                      <option value="PST">(PST)GMT-8:00(Pacific Standard Time)</option>
-                      <option value="MST">(MST)GMT-7:00(Mountain Standard Time)</option>
-                      <option value="EST">(EST)GMT-5:00(Eastern Standard Time)</option>
-                    </select>
-                  </div>
-                  <div className="form-label-group">
-                    <Typography>Language</Typography>
-                    <select
-                      onChange={this.handleLanguageSelect}
-                      value={this.state.lang}
-                      className="form-control"
-                      data-testid="language"
-                      id="sel2"
-                    >
-                      <option value="ENGLISH">English</option>
-                      <option value="CHINESE">Mandarin Chinese</option>
-                      <option value="HINDI">Hindi</option>
-                      <option value="SPANISH">Spanish</option>
-                      <option value="FRENCH"> French</option>
-                    </select>
-                  </div>
-                  <div>
-                    <button
-                      className="btn btn-lg btn-success btn-block text-uppercase"
-                      type="submit"
-                      id="location"
-                      data-testid="save"
-                      style={{ float: 'left', 'background-color': '#ff652f' }}
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </div>
+                      <select
+                        onChange={this.handleCurrencySelect}
+                        value={this.state.default_currency}
+                        className="form-control"
+                        data-testid="currency"
+                        id="sel2"
+                      >
+                        <option value="USD">USD</option>
+                        <option value="KWD">KWD</option>
+                        <option value="BHD">BHD</option>
+                        <option value="GBP">GBP</option>
+                        <option value="CAD">CAD</option>
+                      </select>
+                    </div>
+                    <div className="form-label-group">
+                      <Typography>Your timezone</Typography>
+                      <select
+                        onChange={this.handleTimezoneSelect}
+                        value={this.state.timezone}
+                        className="form-control"
+                        data-testid="timezone"
+                        id="sel2"
+                      >
+                        <option value="GMT">(GMT)GMT(Greenwich Mean Time)</option>
+                        <option value="IST">(IST)GMT+5:30(Indian Standard Time)</option>
+                        <option value="PST">(PST)GMT-8:00(Pacific Standard Time)</option>
+                        <option value="MST">(MST)GMT-7:00(Mountain Standard Time)</option>
+                        <option value="EST">(EST)GMT-5:00(Eastern Standard Time)</option>
+                      </select>
+                    </div>
+                    <div className="form-label-group">
+                      <Typography>Language</Typography>
+                      <select
+                        onChange={this.handleLanguageSelect}
+                        value={this.state.lang}
+                        className="form-control"
+                        data-testid="language"
+                        id="sel2"
+                      >
+                        <option value="ENGLISH">English</option>
+                        <option value="CHINESE">Mandarin Chinese</option>
+                        <option value="HINDI">Hindi</option>
+                        <option value="SPANISH">Spanish</option>
+                        <option value="FRENCH"> French</option>
+                      </select>
+                    </div>
+                    <div>
+                      <button
+                        className="btn btn-lg btn-success btn-block text-uppercase"
+                        type="submit"
+                        id="location"
+                        data-testid="save"
+                        style={{ float: 'left', 'background-color': '#ff652f' }}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </Col>
+                </Row>
+              </form>
             </div>
           </div>
         </div>

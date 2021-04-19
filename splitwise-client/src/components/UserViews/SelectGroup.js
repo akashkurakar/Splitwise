@@ -1,3 +1,4 @@
+/* eslint-disable react/no-did-update-set-state */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable no-undef */
@@ -38,9 +39,11 @@ class SelectGroup extends React.Component {
       errorMessage: '',
       showEdit: false,
       showEditExpense: false,
-      selectedGroup: '',
       transaction: [],
+      selectedGroup: '',
       panel: '',
+      transactions: '',
+      // showAddModal: false,
       // comments: '',
     };
   }
@@ -50,16 +53,23 @@ class SelectGroup extends React.Component {
     this.props.getGroupTransaction(this.props.selectedGroup._id);
     this.setState({
       selectedGroup: this.props.selectedGroup,
+      transactions: this.props.transactions,
     });
   };
+
+  componentDidUpdate() {
+    if (JSON.stringify(this.props.transactions) !== JSON.stringify(this.state.transactions)) {
+      this.setState({ transactions: this.props.transactions });
+    }
+  }
 
   nameFieldChangeHandler = (e) => {
     e.preventDefault();
     document.getElementById('name').disabled = !document.getElementById('name').disabled;
   };
 
-  handleModal = (modal) => {
-    this.setState({ show: modal });
+  handleModal = () => {
+    this.setState({ show: !this.state.show });
     this.props.getGroupTransaction(this.props.selectedGroup._id);
     this.props.getBalances(this.props.selectedGroup._id);
   };
@@ -74,8 +84,10 @@ class SelectGroup extends React.Component {
   handleEditExpenseModal = (index) => {
     // eslint-disable-next-line react/no-access-state-in-setstate
     const modal = !this.state.showEditExpense;
-    this.setState({ showEditExpense: modal, transaction: index.trans });
-    //  this.getTransaction();
+    this.setState({
+      showEditExpense: modal,
+      transaction: index.trans,
+    });
   };
 
   handleChange = (r) => () => {
@@ -166,8 +178,8 @@ class SelectGroup extends React.Component {
                       {this.state.errorMessage}
                     </div>
                   ) : null}
-                  {this.props.transactions.length > 0 ? (
-                    this.props.transactions.map((r) => (
+                  {this.state.transactions.length > 0 ? (
+                    this.state.transactions.map((r) => (
                       <Accordion
                         expanded={this.state.panel === r.trans.transaction_id}
                         id={r.trans.transaction_id}
@@ -281,10 +293,12 @@ class SelectGroup extends React.Component {
                             </Row>
                             <Divider />
                             <Row>
-                              <CommentBox
-                                transaction={r.trans.transaction_id}
-                                group={this.props.selectedGroup._id}
-                              />
+                              {this.state.panel === r.trans.transaction_id && (
+                                <CommentBox
+                                  transaction={r.trans.transaction_id}
+                                  group={this.props.selectedGroup._id}
+                                />
+                              )}
                             </Row>
                           </Container>
                         </AccordionDetails>
@@ -325,13 +339,13 @@ class SelectGroup extends React.Component {
                             })}
                           secondary={
                             trans.total > 0 ? (
-                              <Typography style={{ color: 'green' }}>
-                                gets back{' '}
+                              <Typography style={{ color: 'red' }}>
+                                owes{' '}
                                 {converter(this.props.user.default_currency).format(trans.total)}
                               </Typography>
                             ) : (
-                              <Typography style={{ color: 'red' }}>
-                                owes{' '}
+                              <Typography style={{ color: 'green' }}>
+                                gets back{' '}
                                 {converter(this.props.user.default_currency).format(
                                   0 - trans.total
                                 )}

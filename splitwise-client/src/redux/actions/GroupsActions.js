@@ -1,7 +1,10 @@
+/* eslint-disable no-undef */
 /* eslint-disable arrow-body-style */
 import axios from 'axios';
 import constants from '../../constants/Constants';
 import history from '../../history';
+//  import history from '../../history';
+import { logoutUser } from './UserAction';
 
 export const updateGroup = (group) => ({ type: 'USER_GROUP_UPDATE', group });
 
@@ -11,13 +14,20 @@ export const getGroups = (userId) => async (dispatch) => {
   axios
     .get(`${constants.baseUrl}/api/groups/?id=${userId}`)
     .then((res) => {
-      dispatch({ type: 'USER_GROUPS_SUCCESS', payload: res.data.data });
-      dispatch({ type: 'ALERT_CLEAR', message: '' });
+      if (res.status === 200) {
+        if (res.data.message === 'Group updated successfully!') {
+          dispatch({ type: 'USER_GROUPS_SUCCESS', payload: res.data.data });
+          dispatch({ type: 'ALERT_SUCCESS', message: res.data.message });
+        } else {
+          dispatch({ type: 'USER_GROUPS_SUCCESS', payload: res.data.data });
+          dispatch({ type: 'ALERT_ERROR', message: res.data.message });
+        }
+      }
     })
     .catch((error) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: error });
-      dispatch({ type: 'LOGOUT_USER', message: error });
-      history.push('./login');
     });
 };
 
@@ -37,6 +47,8 @@ export const createGroups = (data) => async (dispatch) => {
       }
     })
     .catch((res) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: res });
     });
 };
@@ -76,6 +88,8 @@ export const editGroup = (data) => async (dispatch) => {
       }
     })
     .catch((res) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: res });
     });
 };
@@ -89,7 +103,39 @@ export const getBalances = (grpId) => async (dispatch) => {
       dispatch({ type: 'GROUP_BALANCE_UPDATE', payload: response.data });
       dispatch({ type: 'ALERT_CLEAR', message: '' });
     } else {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: response.data.message });
+    }
+  });
+};
+
+export const leaveGroup = (data) => async (dispatch) => {
+  await axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
+    if (response.status === 200) {
+      const res = response.data;
+      if (res.message === 'Group Left Successfully') {
+        dispatch({ type: 'ALERT_SUCCESS', message: res.message });
+        dispatch(getGroups(data.user));
+      } else {
+        dispatch({ type: 'ALERT_ERROR', message: res.message });
+      }
+    } else {
+      dispatch(logoutUser());
+      history.push('/login');
+      dispatch({ type: 'ALERT_ERROR', message: response });
+    }
+  });
+};
+export const approveRequest = (data) => async (dispatch) => {
+  await axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
+    if (response.status === 200) {
+      dispatch({ type: 'ALERT_SUCCESS', message: response.message });
+      dispatch(getGroups(data.user));
+    } else {
+      dispatch(logoutUser());
+      history.push('/login');
+      dispatch({ type: 'ALERT_ERROR', message: response.message });
     }
   });
 };

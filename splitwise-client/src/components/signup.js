@@ -72,9 +72,9 @@ class SignUp extends React.Component {
             </Col>
             <Col md={6}>
               {' '}
-              {this.props.alert.message && this.props.alert.message.response !== undefined ? (
+              {this.props.alert.message && this.props.alert.message !== undefined ? (
                 <div className="alert alert-danger" role="alert">
-                  {this.props.alert.message.response.data.message}
+                  {this.props.alert.message}
                 </div>
               ) : null}
               <div id="card-body" className="card-body">

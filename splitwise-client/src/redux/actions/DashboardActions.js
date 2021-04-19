@@ -1,6 +1,9 @@
+/* eslint-disable no-undef */
 /* eslint-disable arrow-body-style */
 import axios from 'axios';
 import constants from '../../constants/Constants';
+import history from '../../history';
+import { logoutUser } from './UserAction';
 
 const getTotalBalances = (user) => async (dispatch) => {
   axios.defaults.headers.common.authorization = localStorage.getItem('token');
@@ -13,6 +16,8 @@ const getTotalBalances = (user) => async (dispatch) => {
       // history.push('/dashboard');
     })
     .catch((error) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: error });
     });
 };

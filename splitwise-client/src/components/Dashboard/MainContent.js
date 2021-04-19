@@ -18,8 +18,9 @@ import * as userActions from '../../redux/actions/UserAction';
 import * as transactionAction from '../../redux/actions/TransactionAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
 import UserProfile from '../UserViews/UserProfile';
-import UserHeader from './UserHeader';
 import constants from '../../constants/Constants';
+import UserHeader from './UserHeader';
+import * as activityAction from '../../redux/actions/ActivitiyAction';
 
 class MainContent extends React.Component {
   constructor(props) {
@@ -32,7 +33,7 @@ class MainContent extends React.Component {
     };
     this.props.getGroups(this.props.user._id);
     this.handleCallback = this.handleCallback.bind(this);
-    if (this.props.user._id === undefined) {
+    if (localStorage.getItem('token') === null) {
       window.location.href = './login';
     }
   }
@@ -41,6 +42,7 @@ class MainContent extends React.Component {
     this.props.getTransaction(this.props.user._id);
     this.props.getGroups(this.props.user._id);
     this.getBalances(this.props.user._id);
+    this.props.getRecentActivitiesByUser(this.props.user._id, 1, 10);
   }
 
   handleCallback = (childData) => {
@@ -118,6 +120,7 @@ MainContent.propTypes = {
   user: PropTypes.objectOf.isRequired,
   getTransaction: PropTypes.func.isRequired,
   getBalances: PropTypes.func.isRequired,
+  getRecentActivitiesByUser: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -133,6 +136,7 @@ const mapDispatchToProps = {
   getTransaction: transactionAction.getGroupTransaction,
   getBalances: groupsActions.getBalances,
   getUserBalances: transactionAction.getUserBalances,
+  getRecentActivitiesByUser: activityAction.getRecentActivitiesByUser,
 };
 
 export default connect(mapStatetoProps, mapDispatchToProps)(MainContent);

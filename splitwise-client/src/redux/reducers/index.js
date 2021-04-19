@@ -7,8 +7,9 @@ import user from './Userreducer';
 import dashboard from './DashboardReducers';
 import groups from './GroupReducer';
 import transactions from './TransactionReducer';
-import notifications from './NotificationReducer';
 import users from './UsersReducers';
+import comments from './CommentReducer';
+import activities from './ActivityReducer';
 
 const rootreducer = combineReducers({
   user,
@@ -16,8 +17,9 @@ const rootreducer = combineReducers({
   alert,
   groups,
   transactions,
-  notifications,
   users,
+  comments,
+  activities,
 });
 
 const initialState = rootreducer({}, {});

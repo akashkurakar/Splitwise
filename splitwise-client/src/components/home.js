@@ -4,15 +4,15 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Typography } from '@material-ui/core';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import Header from '../header';
 
 class Home extends React.Component {
   constructor(props) {
     super(props);
-    if (this.props.user._id !== undefined) {
-      window.location.href = './dashboard';
+    if (localStorage.getItem('token') !== null) {
+      <Redirect to="/dashboard" />;
     }
   }
 
@@ -69,10 +69,6 @@ class Home extends React.Component {
     );
   }
 }
-
-Home.propTypes = {
-  user: PropTypes.objectOf.isRequired,
-};
 
 const mapStatetoProps = (state) => {
   return {

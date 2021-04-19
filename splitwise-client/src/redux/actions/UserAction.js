@@ -19,29 +19,36 @@ export function userProfileSuccess(user) {
 export function clearAlert() {
   return { type: 'ALERT_CLEAR', message: '' };
 }
-export function logoutUser(user, dispatch) {
-  clearAlert(user);
+export const logoutUser = () => async (dispatch) => {
+  clearAlert();
   storage.removeItem('persist:root');
+  dispatch({ type: 'ALERT_CLEAR', message: '' });
   dispatch({ type: 'LOGOUT_USER', data: '' });
-  axios.defaults.headers.common.authorization = localStorage.removeItem('token');
+  localStorage.removeItem('token');
   history.push('/login');
-}
+};
 
 export const loginUser = (user) => async (dispatch) => {
   await axios
     .post(`${constants.baseUrl}/api/login`, user)
     .then((res) => {
-      const decoded = jwt_decode(res.data.token.split(' ')[1], { payload: true });
-      if (decoded) {
-        localStorage.setItem('token', res.data.token);
-        dispatch({ type: 'LOGIN_USER_SUCCESS', payload: res.data.data });
-        history.push('/dashboard');
-        dispatch({ type: 'ALERT_CLEAR', message: '' });
-      } else {
+      try {
+        const decoded = jwt_decode(res.data.token.split(' ')[1], { payload: true });
+        if (decoded) {
+          localStorage.setItem('token', res.data.token);
+          dispatch({ type: 'LOGIN_USER_SUCCESS', payload: res.data.data });
+          history.push('/dashboard');
+          dispatch({ type: 'ALERT_CLEAR', message: '' });
+        } else {
+          dispatch({ type: 'ALERT_ERROR', message: res.data.message });
+        }
+      } catch (e) {
         dispatch({ type: 'ALERT_ERROR', message: res.data.message });
       }
     })
     .catch((error) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: error });
     });
 };
@@ -56,6 +63,8 @@ export const getUser = (id) => async (dispatch) => {
       dispatch({ type: 'ALERT_CLEAR', message: '' });
     })
     .catch((error) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: error });
     });
 };
@@ -66,11 +75,21 @@ export const signupUser = (user) => async (dispatch) => {
   await axios
     .put(`${constants.baseUrl}/api/signup`, user)
     .then((res) => {
-      dispatch({ type: 'SIGN_UP_SUCCESS', payload: res.data.data });
-      dispatch({ type: 'ALERT_CLEAR', message: res.data.message });
-      history.push('/dashboard');
+      try {
+        const decoded = jwt_decode(res.data.token.split(' ')[1], { payload: true });
+        if (decoded) {
+          localStorage.setItem('token', res.data.token);
+          dispatch({ type: 'SIGN_UP_SUCCESS', payload: res.data.data });
+          dispatch({ type: 'ALERT_CLEAR', message: res.data.message });
+          history.push('/dashboard');
+        }
+      } catch (e) {
+        dispatch({ type: 'ALERT_ERROR', message: res.data.message });
+      }
     })
     .catch((error) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'ALERT_ERROR', message: error });
     });
 };
@@ -85,6 +104,8 @@ export const updateUserProfile = (user) => async (dispatch) => {
       dispatch({ type: 'ALERT_SUCCESS', message: res.data.message });
     })
     .catch((error) => {
+      dispatch(logoutUser());
+      history.push('/login');
       dispatch({ type: 'USER_PROFILE_FAILURE', payload: error });
       throw error;
     });

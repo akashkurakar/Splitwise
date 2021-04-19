@@ -17,13 +17,9 @@ class UserHeader extends React.Component {
     };
   }
 
-  handleLogout = (e) => {
-    e.preventDefault();
-    cookie.remove('cookie');
-  };
-
   handleLogout = () => {
     this.props.logoutUser(this.state.user);
+    cookie.remove('cookie');
   };
 
   handleProfilelick = (e) => {

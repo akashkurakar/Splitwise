@@ -88,15 +88,6 @@ class EditGroupModal extends React.Component {
   handleEmail = (e, id) => {
     this.getEmail(e.target.value, id);
   };
-  /*
-  handleName = (e) => {
-    this.getNames(e.target.value);
-  };
-
-  handleEmail = (e) => {
-    this.getEmail(e.target.value,index);
-  };
-*/
 
   addName = (name, index) => {
     this.setState((prevState) => {
@@ -105,7 +96,7 @@ class EditGroupModal extends React.Component {
       if (rows[index] === undefined) {
         rows.push({ name, email: '' });
       } else {
-        rows[index].name = name;
+        rows[index].name = name.target.value;
         rows[index].email = email;
       }
       return {
@@ -146,19 +137,6 @@ class EditGroupModal extends React.Component {
     this.setState({ members: rows });
   };
 
-  /* getUser = () => {
-    axios.defaults.withCredentials = true;
-    axios.get(`${constants.baseUrl}/api/users/`).then((response) => {
-      if (response.status === 200) {
-        const { data } = response;
-        this.setState({
-          users: data,
-        });
-      } else {
-        // error
-      }
-    });
-  }; */
   removeMember = (e, index) => {
     this.setState((prevState) => {
       const rows = prevState.members;
@@ -183,41 +161,6 @@ class EditGroupModal extends React.Component {
       grp_id: this.state.grp_id,
     };
     this.props.editGroup(data);
-    /* axios.defaults.withCredentials = true;
-    axios
-      .put(`${constants.baseUrl}/api/group/`, data)
-      .then((response) => {
-        if (response.status === 200) {
-          if (response.data === 'Group updated successfully!') {
-            this.props.getGroups(this.props.user.id);
-            this.setState({
-              errorMessage: response.data,
-              members: [
-                { name: '', email: '' },
-                { name: '', email: '' },
-                { name: '', email: '' },
-                { name: '', email: '' },
-              ],
-            });
-            // window.location.href = './dashboard';
-          } else {
-            this.setState({
-              errorMessage: response.data,
-              members: [
-                { name: '', email: '' },
-                { name: '', email: '' },
-                { name: '', email: '' },
-                { name: '', email: '' },
-              ],
-            });
-          }
-        }
-      })
-      .catch((res) => {
-        this.setState({
-          errorMessage: res.message,
-        });
-      }); */
   };
 
   getNames = (name) => {
@@ -284,11 +227,16 @@ class EditGroupModal extends React.Component {
                   {' '}
                   <form className="form-signin" onSubmit={this.handleEditGroup}>
                     <div className="form-label-group">
-                      {this.state.errorMessage !== '' && (
+                      {this.props.alert.message && this.props.alert.message !== undefined ? (
+                        <div className="alert alert-danger" role="alert">
+                          {this.props.alert.message}
+                        </div>
+                      ) : null}
+                      {this.state.errorMessage ? (
                         <div className="alert alert-danger" role="alert">
                           {this.state.errorMessage}
                         </div>
-                      )}
+                      ) : null}
                       <Typography className="header-label">Group name shall be</Typography>
                       <input
                         type="text"
@@ -422,6 +370,7 @@ EditGroupModal.propTypes = {
   group: PropTypes.objectOf.isRequired,
   users: PropTypes.objectOf.isRequired,
   editGroup: PropTypes.func.isRequired,
+  alert: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {

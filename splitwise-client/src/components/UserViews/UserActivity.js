@@ -1,3 +1,4 @@
+/* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable arrow-body-style */
 import React from 'react';
@@ -9,7 +10,6 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Row from 'react-bootstrap/Row';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Col from 'react-bootstrap/Col';
@@ -19,31 +19,72 @@ import FormControl from '@material-ui/core/FormControl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import TablePagination from '@material-ui/core/TablePagination';
 import { convertDate } from '../../constants/CommonService';
-import constants from '../../constants/Constants';
+import * as activityActions from '../../redux/actions/ActivitiyAction';
 
 class UserActivity extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activities: {},
+      activities: this.props.activities.data,
       selectedGroup: '',
       selectedSort: 'First',
       page: 0,
       rows: 10,
-      totalRows: 100,
+      totalRows: this.props.activities.totalRows,
     };
   }
 
-  componentDidMount() {
-    this.getRecentActivitiesByUser();
-  }
+  componentDidMount = async () => {
+    await this.props
+      .getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows)
+      .then(() => {
+        this.setState({
+          activities: this.props.activities.data,
+          totalRows: this.props.activities.totalRows,
+        });
+      });
+  };
 
-  handleSelectedGrp = (e) => {
-    const grpid = this.props.groups.filter((grp) => grp.grp_name === e.target.value)[0].grp_id;
+  componentDidUpdate = () => {
+    if (JSON.stringify(this.state.activities) !== JSON.stringify(this.props.activities.data)) {
+      this.setState({
+        activities: this.props.activities.data,
+        totalRows: this.props.activities.totalRows,
+      });
+    }
+  };
+
+  handleSelectedGrp = async (e) => {
     this.setState({
       selectedGroup: e.target.value,
     });
-    this.getRecentActivitiesByGroup(grpid);
+    if (e.target.value === 'ALL') {
+      await this.props
+        .getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows)
+        .then(() => {
+          this.setState({
+            activities: this.props.activities.data,
+            totalRows: this.props.activities.totalRows,
+          });
+        });
+    } else {
+      this.setState({
+        page: 0,
+      });
+      await this.props
+        .getRecentActivitiesByGroup(
+          this.props.user._id,
+          e.target.value,
+          this.state.page,
+          this.state.rows
+        )
+        .then(() => {
+          this.setState({
+            activities: this.props.activities.data,
+            totalRows: this.props.activities.totalRows,
+          });
+        });
+    }
   };
 
   handleSelectedSort = (e) => {
@@ -56,81 +97,63 @@ class UserActivity extends React.Component {
     }
   };
 
-  getRecentActivitiesByUser = () => {
-    const userId = this.props.user._id;
-    axios.defaults.withCredentials = true;
-    axios
-      .get(
-        `${constants.baseUrl}/api/activities?user=${userId}&page=${this.state.page}&rows=${this.state.rows}`
-      )
-      .then((response) => {
-        if (response.status === 200) {
-          const { data } = response.data;
-          this.setState({
-            activities: data,
-            totalRows: response.data.totalRows,
-          });
-        } else {
-          // error
-        }
-      });
-  };
-
-  getRecentActivitiesByGroup = (groupId) => {
-    axios.defaults.withCredentials = true;
-    axios
-      .get(
-        `${constants.baseUrl}/api/activities/group/?userid=${this.props.user.id}&&groupid=${groupId}&page=${this.state.page}&rows=${this.state.rows}`
-      )
-      .then((response) => {
-        if (response.status === 200) {
-          const { data } = response.data;
-          this.setState({
-            activities: data,
-            totalRows: response.data.totalRows,
-          });
-        } else {
-          // error
-        }
-      });
-  };
-
-  getRecentActivitiesLastByUser = () => {
-    const userId = this.props.user._id;
-    axios.defaults.withCredentials = true;
-    axios.get(`${constants.baseUrl}/api/activities/?user=${userId}`).then((response) => {
-      if (response.status === 200) {
-        const { data } = response.data;
-        this.setState({
-          activities: data,
-          totalRows: response.data.totalRows,
-        });
-      } else {
-        // error
-      }
-    });
-  };
-
   handleChangePage = (e, newpage) => {
     e.preventDefault();
     if (this.selectedGroup === undefined) {
-      this.setState({ page: newpage }, () => {
-        this.getRecentActivitiesByUser();
+      this.setState({ page: newpage }, async () => {
+        await this.props
+          .getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows)
+          .then(() => {
+            this.setState({
+              activities: this.props.activities.data,
+              totalRows: this.props.activities.totalRows,
+            });
+          });
       });
     } else {
-      this.setState({ page: newpage }, () => {
-        this.getRecentActivitiesByGroup();
+      this.setState({ page: newpage }, async () => {
+        this.getRecentActivitiesByGroup(
+          this.props.user._id,
+          this.selectedGroup,
+          this.state.page,
+          this.state.rows
+        ).then(() => {
+          this.setState({
+            activities: this.props.activities.data,
+            totalRows: this.props.activities.totalRows,
+          });
+        });
       });
     }
   };
 
   handleChangeRowsPerPage = (event) => {
-    this.setState({ rows: parseInt(event.target.value, 10), page: 0 });
-    if (this.selectedGroup === undefined) {
-      this.getRecentActivitiesByUser();
-    } else {
-      this.getRecentActivitiesByGroup();
-    }
+    this.setState({ rows: parseInt(event.target.value, 10), page: 0 }, async () => {
+      if (this.selectedGroup === undefined) {
+        await this.props.getRecentActivitiesByUser().then(() => {
+          if (this.props.alert.message === '')
+            this.setState({
+              activities: this.props.activities.data,
+              totalRows: this.props.activities.totalRows,
+            });
+        });
+      } else {
+        await this.props
+          .getRecentActivitiesByGroup(
+            this.props.user._id,
+            this.selectedGroup,
+            this.state.page,
+            this.state.rows
+          )
+          .then(() => {
+            if (this.props.alert.message === '')
+              this.setState({
+                activities: this.props.activities.data,
+                totalRows: this.props.activities.totalRows,
+              });
+          });
+      }
+    });
   };
 
   render() {
@@ -166,7 +189,7 @@ class UserActivity extends React.Component {
                           {this.props.groups
                             .filter((entry) => entry.status === 'active')
                             .map((grp) => (
-                              <option value={grp.grp_name}>{grp.grp_name}</option>
+                              <option value={grp._id}>{grp.grp_name}</option>
                             ))}
                         </NativeSelect>
                       </FormControl>
@@ -240,12 +263,22 @@ class UserActivity extends React.Component {
 UserActivity.propTypes = {
   user: PropTypes.objectOf.isRequired,
   groups: PropTypes.objectOf.isRequired,
+  getRecentActivitiesByUser: PropTypes.func.isRequired,
+  getRecentActivitiesByGroup: PropTypes.func.isRequired,
+  alert: PropTypes.objectOf.isRequired,
+  activities: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     groups: state.groups.groups,
+    alert: state.alert,
+    activities: state.activities,
   };
 };
-export default connect(mapStatetoProps)(UserActivity);
+const mapDispatchToProps = {
+  getRecentActivitiesByUser: activityActions.getRecentActivitiesByUser,
+  getRecentActivitiesByGroup: activityActions.getRecentActivitiesByGroup,
+};
+export default connect(mapStatetoProps, mapDispatchToProps)(UserActivity);

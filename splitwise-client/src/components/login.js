@@ -83,9 +83,9 @@ class Login extends React.Component {
                 WELCOME TO SPLITWISE
               </h5>
               <form data-testid="alert" className="form-signin" onSubmit={this.handleLogin}>
-                {this.props.alert.message && this.props.alert.message.response !== undefined ? (
+                {this.props.alert.message && this.props.alert.message !== undefined ? (
                   <div className="alert alert-danger" role="alert">
-                    {this.props.alert.message.response.data.message}
+                    {this.props.alert.message}
                   </div>
                 ) : null}
 

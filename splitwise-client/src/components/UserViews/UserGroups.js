@@ -1,3 +1,4 @@
+/* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable arrow-body-style */
 import React from 'react';
@@ -17,9 +18,7 @@ import { Redirect } from 'react-router-dom';
 import axios from 'axios';
 import { Typography } from '@material-ui/core';
 import SelectGroup from './SelectGroup';
-import * as userNotifications from '../../redux/actions/NotificationAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
-import constants from '../../constants/Constants';
 
 class UserGroups extends React.Component {
   constructor(props) {
@@ -35,26 +34,25 @@ class UserGroups extends React.Component {
 
   componentDidMount() {}
 
+  componentDidUpdate() {
+    if (JSON.stringify(this.props.groups) !== JSON.stringify(this.state.groups)) {
+      this.setState({ groups: this.props.groups });
+    }
+  }
+
   handleLeaveGroup = async (grpid) => {
     axios.defaults.withCredentials = true;
     const data = {
       user: this.props.user._id,
       group: grpid,
     };
-    await axios.post(`${constants.baseUrl}/api/group/leave`, data).then((response) => {
-      if (response.status === 200) {
-        const res = response.data;
-        if (res.message === 'Group Left Successfully') {
-          this.props.getNotifications(this.props.user._id);
-          this.props.getGroups(this.props.user._id);
-        } else {
-          this.setState({
-            errorMessage: res.message,
-          });
-        }
-      } else {
-        // error
+    await this.props.leaveGroup(data, () => {
+      if (this.props.alert.message !== 'Group Left Successfully') {
+        this.setState({
+          errorMessage: this.props.alert.message,
+        });
       }
+      this.props.getGroups(this.props.user._id);
     });
   };
 
@@ -69,13 +67,8 @@ class UserGroups extends React.Component {
       grp_id: grpId,
       participant_id: participantId,
     };
-    await axios.post(`${constants.baseUrl}/api/groups/request`, data).then((response) => {
-      if (response.status === 200) {
-        this.props.getNotifications(this.props.user._id);
-        this.props.getGroups(this.props.user._id);
-      } else {
-        // error
-      }
+    await this.props.approveRequest(data, () => {
+      this.props.getGroups(this.props.user._id);
     });
   };
 
@@ -218,12 +211,14 @@ class UserGroups extends React.Component {
   }
 }
 UserGroups.propTypes = {
-  getNotifications: PropTypes.func.isRequired,
-  getGroups: PropTypes.func.isRequired,
   groups: PropTypes.objectOf.isRequired,
   selectedGroup: PropTypes.func.isRequired,
   user: PropTypes.string.isRequired,
   users: PropTypes.objectOf.isRequired,
+  alert: PropTypes.objectOf.isRequired,
+  leaveGroup: PropTypes.func.isRequired,
+  approveRequest: PropTypes.func.isRequired,
+  getGroups: PropTypes.func.isRequired,
 };
 const mapStatetoProps = (state) => {
   return {
@@ -235,7 +230,8 @@ const mapStatetoProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  getNotifications: userNotifications.getNotifications,
   getGroups: groupsActions.getGroups,
+  leaveGroup: groupsActions.leaveGroup,
+  approveRequest: groupsActions.approveRequest,
 };
 export default connect(mapStatetoProps, mapDispatchToProps)(UserGroups);

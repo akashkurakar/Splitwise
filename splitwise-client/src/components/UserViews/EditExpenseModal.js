@@ -12,7 +12,6 @@ import TextField from '@material-ui/core/TextField';
 import PropTypes from 'prop-types';
 import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
-import constants from '../../constants/Constants';
 import * as groupsActions from '../../redux/actions/GroupsActions';
 
 class EditExpenseModal extends React.Component {
@@ -52,7 +51,15 @@ class EditExpenseModal extends React.Component {
       bill_amt: this.state.amount,
       tran_name: this.state.description,
     };
-    await axios.post(`${constants.baseUrl}/api/transactions/update`, data).then((response) => {
+    await this.props.editExpense(data, this.props.selectedGroup).then(() => {
+      if (this.props.alert.message === 'Transaction Updated') {
+        this.setState({
+          show: false,
+        });
+        this.props.showEditExpense(false);
+      }
+    });
+    /* await axios.post(`${constants.baseUrl}/api/transactions/update`, data).then((response) => {
       if (response.status === 200) {
         if (response.data.message === 'Expenses added successfully!') {
           this.setState({
@@ -67,7 +74,7 @@ class EditExpenseModal extends React.Component {
           });
         }
       }
-    });
+    }); */
   };
 
   render() {
@@ -143,20 +150,24 @@ class EditExpenseModal extends React.Component {
 EditExpenseModal.propTypes = {
   showEditExpense: PropTypes.func.isRequired,
   user: PropTypes.objectOf.isRequired,
-  getGroups: PropTypes.func.isRequired,
   transaction: PropTypes.objectOf.isRequired,
+  alert: PropTypes.string.isRequired,
+  editExpense: PropTypes.func.isRequired,
+  selectedGroup: PropTypes.string.isRequired,
 };
 
 const mapStatetoProps = (state) => {
   return {
     user: state.user,
     transactions: state.transactions,
+    alert: state.alert,
   };
 };
 
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
   getGroups: groupsActions.getGroups,
+  editExpense: transactionActions.editExpense,
 };
 
 export default connect(mapStatetoProps, mapDispatchToProps)(EditExpenseModal);

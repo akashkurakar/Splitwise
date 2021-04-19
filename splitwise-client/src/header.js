@@ -3,8 +3,6 @@ import React from 'react';
 import Container from '@material-ui/core/Container';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { connect } from 'react-redux';
 import * as userActions from './redux/actions/UserAction';
 
@@ -54,35 +52,7 @@ class Header extends React.Component {
                   </a>
                 </div>
               </form>
-            ) : (
-              <form className="form-inline my-2 my-lg-0">
-                <div>
-                  <Link to="/dashboard" style={{ color: 'white' }}>
-                    <Typography onClick={this.handleHome}>Home</Typography>
-                  </Link>
-                </div>
-
-                <div>
-                  <Dropdown>
-                    <Dropdown.Toggle className="header-user" id="dropdown-basic">
-                      {this.props.user.name}
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                      <Link to="/userprofile" style={{ color: 'white' }}>
-                        <Typography> My Profile</Typography>
-                      </Link>
-                      <Link to="/creategroup" style={{ color: 'white' }}>
-                        <Typography> Create Group</Typography>
-                      </Link>
-                      <Link to="/login" style={{ color: 'white' }}>
-                        <Typography onClick={this.handleLogout}>Logout</Typography>
-                      </Link>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
-              </form>
-            )}
+            ) : null}
           </nav>
         </Container>
       </header>

@@ -11,7 +11,6 @@ import Row from 'react-bootstrap/Row';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import AddExpenseModal from './AddExpenseModal';
-import * as userNotifications from '../../redux/actions/NotificationAction';
 import * as groupsActions from '../../redux/actions/GroupsActions';
 import constants from '../../constants/Constants';
 
@@ -129,7 +128,6 @@ Notifications.propTypes = {
 };
 
 const mapDispatchToProps = {
-  getNotifications: userNotifications.getNotifications,
   getGroups: groupsActions.getGroups,
 };
 const mapStatetoProps = (state) => {

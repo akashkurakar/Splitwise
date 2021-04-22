@@ -18,7 +18,7 @@ async function handle_request(msg, callback) {
           message: "User Already Present ! Please Sign in!",
           success: false,
         };
-        callback("Error", json);
+        return callback("Error", json);
       } else {
         const payload = { user_id: user._id };
         const token = jwt.sign(payload, secret, {
@@ -29,12 +29,12 @@ async function handle_request(msg, callback) {
           data: user,
           message: "Use signup successfull",
         };
-        callback("Success", json);
+        return callback("Success", json);
       }
     });
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went wrong!");
+    return callback("Error", "Something went wrong!");
   }
 }
 exports.handle_request = handle_request;

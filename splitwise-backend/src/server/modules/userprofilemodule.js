@@ -4,24 +4,24 @@ async function handle_request(msg, callback) {
   console.log(`Handle req: ${msg}`);
   try {
     const usr = new User(msg);
-    await usr.save((err, user) => {
+    await usr.update({ _id: msg._id, upsert: true }, (err, user) => {
       if (err) {
         var json = {
           data: [],
           message: "Email with same ID already present!",
           success: false,
         };
-        callback("Error", json);
+        return callback("Error", json);
       }
       var json = {
         data: user,
-        message: "Use signup successfull",
+        message: "User update successfull",
       };
-      callback("Success", json);
+      return callback("Success", json);
     });
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went wrong");
+    return callback("Error", "Something went wrong");
   }
 }
 

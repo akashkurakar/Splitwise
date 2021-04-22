@@ -22,6 +22,8 @@ class PaymentModal extends React.Component {
     this.state = {
       show: this.props.show,
       users: [],
+      user: this.props.users.filter((user) => user._id === this.props.data[0].user)[0].name,
+      amount: this.props.data[0].amount,
     };
     this.handleAddExpenses = this.handleAddExpenses.bind(this);
   }
@@ -36,14 +38,8 @@ class PaymentModal extends React.Component {
 
   getUsers = () => {
     const userData = [];
-    this.props.transactions.forEach((element) => {
-      const paidUser = this.props.users.filter((user) => user.id === element.paid_by)[0].name;
-      const owedUser = this.props.users.filter((user) => user.id === element.owed_name)[0].name;
-      if (!userData.includes(owedUser) && element.owed_name !== this.props.user.id) {
-        userData.push(owedUser);
-      } else if (!userData.includes(paidUser) && element.paid_by !== this.props.user.id) {
-        userData.push(paidUser);
-      }
+    this.props.data.forEach((element) => {
+      userData.push(this.props.users.filter((usr) => usr._id === element.user)[0].name);
     });
     this.setState({
       users: userData,
@@ -51,21 +47,27 @@ class PaymentModal extends React.Component {
   };
 
   handleUser = (e) => {
-    this.props.data.user = e;
+    const payeeId = this.props.users.filter((usr) => usr.name === e)[0]._id;
+    const payeeName = this.props.users.filter((usr) => usr.name === e)[0].name;
+
+    this.setState({
+      user: payeeName,
+      amount: this.props.data.filter((usr) => usr.user === payeeId)[0].amount,
+    });
   };
 
-  handleAddExpenses = (e) => {
+  handleAddExpenses = async (e) => {
     e.preventDefault();
     const data = {
       user1: this.props.user._id,
-      user2: this.props.data.user,
+      user2: this.props.users.filter((usr) => usr.name === this.state.user)[0]._id,
     };
 
-    this.props.settleExpense(data).then(() => {
-      if (this.props.alert.message === 'Transaction Settled') {
-        this.handleClose(false);
-      }
-    });
+    await this.props.settleExpense(data);
+    if (this.props.alert.message === 'Transaction Settled') {
+      this.handleClose(false);
+    }
+
     /* axios.defaults.withCredentials = true;
     axios.post(`${constants.baseUrl}/api/transactions/settle`, data).then((response) => {
       if (response.status === 200) {
@@ -103,9 +105,7 @@ class PaymentModal extends React.Component {
                   freeSolo
                   id="free-solo-2-demo"
                   disableClearable
-                  value={
-                    this.props.users.filter((user) => user._id === this.props.data.user)[0].name
-                  }
+                  value={this.state.user}
                   options={this.state.users.map((option) => option)}
                   onChange={(event, value) => this.handleUser(value)}
                   renderInput={(params) => (
@@ -126,9 +126,7 @@ class PaymentModal extends React.Component {
                 <TextField
                   id="standard-basic"
                   value={converter(this.props.user.default_currency).format(
-                    this.props.data.amount < 0
-                      ? this.props.data.amount * -1
-                      : this.props.data.amount
+                    Math.abs(this.state.amount)
                   )}
                 />
               </Col>

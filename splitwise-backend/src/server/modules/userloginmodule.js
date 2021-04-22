@@ -16,7 +16,7 @@ async function handle_request(msg, callback) {
           message: "User Not Present ! Please Sign Up!",
           success: false,
         };
-        callback("Error", json);
+        return callback("Error", json);
       } else {
         if (bcrypt.compareSync(msg.password, response[0].password)) {
           const payload = { user_id: response[0]._id };
@@ -28,7 +28,7 @@ async function handle_request(msg, callback) {
             data: response[0],
             message: "Login Successfull",
           };
-          callback(null, json);
+          return callback(null, json);
           //res.status(200).json(token);
         } else {
           var json = {

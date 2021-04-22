@@ -46,14 +46,14 @@ class UserGroups extends React.Component {
       user: this.props.user._id,
       group: grpid,
     };
-    await this.props.leaveGroup(data, () => {
-      if (this.props.alert.message !== 'Group Left Successfully') {
-        this.setState({
-          errorMessage: this.props.alert.message,
-        });
-      }
+    await this.props.leaveGroup(data);
+    if (this.props.alert.message !== 'Group Left Successfully') {
+      this.setState({
+        errorMessage: this.props.alert.message,
+      });
+    } else {
       this.props.getGroups(this.props.user._id);
-    });
+    }
   };
 
   handleApprove = (grpId, participantId) => {

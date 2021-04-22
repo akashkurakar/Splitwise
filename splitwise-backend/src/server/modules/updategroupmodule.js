@@ -47,7 +47,7 @@ async function handle_request(msg, callback) {
           message: "Not able to update group!",
           success: false,
         };
-        callback(null, json);
+        return callback(null, json);
       }
       var json = {
         data: response,

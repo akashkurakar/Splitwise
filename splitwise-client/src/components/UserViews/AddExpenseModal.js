@@ -66,6 +66,7 @@ class AddExpenseModal extends React.Component {
         show: false,
         successMessage: this.props.alert.message,
       });
+      this.props.show(false);
       this.props.getTransaction(this.props.user._id);
     } else {
       this.setState({

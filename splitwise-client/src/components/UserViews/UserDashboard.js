@@ -48,14 +48,67 @@ class DashboardMiddle extends React.Component {
   };
 
   handleModal = (e) => {
+    const paydata = [];
+    if (this.state.owedList.length > 0) {
+      if (this.state.oweList.length > 0) {
+        const amt = this.state.oweList.filter((data) => data._id === this.state.owedList[0]._id)[0]
+          .total_amt;
+        this.state.owedList.forEach((element) => {
+          paydata.push({
+            user: element._id,
+            amount: parseFloat(amt - element.total_amt),
+          });
+        });
+
+        this.setState({ show: e });
+      } else {
+        this.state.owedList.forEach((element) => {
+          paydata.push({
+            user: element._id,
+            amount: parseFloat(element.total_amt),
+          });
+        });
+      }
+      this.setState({ modalData: paydata });
+      this.setState({ show: e });
+    } else if (this.state.oweList.length > 0) {
+      if (this.state.owedList.length > 0) {
+        const amt = this.state.owedList.filter((data) => data._id === this.state.oweList[0]._id)[0]
+          .total_amt;
+        this.state.owedList.forEach((element) => {
+          paydata.push({
+            user: element._id,
+            amount: element.total_amt + amt,
+          });
+        });
+        this.setState({ show: e });
+      } else {
+        this.state.oweList.forEach((element) => {
+          paydata.push({
+            user: element._id,
+            amount: element.total_amt,
+          });
+        });
+        this.setState({ show: e });
+      }
+      this.setState({ modalData: paydata });
+    } else {
+      this.setState({ show: false });
+    }
+    this.getTotalTransactionByUser();
+    this.getBalances();
+    this.props.getTransaction(this.props.user.id);
+  };
+
+  /* handleModal = (e) => {
     if (this.state.owedList.length > 0) {
       if (this.state.oweList.length > 0) {
         const amt = this.state.oweList.filter(
-          (data) => data.owed_name === this.state.owedList[0].paid_by
+          (data) => data.owed_name === this.state.owedList[0]._id
         )[0].total_amt;
         this.setState({
           modalData: {
-            user: this.state.owedList[0].paid_by,
+            user: this.state.owedList[0]._id,
             amount: parseFloat(amt - this.state.owedList[0].total_amt),
           },
         });
@@ -63,7 +116,7 @@ class DashboardMiddle extends React.Component {
       } else {
         this.setState({
           modalData: {
-            user: this.state.owedList[0].paid_by,
+            user: this.state.owedList[0]._id,
             amount: parseFloat(this.state.owedList[0].total_amt),
           },
         });
@@ -72,11 +125,11 @@ class DashboardMiddle extends React.Component {
     } else if (this.state.oweList.length > 0) {
       if (this.state.owedList.length > 0) {
         const amt = this.state.owedList.filter(
-          (data) => data.paid_by === this.state.oweList[0].owed_name
+          (data) => data.paid_by === this.state.oweList[0]._id
         )[0].total_amt;
         this.setState({
           modalData: {
-            user: this.state.oweList[0].owed_name,
+            user: this.state.oweList[0]._id,
             amount: this.state.oweList[0].total_amt + amt,
           },
         });
@@ -84,7 +137,7 @@ class DashboardMiddle extends React.Component {
       } else {
         this.setState({
           modalData: {
-            user: this.state.oweList[0].owed_name,
+            user: this.state.oweList[0]._id,
             amount: this.state.oweList[0].total_amt,
           },
         });
@@ -96,7 +149,7 @@ class DashboardMiddle extends React.Component {
     this.getTotalTransactionByUser();
     this.getBalances(this.props.user._id);
     this.props.getTransaction(this.props.user._id);
-  };
+  }; */
 
   handleClose = () => {
     this.setState({ show: false });
@@ -128,19 +181,6 @@ class DashboardMiddle extends React.Component {
           owedList: data.owedList,
           oweList: data.oweList,
         });
-
-        // let oweTotal = 0;
-        // this.state.oweList.forEach((element) => {
-        //  oweTotal += element.total_amt;
-        // });
-        // let owedTotal = 0;
-        // this.state.owedList.forEach((element) => {
-        //  owedTotal += element.total_amt;
-        // });
-        // this.setState({
-        // oweTotal,
-        // owedTotal,
-        // });
       } else {
         // error
       }
@@ -224,7 +264,7 @@ class DashboardMiddle extends React.Component {
                               <Avatar
                                 alt={`Avatar n°${trans.user}`}
                                 src={this.props.users
-                                  .filter((us) => us._id === trans.paid_by)
+                                  .filter((us) => us._id === trans._id)
                                   .map((r1) => {
                                     return r1.image_path;
                                   })}
@@ -233,7 +273,7 @@ class DashboardMiddle extends React.Component {
                             <ListItemText
                               id="item1"
                               primary={this.props.users
-                                .filter((us) => us._id === trans.owed_name)
+                                .filter((us) => us._id === trans._id)
                                 .map((r) => {
                                   return r.name;
                                 })}
@@ -245,32 +285,30 @@ class DashboardMiddle extends React.Component {
                                       parseFloat(trans.total_amt)
                                     )}
                                   </Typography>
-                                  {this.state.oweList.length > 0
-                                    ? this.state.oweList
-                                        .filter((grp) => grp.paid_by === trans.paid_by)
-                                        .map((trans1) => (
-                                          <li>
-                                            <div>
-                                              <Typography
-                                                component="span"
-                                                variant="body2"
-                                                className="header-label"
-                                              >
-                                                You owe&nbsp;
-                                                {converter(this.props.user.default_currency).format(
-                                                  trans1.total_amt
-                                                )}
-                                                &nbsp; for '{' '}
-                                                {
-                                                  this.props.groups.filter(
-                                                    (grp) => grp._id === trans1.grp_id
-                                                  )[0].grp_name
-                                                }
-                                                '
-                                              </Typography>
-                                            </div>
-                                          </li>
-                                        ))
+                                  {trans.grps.length > 0
+                                    ? trans.grps.map((trans1) => (
+                                        <li>
+                                          <div>
+                                            <Typography
+                                              component="span"
+                                              variant="body2"
+                                              className="header-label"
+                                            >
+                                              You owe&nbsp;
+                                              {converter(this.props.user.default_currency).format(
+                                                trans1.total
+                                              )}
+                                              &nbsp; for '{' '}
+                                              {
+                                                this.props.groups.filter(
+                                                  (grp) => grp._id === trans1.grp
+                                                )[0].grp_name
+                                              }
+                                              '
+                                            </Typography>
+                                          </div>
+                                        </li>
+                                      ))
                                     : null}
                                 </ul>
                               }
@@ -304,7 +342,7 @@ class DashboardMiddle extends React.Component {
                               <Avatar
                                 alt={`Avatar n°${user.user}`}
                                 src={this.props.users
-                                  .filter((us) => us._id === user.paid_by)
+                                  .filter((us) => us._id === user._id)
                                   .map((r1) => {
                                     return r1.image_path;
                                   })}
@@ -313,7 +351,7 @@ class DashboardMiddle extends React.Component {
                             <ListItemText
                               id="item1"
                               primary={this.props.users
-                                .filter((us) => us._id === user.paid_by)
+                                .filter((us) => us._id === user._id)
                                 .map((r) => {
                                   return r.name;
                                 })}
@@ -325,32 +363,30 @@ class DashboardMiddle extends React.Component {
                                       user.total_amt
                                     )}
                                   </Typography>
-                                  {this.state.owedList.length > 0
-                                    ? this.state.owedList
-                                        .filter((grp) => grp.owed_name === user.owed_name)
-                                        .map((trans1) => (
-                                          <li>
-                                            <div>
-                                              <Typography
-                                                component="span"
-                                                variant="body2"
-                                                className="header-label"
-                                              >
-                                                Owes you &nbsp;
-                                                {converter(this.props.user.default_currency).format(
-                                                  trans1.total_amt
-                                                )}
-                                                &nbsp; for '
-                                                {
-                                                  this.props.groups.filter(
-                                                    (grp) => grp._id === trans1.grp_id
-                                                  )[0].grp_name
-                                                }
-                                                '
-                                              </Typography>
-                                            </div>
-                                          </li>
-                                        ))
+                                  {user.grps.length > 0
+                                    ? user.grps.map((trans1) => (
+                                        <li>
+                                          <div>
+                                            <Typography
+                                              component="span"
+                                              variant="body2"
+                                              className="header-label"
+                                            >
+                                              Owes you &nbsp;
+                                              {converter(this.props.user.default_currency).format(
+                                                trans1.total
+                                              )}
+                                              &nbsp; for '
+                                              {
+                                                this.props.groups.filter(
+                                                  (grp) => grp._id === trans1.grp
+                                                )[0].grp_name
+                                              }
+                                              '
+                                            </Typography>
+                                          </div>
+                                        </li>
+                                      ))
                                     : null}
                                 </ul>
                               }

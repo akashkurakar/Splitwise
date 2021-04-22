@@ -29,7 +29,7 @@ class UserActivity extends React.Component {
       selectedGroup: '',
       selectedSort: 'First',
       page: 0,
-      rows: 10,
+      rows: 2,
       totalRows: this.props.activities.totalRows,
     };
   }
@@ -130,13 +130,15 @@ class UserActivity extends React.Component {
   handleChangeRowsPerPage = (event) => {
     this.setState({ rows: parseInt(event.target.value, 10), page: 0 }, async () => {
       if (this.selectedGroup === undefined) {
-        await this.props.getRecentActivitiesByUser().then(() => {
-          if (this.props.alert.message === '')
-            this.setState({
-              activities: this.props.activities.data,
-              totalRows: this.props.activities.totalRows,
-            });
-        });
+        await this.props
+          .getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows)
+          .then(() => {
+            if (this.props.alert.message === '')
+              this.setState({
+                activities: this.props.activities.data,
+                totalRows: this.props.activities.totalRows,
+              });
+          });
       } else {
         await this.props
           .getRecentActivitiesByGroup(
@@ -255,6 +257,7 @@ class UserActivity extends React.Component {
           onChangePage={this.handleChangePage}
           rowsPerPage={this.state.rows}
           onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          rowsPerPageOptions={[2, 5, 10]}
         />
       </>
     );

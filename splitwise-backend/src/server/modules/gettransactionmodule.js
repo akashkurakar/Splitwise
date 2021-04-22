@@ -37,18 +37,18 @@ async function handle_request(msg, callback) {
             message: "Something went wrong",
             success: false,
           };
-          callback("Error", json);
+          return callback("Error", json);
         }
         var json = {
           data: response,
           message: "",
         };
-        callback(null, json);
+        return callback(null, json);
       });
     //}
   } catch (e) {
     console.log(e);
-    res.sendStatus(500);
+    return callback("Error", e);
   }
 }
 exports.handle_request = handle_request;

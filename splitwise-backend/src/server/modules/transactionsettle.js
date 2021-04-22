@@ -19,8 +19,7 @@ async function handle_request(msg, callback) {
       },
       {
         $set: { status: "settled" },
-      },
-      { upsert: true }
+      }
     ).then((response, err) => {
       if (err) {
         var json = {
@@ -28,7 +27,7 @@ async function handle_request(msg, callback) {
           message: "Error while settling transactions!",
           success: false,
         };
-        callback(null, json);
+        return callback(null, json);
       }
 
       const activities = [];
@@ -36,7 +35,7 @@ async function handle_request(msg, callback) {
       activity.activity_name = "msg settled";
       activity.grp_id = "";
       activity.user_name = msg.user1;
-      activity.description = `${msg.user2} settled up woth you`;
+      activity.description = `${msg.user2} settled up with you`;
       activities.push(activity);
       activity.activity_name = "msg settled";
       activity.grp_id = "";
@@ -48,11 +47,11 @@ async function handle_request(msg, callback) {
         data: response,
         message: "Transaction Settled",
       };
-      callback(null, json);
+      return callback(null, json);
     });
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went wrong");
+    return callback("Error", "Something went wrong");
   }
 }
 exports.handle_request = handle_request;

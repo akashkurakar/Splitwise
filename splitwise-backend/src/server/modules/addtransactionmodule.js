@@ -19,10 +19,9 @@ async function handle_request(msg, callback) {
     );
     for (let participant of group.participants) {
       const tran = {};
-      const user = User.findById({ _id: msg.user });
-
+      const user = await User.findById({ _id: msg.user });
+      const activity = new Activity();
       if (participant.user_name.toString() !== msg.user) {
-        const activity = new Activity();
         if (participant.status === "active") {
           activity.activity_name = "msg added";
           activity.grp_id = msg.grpId;
@@ -37,14 +36,15 @@ async function handle_request(msg, callback) {
           tran.status = "PENDING";
           tran.grp_id = msg.grpId;
           newExpense.push(tran);
-        } else {
-          activity.activity_name = "msg added";
-          activity.grp_id = msg.grpId;
-          activity.user_name = msg.user;
-          activity.description = `You paid for ${msg.description} in ${group.grp_name}`;
         }
         activities.push(activity);
         //  group.transactions.push(tran);
+      } else {
+        activity.activity_name = "msg added";
+        activity.grp_id = msg.grpId;
+        activity.user_name = msg.user;
+        activity.description = `You paid for ${msg.description} in ${group.grp_name}`;
+        activities.push(activity);
       }
     }
     if (newExpense.length < 1) {
@@ -52,7 +52,7 @@ async function handle_request(msg, callback) {
         data: [],
         message: "No more than one member active!",
       };
-      callback(null, json);
+      return callback(null, json);
     }
     let groupTransactions = await Transaction.insertMany(newExpense);
     await Activity.insertMany(activities);
@@ -65,19 +65,19 @@ async function handle_request(msg, callback) {
       if (err) {
         var json = {
           data: [],
-          message: "User Already Present ! Please Sign in!",
+          message: "Not able to add transactio at this moment",
         };
-        callback(null, json);
+        return callback(null, json);
       }
       var json = {
         data: response,
         message: "Expenses added successfully!",
       };
-      callback(null, json);
+      return callback(null, json);
     });
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went wrong");
+    return callback("Error", "Something went wrong");
   }
 }
 

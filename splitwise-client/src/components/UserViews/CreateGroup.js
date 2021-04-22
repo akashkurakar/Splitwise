@@ -98,7 +98,11 @@ class CreateGroup extends React.Component {
   addName = (name, index) => {
     this.setState((prevState) => {
       const rows = prevState.members;
-      const { email } = this.state.users.filter((user) => user.name === name.target.value)[0];
+      let email = '';
+      const data = prevState.users.filter((user) => user.name === name.target.value);
+      if (data.length > 0) {
+        email = data[0].email;
+      }
       if (rows[index] === undefined) {
         rows.push({ name, email: '' });
       } else {

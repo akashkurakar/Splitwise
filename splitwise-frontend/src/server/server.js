@@ -15,10 +15,10 @@ const port = 3001;
 
 // const connect = require("./kafka-services/kafka-connect");
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "http://54.198.17.233:3000", credentials: true }));
 
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Origin", "http://54.198.17.233:3000");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -53,10 +53,11 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error"));
 db.once("open", function () {
   console.log("Connected to Mongo");
+  app.listen(port, console.log("Ser ver is listening on port :", port));
+  app.emit("app_started");
 });
 
 //connect();
-app.listen(port, console.log("Ser ver is listening on port :", port));
 
 /* client.connect((err) => {
   const collection = client.db("main");
@@ -65,3 +66,5 @@ app.listen(port, console.log("Ser ver is listening on port :", port));
   console.log("MongoDb Connected");
   //client.close();
 }); */
+
+module.exports = app;

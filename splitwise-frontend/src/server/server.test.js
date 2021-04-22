@@ -1,18 +1,23 @@
 const assert = require("assert");
 const http = require("http");
 const https = require("https");
-const app = require("./server");
 const bodyParser = require("body-parser");
 var request = require("request");
 var Agent = require("https");
 const { url } = require("inspector");
-
+const app = require("./server");
 var jsonParser = bodyParser.json();
+before((done) => {
+  app.on("app_started", function () {
+    done();
+  });
+});
 
 describe("get users API call", () => {
   it("should return LIST OF USERS", async () => {
     await get("http://127.0.0.1:3001/api/users").then((response) => {
-      assert.deepStrictEqual(response.length > 0, true);
+      //console.log(response.data);
+      assert.deepStrictEqual(response.data.length > 0, true);
     });
   });
 });
@@ -24,8 +29,7 @@ describe("POST users API call", () => {
       password: "akash",
     };
     await post(data).then((response) => {
-      console.log();
-      assert.deepStrictEqual(response.message, "Login Successfull");
+      assert.deepStrictEqual(response.message, "Invalid Credentials");
     });
   });
 });
@@ -33,21 +37,25 @@ describe("POST users API call", () => {
 describe("PUT -Update user profile call", () => {
   it("should update user profile", async () => {
     const data = {
-      id: 21,
-      name: "Aditya",
-      username: null,
-      email: "aditya@gmail.com",
-      password: "$2b$10$CMW8YBvCpEBmlCh1YnTJ/e1b4lTJtBceRIPGBNzZJp.PEaNpzKLCW",
-      phone: "null",
-      default_currency: "CAD",
-      image_path:
-        "https://splitwise-bucket.s3.amazonaws.com/8B7FB326-154E-429A-BE19-DDF36953F913.jpeg",
-      lang: "ENGLISH",
-      timezone: "null",
+      default_currency: "USD",
+      language: "ENGLISH",
+      timezone: "GMT",
+      _id: "607af0bd44d0fd076dfc4aae",
+      name: "Karan Shelke",
+      email: "karan@gmail.com",
+      password: "$2b$10$qm.Lie6AeAXHWlnbsZuOxOsUuFMT0gyWhA1UfOotUEXwrXpo9w2aG",
+      createdAt: "2021-04-17T14:29:17.185Z",
+      updatedAt: "2021-04-17T14:29:17.185Z",
+      __v: 0,
     };
-    await put("/api/user/update", data).then((response) => {
-      console.log();
-      assert.deepStrictEqual(response.message, "Update Successfull");
+    await put("/api/user/update", data).then((response, err) => {
+      if (err) {
+        console.log(err);
+      }
+      assert.deepStrictEqual(
+        response.message,
+        "Email with same ID already present!"
+      );
     });
   });
 });
@@ -55,6 +63,7 @@ describe("PUT -Update user profile call", () => {
 describe("GET users balances API call", () => {
   it("should return balances of user", async () => {
     await get("http://127.0.0.1:3001/api/balances/?user=3").then((response) => {
+      console.log("Balances------" + response);
       assert.deepStrictEqual(response.data !== "", true);
     });
   });
@@ -67,7 +76,7 @@ describe("POST -Settle balances between users", () => {
       user2: 21,
     };
     await put("/api/transactions/settle", data).then((response) => {
-      assert.deepStrictEqual(response, "Transaction Settled");
+      assert.deepStrictEqual(response.message, "Transaction Settled");
     });
   });
 });
@@ -80,6 +89,8 @@ const post = async (data) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      authorization:
+        "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjA3YWVmM2FmODY2ZTcwNzNkMWI5YTliIiwiaWF0IjoxNjE5MDYyMDAyLCJleHAiOjE2MjAwNzAwMDJ9.f9gOQdNfqM7IbmGptKhwkOCjmrW-wZWHdEW1UO008eA",
     },
   };
   return new Promise((resolve, reject) => {
@@ -107,6 +118,8 @@ const put = async (url, data) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      authorization:
+        "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjA3YWVmM2FmODY2ZTcwNzNkMWI5YTliIiwiaWF0IjoxNjE5MDYyMDAyLCJleHAiOjE2MjAwNzAwMDJ9.f9gOQdNfqM7IbmGptKhwkOCjmrW-wZWHdEW1UO008eA",
     },
   };
   return new Promise((resolve, reject) => {

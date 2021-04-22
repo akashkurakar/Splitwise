@@ -86,13 +86,17 @@ class EditGroupModal extends React.Component {
   };
 
   handleEmail = (e, id) => {
-    this.getEmail(e.target.value, id);
+    this.getEmails(e.target.value, id);
   };
 
   addName = (name, index) => {
     this.setState((prevState) => {
       const rows = prevState.members;
-      const email = this.state.users.filter((user) => user.name === name.target.value)[0].email;
+      let email = '';
+      const data = prevState.users.filter((user) => user.name === name.target.value);
+      if (data.length > 0) {
+        email = data[0].email;
+      }
       if (rows[index] === undefined) {
         rows.push({ name, email: '' });
       } else {
@@ -166,6 +170,20 @@ class EditGroupModal extends React.Component {
   getNames = (name) => {
     axios.defaults.withCredentials = true;
     axios.get(`${constants.baseUrl}/api/users/?name=${name}`).then((response) => {
+      if (response.status === 200) {
+        const res = response.data.data;
+        this.setState({
+          users: res,
+        });
+      } else {
+        // error
+      }
+    });
+  };
+
+  getEmails = (name) => {
+    axios.defaults.withCredentials = true;
+    axios.get(`${constants.baseUrl}/api/users/?email=${name}`).then((response) => {
       if (response.status === 200) {
         const res = response.data.data;
         this.setState({
@@ -320,7 +338,7 @@ class EditGroupModal extends React.Component {
                                       type: 'search',
                                       pattern: '[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,}$',
                                     }}
-                                    onChange={(event) => this.addEmail(event, index)}
+                                    onBlur={(event) => this.addEmail(event, index)}
                                     type="email"
                                   />
                                 )}

@@ -4,11 +4,13 @@ import { connect } from 'react-redux';
 import AssistantPhotoIcon from '@material-ui/icons/AssistantPhoto';
 import { Typography } from '@material-ui/core';
 import ListOutlinedIcon from '@material-ui/icons/ListOutlined';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 // import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import NotificationImportantIcon from '@material-ui/icons/NotificationImportant';
 import PropTypes from 'prop-types';
+
 import photo from '../../static/images/avatar/download.png';
 
 class LeftSideBar extends React.Component {
@@ -169,7 +171,7 @@ class LeftSideBar extends React.Component {
               ? this.props.groups.map((p) =>
                   p.participants
                     .filter((r) => r.user_name === this.props.user._id && r.status === 'active')
-                    .map((r) => (
+                    .map(() => (
                       <li>
                         <div
                           className="card-body"
@@ -177,23 +179,11 @@ class LeftSideBar extends React.Component {
                           value={p.grp_name}
                         >
                           <Typography onClick={() => this.handleGroupClick(p.grp_name)}>
-                            {p.image_path !== '' ? (
-                              <img
-                                src={r.image_path}
-                                width="20"
-                                height="20"
-                                className="img-fluid"
-                                alt=""
-                              />
-                            ) : (
-                              <img
-                                width="20"
-                                height="20"
-                                className="img-fluid"
-                                alt=""
-                                src="https://assets.splitwise.com/assets/core/logo-square-65a6124237868b1d2ce2f5db2ab0b7c777e2348b797626816400534116ae22d7.svg"
-                              />
-                            )}
+                            <LocalOfferIcon
+                              type="disable"
+                              style={{ color: '#bfbfbf' }}
+                              fontSize="small"
+                            />
                             &nbsp;
                             {p.grp_name}
                           </Typography>

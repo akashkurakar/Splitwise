@@ -127,15 +127,14 @@ class UserProfile extends React.Component {
   handleSave = (e) => {
     e.preventDefault();
     const data = {
-      id: this.props.user._id,
+      _id: this.props.user._id,
       name: this.state.name,
       email: this.state.email,
       phone: this.state.phone,
       default_currency: this.state.default_currency,
-      lang: this.state.lang,
+      language: this.state.lang,
       timezone: this.state.timezone,
       image_path: this.state.image_path,
-      username: this.props.user.username,
     };
     this.props.updateUserProfile(data);
   };

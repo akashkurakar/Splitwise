@@ -33,17 +33,17 @@ async function handle_request(msg, callback) {
         data: [],
         message: "No Groups for you!",
       };
-      callback(null, json);
+      return callback(null, json);
     } else {
       var json = {
         data: result,
         message: "",
       };
-      callback(null, json);
+      return callback(null, json);
     }
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went wrong");
+    return callback("Error", "Something went wrong");
   }
 }
 

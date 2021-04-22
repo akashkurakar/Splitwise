@@ -58,10 +58,10 @@ async function handle_request(msg, callback) {
       }
       data.push({ user: participant.user_name, total: sum });
     }
-    callback(null, data);
+    return callback(null, data);
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went werong");
+    return callback("Error", "Something went werong");
   }
 }
 exports.handle_request = handle_request;

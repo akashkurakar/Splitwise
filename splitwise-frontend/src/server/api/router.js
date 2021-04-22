@@ -161,7 +161,7 @@ router.get(
 
 router.put("/uploadfile/", upload, (req, res) => {
   const params = {
-    Bucket: "splitwise-bucket",
+    Bucket: "splitwise-demo",
     Key: `${req.file.originalname}`,
     Body: req.file.buffer,
   };

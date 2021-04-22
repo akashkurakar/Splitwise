@@ -19,7 +19,7 @@ async function handle_request(msg, callback) {
           message: "You can not leave the group before clearing dues",
           success: false,
         };
-        callback(null, json);
+        return callback(null, json);
       }
     }
     let updatedParticipant = group.participants.filter(
@@ -37,17 +37,17 @@ async function handle_request(msg, callback) {
           message: "Not able to add participant!",
           success: false,
         };
-        callback(null, json);
+        return callback(null, json);
       }
       var json = {
         data: response,
         message: "Group Left Successfully",
       };
-      callback(null, json);
+      return callback(null, json);
     });
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went wrong");
+    return callback("Error", "Something went wrong");
   }
 }
 exports.handle_request = handle_request;

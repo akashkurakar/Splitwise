@@ -134,7 +134,7 @@ const mapDispatchToProps = {
   getGroups: groupsActions.getGroups,
   getGroupTransaction: transactionAction.getGroupTransaction,
   getTransaction: transactionAction.getGroupTransaction,
-  getBalances: groupsActions.getBalances,
+  getBalances: transactionAction.getBalances,
   getUserBalances: transactionAction.getUserBalances,
   getRecentActivitiesByUser: activityAction.getRecentActivitiesByUser,
 };

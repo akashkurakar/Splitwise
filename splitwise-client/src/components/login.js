@@ -24,8 +24,6 @@ class Login extends React.Component {
     } */
   }
 
-  componentWillUnmount() {}
-
   emailChangeHandler = (e) => {
     e.preventDefault();
     this.setState({

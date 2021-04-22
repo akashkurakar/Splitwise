@@ -23,6 +23,22 @@ export const getTransaction = (userId) => async (dispatch) => {
     });
 };
 
+export const getBalances = (grpId) => async (dispatch) => {
+  axios.defaults.headers.common.authorization = localStorage.getItem('token');
+  axios.defaults.withCredentials = true;
+  const data = { grp_id: grpId };
+  axios.post(`${constants.baseUrl}/api/transactions/groupbalances/`, data).then((response) => {
+    if (response.status === 200) {
+      dispatch({ type: 'GROUP_BALANCE_UPDATE', payload: response.data });
+      dispatch({ type: 'ALERT_CLEAR', message: '' });
+    } else {
+      dispatch(logoutUser());
+      history.push('/login');
+      dispatch({ type: 'ALERT_ERROR', message: response.data.message });
+    }
+  });
+};
+
 export const getGroupTransaction = (grpId) => async (dispatch) => {
   axios.defaults.headers.common.authorization = localStorage.getItem('token');
 
@@ -67,6 +83,7 @@ export const addExpense = (data) => async (dispatch) => {
         if (response.data.message === 'Expenses added successfully!') {
           dispatch({ type: 'ALERT_SUCCESS', message: response.data.message });
           dispatch(getGroupTransaction(data.grpId));
+          dispatch(getBalances(data.grpId));
         } else {
           dispatch({ type: 'ALERT_ERROR', message: response.data.message });
         }
@@ -103,7 +120,7 @@ export const editExpense = (data, grpId) => async (dispatch) => {
 
 export const settleExpense = (data) => async (dispatch) => {
   axios.defaults.withCredentials = true;
-  axios
+  await axios
     .post(`${constants.baseUrl}/api/transactions/settle`, data)
     .then((response) => {
       if (response.status === 200) {

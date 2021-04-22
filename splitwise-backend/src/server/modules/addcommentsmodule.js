@@ -14,18 +14,18 @@ async function handle_request(msg, callback) {
           data: [],
           message: "Error while adding comment in group !",
         };
-        callback(null, json);
+        return callback(null, json);
       } else {
         var json = {
           data: newGroup,
           message: "Comment added successfully!",
         };
-        callback(null, json);
+        return callback(null, json);
       }
     });
   } catch (e) {
     console.log(e);
-    callback("Error", "Something went wrong");
+    return callback("Error", "Something went wrong");
   }
 }
 exports.handle_request = handle_request;

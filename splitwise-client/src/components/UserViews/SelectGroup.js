@@ -406,7 +406,7 @@ const mapStatetoProps = (state) => {
 };
 const mapDispatchToProps = {
   getGroups: groupsActions.getGroups,
-  getBalances: groupsActions.getBalances,
+  getBalances: transactionsActions.getBalances,
   getGroupTransaction: transactionsActions.getGroupTransaction,
 };
 export default connect(mapStatetoProps, mapDispatchToProps)(SelectGroup);

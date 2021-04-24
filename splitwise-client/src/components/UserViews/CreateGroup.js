@@ -136,6 +136,7 @@ class CreateGroup extends React.Component {
 
   addMember = (e) => {
     e.preventDefault();
+    this.setState({ users: [] });
     this.setState((prevState) => {
       const { members } = prevState;
       members.push({ name: '', email: '' });

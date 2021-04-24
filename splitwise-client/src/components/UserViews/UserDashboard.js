@@ -22,7 +22,7 @@ import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
 import RightSideBar from '../Dashboard/DashboardRightSidebar';
 import * as userListAction from '../../redux/actions/UsersListAction';
-import * as userActions from '../../redux/actions/UserAction';
+// import * as userActions from '../../redux/actions/UserAction';
 import constants from '../../constants/Constants';
 
 class DashboardMiddle extends React.Component {
@@ -44,7 +44,7 @@ class DashboardMiddle extends React.Component {
     this.getBalances(this.props.user._id);
     this.props.getUsers(this.props.user._id);
     this.getTotalTransactionByUser();
-    this.props.getUser(this.props.user._id);
+    // this.props.getUser(this.props.user._id);
   };
 
   handleModal = (e) => {
@@ -99,57 +99,6 @@ class DashboardMiddle extends React.Component {
     this.getBalances();
     this.props.getTransaction(this.props.user.id);
   };
-
-  /* handleModal = (e) => {
-    if (this.state.owedList.length > 0) {
-      if (this.state.oweList.length > 0) {
-        const amt = this.state.oweList.filter(
-          (data) => data.owed_name === this.state.owedList[0]._id
-        )[0].total_amt;
-        this.setState({
-          modalData: {
-            user: this.state.owedList[0]._id,
-            amount: parseFloat(amt - this.state.owedList[0].total_amt),
-          },
-        });
-        this.setState({ show: e });
-      } else {
-        this.setState({
-          modalData: {
-            user: this.state.owedList[0]._id,
-            amount: parseFloat(this.state.owedList[0].total_amt),
-          },
-        });
-      }
-      this.setState({ show: e });
-    } else if (this.state.oweList.length > 0) {
-      if (this.state.owedList.length > 0) {
-        const amt = this.state.owedList.filter(
-          (data) => data.paid_by === this.state.oweList[0]._id
-        )[0].total_amt;
-        this.setState({
-          modalData: {
-            user: this.state.oweList[0]._id,
-            amount: this.state.oweList[0].total_amt + amt,
-          },
-        });
-        this.setState({ show: e });
-      } else {
-        this.setState({
-          modalData: {
-            user: this.state.oweList[0]._id,
-            amount: this.state.oweList[0].total_amt,
-          },
-        });
-        this.setState({ show: e });
-      }
-    } else {
-      this.setState({ show: false });
-    }
-    this.getTotalTransactionByUser();
-    this.getBalances(this.props.user._id);
-    this.props.getTransaction(this.props.user._id);
-  }; */
 
   handleClose = () => {
     this.setState({ show: false });
@@ -220,26 +169,32 @@ class DashboardMiddle extends React.Component {
                         <Col md={4}>
                           <medium className="text-muted">Total Balance</medium>
                           <h6 style={{ color: 'green' }} data-testid="balance">
-                            {converter(this.props.user.default_currency).format(
-                              parseFloat(this.state.balances.balance)
-                            )}
+                            {this.state.balances.balance
+                              ? converter(this.props.user.default_currency).format(
+                                  parseFloat(this.state.balances.balance)
+                                )
+                              : converter(this.props.user.default_currency).format(parseFloat(0))}
                           </h6>
                         </Col>
 
                         <Col md={4}>
                           <medium className="text-muted">You Owe</medium>
                           <h6 style={{ color: 'red' }} data-testid="paidAmount">
-                            {converter(this.props.user.default_currency).format(
-                              this.state.balances.paidAmount
-                            )}
+                            {this.state.balances.paidAmount
+                              ? converter(this.props.user.default_currency).format(
+                                  parseFloat(this.state.balances.paidAmount)
+                                )
+                              : converter(this.props.user.default_currency).format(parseFloat(0))}
                           </h6>
                         </Col>
                         <Col md={4}>
                           <medium className="text-muted">You are Owed</medium>
                           <h6 style={{ color: 'green' }} data-testid="owedAmount">
-                            {converter(this.props.user.default_currency).format(
-                              this.state.balances.owedAmount
-                            )}
+                            {this.state.balances.owedAmount
+                              ? converter(this.props.user.default_currency).format(
+                                  parseFloat(this.state.balances.owedAmount)
+                                )
+                              : converter(this.props.user.default_currency).format(parseFloat(0))}
                           </h6>
                         </Col>
                       </Row>
@@ -428,7 +383,7 @@ DashboardMiddle.propTypes = {
   getTransaction: PropTypes.func.isRequired,
   users: PropTypes.objectOf.isRequired,
   getUsers: PropTypes.func.isRequired,
-  getUser: PropTypes.func.isRequired,
+  // getUser: PropTypes.func.isRequired,
   groups: PropTypes.objectOf.isRequired,
 };
 const mapStatetoProps = (state) => {
@@ -443,7 +398,7 @@ const mapStatetoProps = (state) => {
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
   getUsers: userListAction.getUsers,
-  getUser: userActions.getUser,
+  // getUser: userActions.getUser,
 };
 // Export The Main Component
 export default connect(mapStatetoProps, mapDispatchToProps)(DashboardMiddle);

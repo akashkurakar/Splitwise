@@ -34,16 +34,7 @@ class UserActivity extends React.Component {
     };
   }
 
-  componentDidMount = async () => {
-    await this.props
-      .getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows)
-      .then(() => {
-        this.setState({
-          activities: this.props.activities.data,
-          totalRows: this.props.activities.totalRows,
-        });
-      });
-  };
+  componentDidMount = async () => {};
 
   componentDidUpdate = () => {
     if (JSON.stringify(this.state.activities) !== JSON.stringify(this.props.activities.data)) {

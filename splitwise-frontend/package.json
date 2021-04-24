@@ -26,12 +26,8 @@
     "mongodb": "^3.6.5",
     "mongoose": "^5.12.2",
     "multer": "^1.4.2",
-    "mysql": "^2.18.1",
-    "mysql-model": "0.0.3",
-    "mysql2": "^2.2.5",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "redux": "^4.0.5",
     "request": "^2.88.2",
     "sequelize": "^6.5.0",
     "webpack-cli": "^4.5.0"

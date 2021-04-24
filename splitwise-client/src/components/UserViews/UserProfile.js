@@ -28,7 +28,7 @@ class UserProfile extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getUser(this.props.user.id).then(() => {
+    this.props.getUser(this.props.user._id).then(() => {
       this.setState({
         name: this.props.user.name,
         email: this.props.user.email,

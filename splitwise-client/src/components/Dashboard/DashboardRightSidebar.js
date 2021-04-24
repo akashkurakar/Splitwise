@@ -24,14 +24,22 @@ class DashboardRightSideBar extends React.Component {
             <li className="active">
               <Typography style={{ color: 'gree' }}> You Owe</Typography>
               <Typography style={{ color: 'green' }}>
-                {converter(this.props.user.default_currency).format(this.props.data.paidAmount)}
+                {this.props.data.paidAmount
+                  ? converter(this.props.user.default_currency).format(
+                      parseFloat(this.props.data.paidAmount)
+                    )
+                  : converter(this.props.user.default_currency).format(parseFloat(0))}
               </Typography>
             </li>
             <li className="active">
               <Typography style={{ color: 'red' }}> You are Owed</Typography>
               <Typography style={{ color: 'red' }}>
                 {' '}
-                {converter(this.props.user.default_currency).format(this.props.data.owedAmount)}
+                {this.props.data.owedAmount
+                  ? converter(this.props.user.default_currency).format(
+                      parseFloat(this.props.data.owedAmount)
+                    )
+                  : converter(this.props.user.default_currency).format(parseFloat(0))}
               </Typography>
             </li>
           </ul>

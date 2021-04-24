@@ -70,7 +70,7 @@ router.get("/groups/all", jsonParser, checkAuth, GroupController.getAllGroups);
 router.post(
   "/groups/request",
   jsonParser,
-  checkAuth,
+  // checkAuth,
   GroupController.approveGroupRequest
 );
 

@@ -1,4 +1,4 @@
-var connection = new require("./kafka-services/Connection");
+var connection = new require("./kafka-services/connection");
 //topics files
 
 var userlogin = require("./modules/userloginmodule");

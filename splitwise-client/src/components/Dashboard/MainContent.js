@@ -43,6 +43,7 @@ class MainContent extends React.Component {
     this.props.getGroups(this.props.user._id);
     this.getBalances(this.props.user._id);
     this.props.getRecentActivitiesByUser(this.props.user._id, 1, 10);
+    // this.props.getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows);
   }
 
   handleCallback = (childData) => {

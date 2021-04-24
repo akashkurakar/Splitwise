@@ -44,6 +44,7 @@ class CommentBox extends React.Component {
       transaction_id: this.props.transaction,
     };
     await this.props.addComments(data);
+    this.setState({ comment: '' });
   };
 
   getComments = async () => {
@@ -97,7 +98,7 @@ class CommentBox extends React.Component {
             aria-label="maximum height"
             placeholder=""
             defaultValue=""
-            value={this.state.value}
+            value={this.state.comment}
             onChange={this.handleComment}
           />
           <div>

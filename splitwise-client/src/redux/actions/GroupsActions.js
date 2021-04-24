@@ -20,7 +20,7 @@ export const getGroups = (userId) => async (dispatch) => {
           dispatch({ type: 'ALERT_SUCCESS', message: res.data.message });
         } else {
           dispatch({ type: 'USER_GROUPS_SUCCESS', payload: res.data.data });
-          dispatch({ type: 'ALERT_ERROR', message: res.data.message });
+          dispatch({ type: 'ALERT_CLEAR', message: '' });
         }
       }
     })

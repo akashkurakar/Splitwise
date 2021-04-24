@@ -35,7 +35,8 @@ class CommentBox extends React.Component {
     });
   };
 
-  addComment = async () => {
+  addComment = async (e) => {
+    e.preventDefault();
     axios.defaults.withCredentials = true;
     const data = {
       user: this.props.user._id,
@@ -93,29 +94,31 @@ class CommentBox extends React.Component {
               </ListItem>
             )}
           </List>
-          <TextareaAutosize
-            rowsMax={4}
-            aria-label="maximum height"
-            placeholder=""
-            defaultValue=""
-            value={this.state.comment}
-            onChange={this.handleComment}
-          />
-          <div>
-            <Button
-              variant="primary"
-              style={{
-                'background-color': '#ff652f',
-                'border-color': '#5bc5a7',
-              }}
-              className="btn btn-2 btn-success pull-right text-uppercase"
-              type="submit"
-              id="location"
-              onClick={() => this.addComment()}
-            >
-              POST
-            </Button>
-          </div>
+          <form onSubmit={this.addComment} encType="multipart/form-data">
+            <TextareaAutosize
+              rowsMax={4}
+              aria-label="maximum height"
+              placeholder=""
+              defaultValue=""
+              value={this.state.comment}
+              required
+              onChange={this.handleComment}
+            />
+            <div>
+              <Button
+                variant="primary"
+                style={{
+                  'background-color': '#ff652f',
+                  'border-color': '#5bc5a7',
+                }}
+                className="btn btn-2 btn-success pull-right text-uppercase"
+                type="submit"
+                id="location"
+              >
+                POST
+              </Button>
+            </div>
+          </form>
         </Col>
       </>
     );

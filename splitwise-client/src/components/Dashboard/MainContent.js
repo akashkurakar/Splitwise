@@ -31,6 +31,7 @@ class MainContent extends React.Component {
       transactions: [],
       balances: [],
     };
+    this.props.getGroups(this.props.user._id);
     this.handleCallback = this.handleCallback.bind(this);
     if (localStorage.getItem('token') === null) {
       window.location.href = './login';

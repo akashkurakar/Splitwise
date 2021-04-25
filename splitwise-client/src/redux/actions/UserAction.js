@@ -81,7 +81,7 @@ export const signupUser = (user) => async (dispatch) => {
         const decoded = jwt_decode(res.data.token.split(' ')[1], { payload: true });
         if (decoded) {
           localStorage.setItem('token', res.data.token);
-          dispatch({ type: 'SIGN_UP_SUCCESS', payload: res.data.data });
+          dispatch({ type: 'SIGN_UP_SUCCESS', payload: res.data });
           dispatch({ type: 'ALERT_CLEAR', message: res.data.message });
           history.push('/dashboard');
         }

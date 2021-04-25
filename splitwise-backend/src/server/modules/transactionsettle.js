@@ -29,7 +29,10 @@ async function handle_request(msg, callback) {
         };
         return callback(null, json);
       }
-
+      var json = {
+        data: response,
+        message: "Transaction Settled",
+      };
       const activities = [];
       const activity = new Activity();
       activity.activity_name = "msg settled";
@@ -42,11 +45,8 @@ async function handle_request(msg, callback) {
       activity.user_name = msg.user2;
       activity.description = `${msg.user1} settled up woth you`;
       activities.push(activity);
-      Activity.insertMany(activities);
-      var json = {
-        data: response,
-        message: "Transaction Settled",
-      };
+      await Activity.insertMany(activities);
+      
       return callback(null, json);
     });
   } catch (e) {

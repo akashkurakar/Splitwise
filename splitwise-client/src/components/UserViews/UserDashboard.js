@@ -22,7 +22,7 @@ import { converter } from '../../constants/CommonService';
 import * as transactionActions from '../../redux/actions/TransactionAction';
 import RightSideBar from '../Dashboard/DashboardRightSidebar';
 import * as userListAction from '../../redux/actions/UsersListAction';
-import * as userActions from '../../redux/actions/UserAction';
+// import * as userActions from '../../redux/actions/UserAction';
 import constants from '../../constants/Constants';
 
 class DashboardMiddle extends React.Component {
@@ -41,7 +41,7 @@ class DashboardMiddle extends React.Component {
   }
 
   componentDidMount = async () => {
-    await this.props.getUser(localStorage.getItem('user_id'));
+    // await this.props.getUser(localStorage.getItem('user_id'));
     this.getBalances(this.props.user._id);
     this.props.getUsers(this.props.user._id);
     this.getTotalTransactionByUser();
@@ -384,7 +384,7 @@ DashboardMiddle.propTypes = {
   getTransaction: PropTypes.func.isRequired,
   users: PropTypes.objectOf.isRequired,
   getUsers: PropTypes.func.isRequired,
-  getUser: PropTypes.func.isRequired,
+  // getUser: PropTypes.func.isRequired,
   groups: PropTypes.objectOf.isRequired,
 };
 const mapStatetoProps = (state) => {
@@ -399,7 +399,7 @@ const mapStatetoProps = (state) => {
 const mapDispatchToProps = {
   getTransaction: transactionActions.getTransaction,
   getUsers: userListAction.getUsers,
-  getUser: userActions.getUser,
+  // getUser: userActions.getUser,
 };
 // Export The Main Component
 export default connect(mapStatetoProps, mapDispatchToProps)(DashboardMiddle);

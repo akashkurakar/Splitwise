@@ -27,6 +27,7 @@ const initialState = rootreducer({}, {});
 
 const appReducer = (state, action) => {
   if (action.type === 'LOGOUT_USER') {
+    storage.removeItem('persist:root');
     Object.assign(state, initialState);
   }
 

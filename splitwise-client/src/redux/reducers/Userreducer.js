@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
+import storage from 'redux-persist/lib/storage';
 
 export default function userLogin(state = [], action) {
   switch (action.type) {
@@ -12,7 +13,7 @@ export default function userLogin(state = [], action) {
     case 'LOGIN_USER_FAILURE':
       return Object.assign(state, { ...action.payload });
     case 'SIGN_UP_SUCCESS':
-      return Object.assign((state, action.payload));
+      return Object.assign(...state, action.payload.data);
     case 'SIGN_UP_FAILURE':
       return Object.assign(...state, ...action.payload);
     case 'USER_PROFILE_SUCCESS':
@@ -22,6 +23,7 @@ export default function userLogin(state = [], action) {
     case 'USER_PROFILE_FAILURE':
       return Object.assign(...state, action.payload);
     case 'LOGOUT_USER':
+      storage.removeItem('persist:root');
       return (state = []);
     default:
       return state;

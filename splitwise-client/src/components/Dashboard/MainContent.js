@@ -38,7 +38,7 @@ class MainContent extends React.Component {
   }
 
   componentDidMount = async () => {
-    this.props.getUser(localStorage.getItem('user_id'));
+    // this.props.getUser(localStorage.getItem('user_id'));
     this.props.getTransaction(this.props.user._id);
     this.props.getGroups(this.props.user._id);
     this.getBalances(this.props.user._id);
@@ -123,7 +123,7 @@ MainContent.propTypes = {
   getTransaction: PropTypes.func.isRequired,
   getBalances: PropTypes.func.isRequired,
   getRecentActivitiesByUser: PropTypes.func.isRequired,
-  getUser: PropTypes.func.isRequired,
+  // getUser: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -134,7 +134,7 @@ const mapStatetoProps = (state) => {
 };
 const mapDispatchToProps = {
   loginUser: userActions.loginUser,
-  getUser: userActions.getUser,
+  // getUser: userActions.getUser,
   getGroups: groupsActions.getGroups,
   getGroupTransaction: transactionAction.getGroupTransaction,
   getTransaction: transactionAction.getGroupTransaction,

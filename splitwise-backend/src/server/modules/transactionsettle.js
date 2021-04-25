@@ -4,6 +4,8 @@ const Activity = require("../models/ActivityModel");
 
 async function handle_request(msg, callback) {
   try {
+    var json = {};
+    const activities = [];
     await Transaction.updateMany(
       {
         $or: [
@@ -22,18 +24,18 @@ async function handle_request(msg, callback) {
       }
     ).then((response, err) => {
       if (err) {
-        var json = {
+        json = {
           data: [],
           message: "Error while settling transactions!",
           success: false,
         };
         return callback(null, json);
       }
-      var json = {
+      json = {
         data: response,
         message: "Transaction Settled",
       };
-      const activities = [];
+
       const activity = new Activity();
       activity.activity_name = "msg settled";
       activity.grp_id = "";
@@ -45,10 +47,9 @@ async function handle_request(msg, callback) {
       activity.user_name = msg.user2;
       activity.description = `${msg.user1} settled up woth you`;
       activities.push(activity);
-      await Activity.insertMany(activities);
-      
-      return callback(null, json);
     });
+    await Activity.insertMany(activities);
+    return callback(null, json);
   } catch (e) {
     console.log(e);
     return callback("Error", "Something went wrong");

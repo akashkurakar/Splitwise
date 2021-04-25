@@ -63,6 +63,10 @@ class SelectGroup extends React.Component {
     }
   }
 
+  componentWillUnmount = () => {
+    this.props.getGroups(this.props.user._id);
+  };
+
   nameFieldChangeHandler = (e) => {
     e.preventDefault();
     document.getElementById('name').disabled = !document.getElementById('name').disabled;
@@ -392,6 +396,7 @@ SelectGroup.propTypes = {
   balances: PropTypes.objectOf.isRequired,
   users: PropTypes.func.isRequired,
   transactions: PropTypes.objectOf.isRequired,
+  getGroups: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {

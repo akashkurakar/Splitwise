@@ -62,11 +62,8 @@ class PaymentModal extends React.Component {
       user1: this.props.user._id,
       user2: this.props.users.filter((usr) => usr.name === this.state.user)[0]._id,
     };
-
+    this.handleClose(false);
     await this.props.settleExpense(data);
-    if (this.props.alert.message === 'Transaction Settled') {
-      this.handleClose(false);
-    }
 
     /* axios.defaults.withCredentials = true;
     axios.post(`${constants.baseUrl}/api/transactions/settle`, data).then((response) => {

@@ -8,10 +8,12 @@ import { logoutUser } from './UserAction';
 
 export const updateGroup = (group) => ({ type: 'USER_GROUP_UPDATE', group });
 
+export const clearAlert = () => async (dispatch) => dispatch({ type: 'ALERT_CLEAR', message: '' });
+
 export const getGroups = (userId) => async (dispatch) => {
   axios.defaults.headers.common.authorization = localStorage.getItem('token');
 
-  axios
+  await axios
     .get(`${constants.baseUrl}/api/groups/?id=${userId}`)
     .then((res) => {
       if (res.status === 200) {

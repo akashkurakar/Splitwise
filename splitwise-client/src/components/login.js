@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Typography } from '@material-ui/core';
+import * as groupsActions from '../redux/actions/GroupsActions';
 import * as userActions from '../redux/actions/UserAction';
 import Header from '../header';
 
@@ -23,6 +24,10 @@ class Login extends React.Component {
       window.location.href = './dashboard';
     } */
   }
+
+  componentWillUnmount = () => {
+    this.props.getGroups(this.props.user._id);
+  };
 
   emailChangeHandler = (e) => {
     e.preventDefault();
@@ -141,6 +146,8 @@ class Login extends React.Component {
 Login.propTypes = {
   alert: PropTypes.func.isRequired,
   loginUser: PropTypes.func.isRequired,
+  getGroups: PropTypes.func.isRequired,
+  user: PropTypes.objectOf.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -151,6 +158,7 @@ const mapStatetoProps = (state) => {
 };
 const mapDispatchToProps = {
   loginUser: userActions.loginUser,
+  getGroups: groupsActions.getGroups,
 };
 
 export default connect(mapStatetoProps, mapDispatchToProps)(Login);

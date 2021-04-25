@@ -39,10 +39,10 @@ class MainContent extends React.Component {
 
   componentDidMount = async () => {
     // this.props.getUser(localStorage.getItem('user_id'));
-    this.props.getTransaction(this.props.user._id);
-    this.props.getGroups(this.props.user._id);
-    this.getBalances(this.props.user._id);
-    this.props.getRecentActivitiesByUser(this.props.user._id, 0, 2);
+    await this.props.getTransaction(this.props.user._id);
+    await this.props.getGroups(this.props.user._id);
+    await this.getBalances(this.props.user._id);
+    await this.props.getRecentActivitiesByUser(this.props.user._id, 0, 2);
 
     // this.props.getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows);
   };

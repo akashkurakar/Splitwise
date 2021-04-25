@@ -14,8 +14,8 @@ import constants from '../../constants/Constants';
 import UserHeader from '../Dashboard/UserHeader';
 
 class CreateGroup extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       grpName: '',
       members: [{ name: '', email: '' }],
@@ -26,7 +26,7 @@ class CreateGroup extends React.Component {
     };
   }
 
-  componentDidMounta = async () => {
+  componentDidMount = async () => {
     this.setState({
       user: this.props.user,
     });

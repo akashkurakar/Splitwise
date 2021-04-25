@@ -18,6 +18,7 @@ async function handle_request(msg, callback) {
           };
           return callback("Error", json);
         }
+
         var json = {
           data: user,
           message: "User update successfull",

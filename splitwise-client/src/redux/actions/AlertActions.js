@@ -6,7 +6,7 @@ function error(message) {
   return { type: 'ALERT_ERROR', message };
 }
 
-function clear() {
+export function clear() {
   return { type: 'ALERT_CLEAR' };
 }
 const alertActions = {

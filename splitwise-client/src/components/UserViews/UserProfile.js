@@ -40,6 +40,10 @@ class UserProfile extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    this.props.clearAlert();
+  }
+
   onFileChange = (event) => {
     // Update the state
     this.setState({ selectedFile: event }, () => {
@@ -321,6 +325,7 @@ UserProfile.propTypes = {
   user: PropTypes.objectOf.isRequired,
   updateUserProfile: PropTypes.func.isRequired,
   getUser: PropTypes.func.isRequired,
+  clearAlert: PropTypes.func.isRequired,
 };
 const mapStatetoProps = (state) => {
   return {
@@ -331,5 +336,6 @@ const mapStatetoProps = (state) => {
 const mapDispatchToProps = {
   updateUserProfile: userActions.updateUserProfile,
   getUser: userActions.getUser,
+  clearAlert: userActions.clearAlert,
 };
 export default connect(mapStatetoProps, mapDispatchToProps)(UserProfile);

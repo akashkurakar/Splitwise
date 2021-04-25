@@ -19,12 +19,13 @@ export function userProfileSuccess(user) {
 export function clearAlert() {
   return { type: 'ALERT_CLEAR', message: '' };
 }
+
 export const logoutUser = () => async (dispatch) => {
-  clearAlert();
   storage.removeItem('persist:root');
   dispatch({ type: 'ALERT_CLEAR', message: '' });
   dispatch({ type: 'LOGOUT_USER', data: '' });
   localStorage.removeItem('token');
+  clearAlert();
   history.push('/login');
 };
 
@@ -34,6 +35,7 @@ export const loginUser = (user) => async (dispatch) => {
     .then((res) => {
       try {
         const decoded = jwt_decode(res.data.token.split(' ')[1], { payload: true });
+        localStorage.setItem('user_id', decoded.user_id);
         if (decoded) {
           localStorage.setItem('token', res.data.token);
           dispatch({ type: 'LOGIN_USER_SUCCESS', payload: res.data.data });

@@ -31,20 +31,21 @@ class MainContent extends React.Component {
       transactions: [],
       balances: [],
     };
-    this.props.getGroups(this.props.user._id);
     this.handleCallback = this.handleCallback.bind(this);
     if (localStorage.getItem('token') === null) {
       window.location.href = './login';
     }
   }
 
-  componentDidMount() {
+  componentDidMount = async () => {
+    this.props.getUser(localStorage.getItem('user_id'));
     this.props.getTransaction(this.props.user._id);
     this.props.getGroups(this.props.user._id);
     this.getBalances(this.props.user._id);
-    this.props.getRecentActivitiesByUser(this.props.user._id, 1, 10);
+    this.props.getRecentActivitiesByUser(this.props.user._id, 0, 2);
+
     // this.props.getRecentActivitiesByUser(this.props.user._id, this.state.page, this.state.rows);
-  }
+  };
 
   handleCallback = (childData) => {
     this.setState({ step: childData });
@@ -122,6 +123,7 @@ MainContent.propTypes = {
   getTransaction: PropTypes.func.isRequired,
   getBalances: PropTypes.func.isRequired,
   getRecentActivitiesByUser: PropTypes.func.isRequired,
+  getUser: PropTypes.func.isRequired,
 };
 
 const mapStatetoProps = (state) => {
@@ -132,6 +134,7 @@ const mapStatetoProps = (state) => {
 };
 const mapDispatchToProps = {
   loginUser: userActions.loginUser,
+  getUser: userActions.getUser,
   getGroups: groupsActions.getGroups,
   getGroupTransaction: transactionAction.getGroupTransaction,
   getTransaction: transactionAction.getGroupTransaction,

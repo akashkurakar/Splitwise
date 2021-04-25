@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-boolean-value */
 import './App.css';
 import React from 'react';
-import { Router, Route } from 'react-router-dom';
+import { Route, Router } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 
 import { Provider } from 'react-redux';
@@ -21,9 +21,10 @@ import Footer from './footer';
 
 const App = () => (
   // eslint-disable-next-line react/jsx-filename-extension
-  <Router history={history}>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
+
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <Router history={history}>
         {' '}
         <Container fluid>
           <Route path="/login" component={Login} />
@@ -36,9 +37,9 @@ const App = () => (
           <Route path="/selectgroup" component={SelectGroup} />
         </Container>
         <Footer />
-      </PersistGate>
-    </Provider>
-  </Router>
+      </Router>
+    </PersistGate>
+  </Provider>
 );
 
 export default App;

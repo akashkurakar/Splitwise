@@ -26,11 +26,11 @@ class CreateGroup extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMounta = async () => {
     this.setState({
       user: this.props.user,
     });
-  }
+  };
 
   onFileChange = (event) => {
     // Update the state

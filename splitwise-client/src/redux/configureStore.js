@@ -17,13 +17,7 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootreducer);
 
-export const store = createStore(
-  persistedReducer,
-  compose(
-    applyMiddleware(thunk, logger),
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__({ latency: 0 })
-  )
-);
+export const store = createStore(persistedReducer, compose(applyMiddleware(thunk, logger)));
 
 export const persistor = persistStore(store);
 

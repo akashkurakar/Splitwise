@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/no-did-update-set-state */
 /* eslint-disable arrow-body-style */
 import React from 'react';
@@ -16,17 +17,25 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as commentActions from '../../redux/actions/CommentAction';
 import { convertDate } from '../../constants/CommonService';
+import DeleteComment from './DeleteComment';
 
 class CommentBox extends React.Component {
   constructor() {
     super();
     this.state = {
       comment: '',
+      show: false,
+      index: '',
     };
   }
 
   componentDidMount = () => {
     this.getComments();
+  };
+
+  handleCommentModal = (e, index) => {
+    const { show } = this.state;
+    this.setState({ show: !show, index });
   };
 
   handleComment = (e) => {
@@ -80,10 +89,12 @@ class CommentBox extends React.Component {
                     secondary={c.comment}
                   />
 
-                  <CloseIcon
-                    style={{ fontSize: 15, color: 'red' }}
-                    onClick={(event) => this.removeComments(event, c._id)}
-                  />
+                  {this.props.user._id === c.comment_by && (
+                    <CloseIcon
+                      style={{ fontSize: 15, color: 'red' }}
+                      onClick={(event) => this.handleCommentModal(event, c._id)}
+                    />
+                  )}
 
                   <Divider />
                 </ListItem>
@@ -120,6 +131,13 @@ class CommentBox extends React.Component {
             </div>
           </form>
         </Col>
+        {this.state.show && (
+          <DeleteComment
+            show={this.handleCommentModal}
+            transaction={this.props.transaction}
+            index={this.state.index}
+          />
+        )}
       </>
     );
   }

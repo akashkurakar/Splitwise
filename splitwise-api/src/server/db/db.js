@@ -9,7 +9,7 @@ const mysql = require("mysql");
 const con = mysql.createConnection({
   host: "splitwise-master.c47djnvlu0si.us-east-1.rds.amazonaws.com",
   user: "admin",
-  password: "4Mm76iLus8JcgOuB6yYt",
+  password: "",
   port: "3306",
 });
 
